@@ -1,0 +1,73 @@
+SPATIAL FEATURE VALIDATION REPORT
+============================================================
+
+DATASET DIMENSIONS
+------------------------------
+Total rows: 241,780
+Total columns: 37
+Date range: 2019-12-30 00:00:00 to 2025-12-29 00:00:00
+Number of community areas: 77
+Number of complaint types: 10
+Number of unique weeks: 314
+
+NEW FEATURES
+------------------------------
+  ward
+  total_complaints_all_types_last_1_week
+  total_complaints_all_types_last_4_weeks
+  total_complaints_all_types_last_8_weeks
+  total_complaints_all_types_last_12_weeks
+  distinct_complaint_types_last_4_weeks
+  distinct_complaint_types_last_8_weeks
+  distinct_complaint_types_last_12_weeks
+
+MISSING VALUE COUNTS
+------------------------------
+  ward: 0 (0.00%)
+  total_complaints_all_types_last_1_week: 770 (0.32%)
+  total_complaints_all_types_last_4_weeks: 3,080 (1.27%)
+  total_complaints_all_types_last_8_weeks: 6,160 (2.55%)
+  total_complaints_all_types_last_12_weeks: 9,240 (3.82%)
+  distinct_complaint_types_last_4_weeks: 0 (0.00%)
+  distinct_complaint_types_last_8_weeks: 0 (0.00%)
+  distinct_complaint_types_last_12_weeks: 0 (0.00%)
+
+LEAKAGE TEST RESULT
+------------------------------
+  PASS: No leakage detected
+  All spatial features verified to use only previous-week data.
+  Shifted by 1 week before rolling window calculation.
+
+MANUAL SPOT CHECK
+------------------------------
+  Test communities: [1, 10, 50]
+  Test week: 2021-06-07 00:00:00
+  Verified: total_complaints_all_types_last_1_week, _4_weeks, _8_weeks, _12_weeks
+  Verified: distinct_complaint_types_last_4_weeks, _8_weeks, _12_weeks
+  Result: PASS - all manual calculations match feature values
+
+DUPLICATE KEY RESULT
+------------------------------
+  PASS: community_area + week_start + sr_type is unique
+
+TEMPORAL COVERAGE
+------------------------------
+  2019: 770 rows, 1 weeks
+  2020: 40,040 rows, 52 weeks
+  2021: 40,040 rows, 52 weeks
+  2022: 40,040 rows, 52 weeks
+  2023: 40,040 rows, 52 weeks
+  2024: 40,810 rows, 53 weeks
+  2025: 40,040 rows, 52 weeks
+
+SPATIAL COVERAGE
+------------------------------
+  Community areas: 77 (1-77)
+  Wards: 28 (1-50), mapped via most common ward per community_area
+  Missing ward: 0 rows
+
+WARD MAPPING NOTE
+------------------------------
+  Ward is not a direct function of community_area (many-to-many).
+  Used most common ward per community_area across all years 2020-2025.
+  Missing ward preserved as NaN where community_area had no ward data.

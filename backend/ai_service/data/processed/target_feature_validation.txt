@@ -1,0 +1,68 @@
+TARGET FEATURE VALIDATION REPORT
+============================================================
+
+A. DATASET DIMENSIONS
+------------------------------
+Total rows: 241,780
+Total columns: 39
+Date range: 2019-12-30 00:00:00 to 2025-12-29 00:00:00
+Number of community areas: 77
+Number of complaint types: 10
+Number of unique weeks: 314
+
+B. POSITIVE/NEGATIVE TARGET DISTRIBUTION
+------------------------------
+Total rows with target: 241,010
+Positive (future_complaint=1): 216,130 (89.98%)
+Negative (future_complaint=0): 24,880 (10.02%)
+Rows without target (final week): 770
+
+C. TARGET DISTRIBUTION BY COMPLAINT TYPE
+------------------------------
+  Abandoned Vehicle Complaint: 22,942/24,101 (95.19%)
+  Blue Recycling Cart: 21,128/24,101 (87.66%)
+  Building Violation: 21,104/24,101 (87.56%)
+  Garbage Cart Maintenance: 23,086/24,101 (95.79%)
+  Graffiti Removal Request: 20,350/24,101 (84.44%)
+  Pothole in Street Complaint: 22,655/24,101 (94.00%)
+  Rodent Baiting/Rat Complaint: 22,071/24,101 (91.58%)
+  Street Light Out Complaint: 22,720/24,101 (94.27%)
+  Traffic Signal Out Complaint: 20,889/24,101 (86.67%)
+  Tree Debris Clean-Up Request: 19,185/24,101 (79.60%)
+
+D. TARGET DISTRIBUTION BY YEAR
+------------------------------
+  2019: 668/770 (86.75%)
+  2020: 35,588/40,040 (88.88%)
+  2021: 35,738/40,040 (89.26%)
+  2022: 35,805/40,040 (89.42%)
+  2023: 36,091/40,040 (90.14%)
+  2024: 36,904/40,810 (90.43%)
+  2025: 35,336/39,270 (89.98%)
+
+E. FINAL WEEK HANDLING
+------------------------------
+Last week in dataset: 2025-12-29 00:00:00
+Rows in last week: 770
+Target set to NaN for last week (no future data available)
+Decision: Removed final week from modeling by setting target=NaN
+
+F. DUPLICATE KEY VALIDATION
+------------------------------
+Duplicate community_area + week_start + sr_type: 0
+Result: PASS
+
+G. TARGET CORRECTNESS VALIDATION
+------------------------------
+future_complaint=1 only when future_complaint_count>=1: PASS
+future_complaint=0 only when future_complaint_count==0: PASS
+Manual verification (10 random rows): PASS
+
+H. LEAKAGE VALIDATION
+------------------------------
+Future target uses ONLY next week (week+7 days): PASS
+No historical features modified - all lag/rolling/seasonal/spatial features unchanged
+
+I. OUTPUT FILE
+------------------------------
+  data\processed\target_features.csv

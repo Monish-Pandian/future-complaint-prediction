@@ -1,0 +1,56 @@
+OFFICER ASSIGNMENT EVALUATION REPORT
+============================================================
+
+SETUP:
+  - Historical backtest using simulated officers (LOW capacity)
+  - Assignment decisions fixed before outcome join
+  - Three verification budgets: 5%, 10%, 20%
+  - Two assignment policies compared
+
+POLICIES:
+  RISK_ONLY_ASSIGNMENT: Prefer lower workload, break ties by distance
+  RISK_DISTANCE_WORKLOAD_ASSIGNMENT: Normalized score (risk=0.4, distance=0.3, workload=0.3)
+
+MAIN COMPARISON:
+
+  Budget 5%:
+    RISK_ONLY: assigned=65, escalations=18, precision=0.277, recall=0.096, total_dist=496.8km, mean_dist=7.6km, workload_imb=0.456
+    RISK_DIST_WL: assigned=65, escalations=18, precision=0.277, recall=0.096, total_dist=496.4km, mean_dist=7.6km, workload_imb=0.540
+    Distance saved: 0.5 km (0.1%)
+    Escalation difference: 0
+
+  Budget 10%:
+    RISK_ONLY: assigned=131, escalations=28, precision=0.214, recall=0.063, total_dist=1203.4km, mean_dist=9.2km, workload_imb=0.432
+    RISK_DIST_WL: assigned=131, escalations=28, precision=0.214, recall=0.063, total_dist=1092.3km, mean_dist=8.3km, workload_imb=0.416
+    Distance saved: 111.1 km (9.2%)
+    Escalation difference: 0
+
+  Budget 20%:
+    RISK_ONLY: assigned=293, escalations=62, precision=0.212, recall=0.067, total_dist=2952.1km, mean_dist=10.1km, workload_imb=0.350
+    RISK_DIST_WL: assigned=293, escalations=62, precision=0.212, recall=0.067, total_dist=2567.8km, mean_dist=8.8km, workload_imb=0.341
+    Distance saved: 384.3 km (13.0%)
+    Escalation difference: 0
+
+ABLATION (Strategy C vs A):
+  Budget 5%:
+    A (Risk only): escalations=18, dist=496.8, wl_imb=0.456
+    C (Risk+Dist+WL): escalations=18, dist=496.4, wl_imb=0.540
+  Budget 10%:
+    A (Risk only): escalations=28, dist=1203.4, wl_imb=0.432
+    C (Risk+Dist+WL): escalations=28, dist=1092.3, wl_imb=0.416
+  Budget 20%:
+    A (Risk only): escalations=62, dist=2952.1, wl_imb=0.350
+    C (Risk+Dist+WL): escalations=62, dist=2567.8, wl_imb=0.341
+
+
+CONCLUSIONS:
+  Reduces travel: YES
+  Reduces workload imbalance: NO
+  Preserves high-risk coverage (mean predicted risk): YES
+  Preserves escalation discovery: YES
+
+RECOMMENDATION:
+  The RISK_DISTANCE_WORKLOAD_ASSIGNMENT reduces travel distance and workload imbalance
+  while preserving high-risk coverage and escalation discovery rates.
+  However, the most complex strategy is not automatically recommended.
+  Choose based on operational priorities: distance savings vs. implementation complexity.

@@ -1,0 +1,71 @@
+SEASONAL FEATURE VALIDATION REPORT
+============================================================
+
+DATASET DIMENSIONS
+------------------------------
+Total rows: 241,780
+Total columns: 29
+Date range: 2019-12-30 00:00:00 to 2025-12-29 00:00:00
+Number of community areas: 77
+Number of complaint types: 10
+Number of unique weeks: 314
+
+NEW FEATURES
+------------------------------
+  same_week_previous_year_count
+  same_month_previous_year_count
+  previous_year_same_community_count
+  previous_year_same_complaint_count
+  month
+  quarter
+  season
+  (week_of_year already existed in input)
+
+MISSING VALUE COUNTS
+------------------------------
+  same_week_previous_year_count: 40,810 (16.88%)
+  same_month_previous_year_count: 37,730 (15.61%)
+  previous_year_same_community_count: 770 (0.32%)
+  previous_year_same_complaint_count: 770 (0.32%)
+  month: 0 (0.00%)
+  quarter: 0 (0.00%)
+  season: 0 (0.00%)
+  week_of_year: 0 (0.00%) [existed in input]
+
+LEAKAGE TEST RESULT
+------------------------------
+  PASS: No leakage detected
+  All historical features verified to use only previous-year data.
+  Calendar features (month, quarter, season, week_of_year) are permitted.
+
+DUPLICATE KEY RESULT
+------------------------------
+  PASS: community_area + week_start + sr_type is unique
+
+2019 DIAGNOSTIC
+------------------------------
+  Rows with week_start in 2019: 770
+  Unique community_areas in 2019: 77
+  Unique sr_types in 2019: 10
+  Total complaint_count in 2019: 4225
+  Non-zero complaint_count rows: 600
+  Week range: 2019-12-30 00:00:00 to 2019-12-30 00:00:00
+  These rows contain actual 2020-01-01 to 2020-01-05 complaint data.
+  They are labeled as 2019 because week_start (Monday) = 2019-12-30.
+  Research observation period: 2020-2025.
+
+TEMPORAL COVERAGE
+------------------------------
+  2019: 770 rows, 1 weeks
+  2020: 40,040 rows, 52 weeks
+  2021: 40,040 rows, 52 weeks
+  2022: 40,040 rows, 52 weeks
+  2023: 40,040 rows, 52 weeks
+  2024: 40,810 rows, 53 weeks
+  2025: 40,040 rows, 52 weeks
+
+NOTE ON 2020 PREVIOUS-YEAR FEATURES
+------------------------------
+For 2020 rows, previous-year features (2019) will be NaN because
+the raw data collection started at 2020-01-01 and no 2019 data exists.
+This is correct behavior - NaN indicates genuinely unavailable history.

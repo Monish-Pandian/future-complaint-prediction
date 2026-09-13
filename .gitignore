@@ -1,0 +1,179 @@
+# ==============================================================================
+# Future Complaint Prediction - .gitignore
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Dependencies
+# ------------------------------------------------------------------------------
+node_modules/
+*/node_modules/
+package-lock.json
+!frontend/package-lock.json
+!backend/package-lock.json
+
+# ------------------------------------------------------------------------------
+# Environment variables & secrets (NEVER COMMIT CREDENTIALS)
+# ------------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+!.env.*.example
+backend/.env
+backend/.env.test
+frontend/.env
+
+# ------------------------------------------------------------------------------
+# Python & Virtual Environments
+# ------------------------------------------------------------------------------
+__pycache__/
+*/__pycache__/
+*/**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+
+# ------------------------------------------------------------------------------
+# Build outputs
+# ------------------------------------------------------------------------------
+frontend/dist/
+frontend/dist-ssr/
+backend/dist/
+backend/build/
+
+# ------------------------------------------------------------------------------
+# IDE, OS & Editor files
+# ------------------------------------------------------------------------------
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# ------------------------------------------------------------------------------
+# AI Agent, OpenCode & Antigravity session & temporary artifacts
+# ------------------------------------------------------------------------------
+.agents/
+.gemini/
+session-*.md
+**/session-*.md
+MODULE*.md
+MODULE_*.md
+module_*.md
+module_*.json
+**/MODULE*.md
+**/MODULE_*.md
+**/module_*.md
+**/module_*.json
+
+# Scratch & one-off validation/audit scripts
+api_test*.js
+audit_db*.js
+check_*.js
+check_*.py
+clean_orphans.js
+db_audit*.js
+db_check*.js
+final_check*.js
+final_db_check*.js
+final_verify*.js
+final_verify.py
+fix_*.js
+login_test.js
+smoke_test_*.js
+test_login.py
+test_multiple_weeks.py
+test_predict.py
+test_predictions.py
+test_training.js
+test_verify.py
+validate_api.py
+validate_restoration.js
+run_validation.js
+run_ablation.py
+map_officers_to_centroids.js
+get_admin_user.js
+init_users.js
+*restoration_counts.json
+current_db_audit.json
+
+# Backend root one-off scratch scripts
+backend/api_test*.js
+backend/audit_*.js
+backend/check_*.js
+backend/clean_orphans.js
+backend/final_*.js
+backend/fix_*.js
+backend/get_admin_user.js
+backend/init_users.js
+backend/login_test.js
+backend/map_officers_to_centroids.js
+backend/smoke_test_*.js
+backend/test_*.js
+backend/validate_restoration.js
+backend/run_validation.js
+backend/*restoration_counts.json
+backend/current_db_audit.json
+
+# ------------------------------------------------------------------------------
+# Large Datasets & ML Model Checkpoints
+# (Download Chicago 311 data via backend/ai_service/download_chicago_311.py)
+# ------------------------------------------------------------------------------
+backend/ai_service/data/raw/*.csv
+backend/ai_service/data/raw/*.txt
+backend/ai_service/data/processed/*.json
+backend/ai_service/data/processed/base_dataset.csv
+backend/ai_service/data/processed/final_research_dataset.csv
+backend/ai_service/data/processed/target_features.csv
+backend/ai_service/data/processed/spatial_features.csv
+backend/ai_service/data/processed/seasonal_features.csv
+backend/ai_service/data/processed/rolling_features.csv
+backend/ai_service/data/processed/lag_features.csv
+backend/ai_service/data/processed/weekly_community_area_counts.csv
+backend/ai_service/data/predict_input.json
+backend/ai_service/data/models/*.pkl
+
+# Large simulation decision/candidate tables (>1MB)
+backend/ai_service/data/results/exploration_ablation_decisions.csv
+backend/ai_service/data/results/officer_assignment_decisions.csv
+backend/ai_service/data/results/test_predictions_xgboost.csv
+backend/ai_service/data/results/verification_decisions.csv
+backend/ai_service/data/results/officer_assignment_candidates.csv
+backend/ai_service/data/results/simulated_officers.csv
+backend/ai_service/data/results/verification_cumulative_results.csv
+backend/ai_service/data/results/exploration_ablation_cumulative.csv
+backend/ai_service/data/results/exploration_ablation_weekly.csv
+backend/ai_service/data/results/officer_assignment_weekly.csv
+backend/ai_service/data/results/verification_weekly_results.csv
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*

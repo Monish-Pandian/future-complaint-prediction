@@ -1,0 +1,726 @@
+================================================================================
+HISTORICAL DATASET AUDIT - CHICAGO 311 SERVICE REQUESTS 2020-2025
+================================================================================
+
+PER-YEAR STATISTICS
+--------------------------------------------------------------------------------
+
+YEAR: 2020
+  Records: 2,038,034
+  Date Range: 2020-01-01 00:00:15 to 2020-12-31 23:59:28
+  Unique SR Numbers: 2,038,034
+  Duplicate SR Numbers: 0
+  Unique SR Types: 104
+  Unique Departments: 15
+  Missing Latitude: 0.11%
+  Missing Longitude: 0.11%
+  Missing Ward: 0.14%
+  Missing Community Area: 0.15%
+  Missing Zip Code: 0.3%
+  Status Distribution: {'Completed': 2009539, 'Canceled': 17760, 'Open': 10735}
+  Top 30 SR Types:
+    311 INFORMATION ONLY CALL: 858475
+    Aircraft Noise Complaint: 258734
+    Graffiti Removal Request: 110685
+    Street Light Out Complaint: 72481
+    Garbage Cart Maintenance: 57769
+    Rodent Baiting/Rat Complaint: 54068
+    Weed Removal Request: 53532
+    Pothole in Street Complaint: 39967
+    Tree Trim Request (NO LONGER BEING ACCEPTED): 38034
+    Tree Debris Clean-Up Request: 34209
+    Abandoned Vehicle Complaint: 33089
+    Sign Repair Request - All Other Signs: 32093
+    Tree Emergency: 25453
+    Traffic Signal Out Complaint: 21525
+    Blue Recycling Cart: 21296
+    Building Violation: 18372
+    Alley Light Out Complaint: 17148
+    Tree Removal Inspection: 16046
+    Sanitation Code Violation: 14965
+    Business Complaints: 13439
+    Dead Animal Pick-Up Request: 12376
+    Sewer Cleaning Inspection Request: 12122
+    Fly Dumping Complaint: 10841
+    Yard Waste Pick-Up Request: 10035
+    Recycling Pick Up: 9650
+    Stray Animal Complaint: 9470
+    Check for Leak: 9023
+    Water On Street Complaint: 8650
+    Alley Pothole Complaint: 8647
+    Report an Injured Animal: 8366
+
+YEAR: 2021
+  Records: 1,831,871
+  Date Range: 2021-01-01 00:00:09 to 2021-12-31 23:57:32
+  Unique SR Numbers: 1,831,871
+  Duplicate SR Numbers: 0
+  Unique SR Types: 104
+  Unique Departments: 14
+  Missing Latitude: 0.09%
+  Missing Longitude: 0.09%
+  Missing Ward: 0.13%
+  Missing Community Area: 0.14%
+  Missing Zip Code: 0.22%
+  Status Distribution: {'Completed': 1807312, 'Canceled': 15140, 'Open': 9419}
+  Top 30 SR Types:
+    311 INFORMATION ONLY CALL: 656348
+    Aircraft Noise Complaint: 317127
+    Graffiti Removal Request: 93720
+    Rodent Baiting/Rat Complaint: 65897
+    Garbage Cart Maintenance: 54919
+    Street Light Out Complaint: 48420
+    Abandoned Vehicle Complaint: 43363
+    Pothole in Street Complaint: 38557
+    Tree Trim Request (NO LONGER BEING ACCEPTED): 32986
+    Weed Removal Request: 29174
+    Sign Repair Request - All Other Signs: 27208
+    Tree Debris Clean-Up Request: 23950
+    Traffic Signal Out Complaint: 21399
+    Building Violation: 21348
+    Blue Recycling Cart: 20903
+    Ice and Snow Removal Request: 19306
+    Sanitation Code Violation: 18453
+    Tree Emergency: 17063
+    Tree Removal Inspection: 16044
+    Dead Animal Pick-Up Request: 12951
+    Water Lead Test Kit Request: 11616
+    Fly Dumping Complaint: 11304
+    Missed Garbage Pick-Up Complaint: 11236
+    Recycling Pick Up: 10441
+    Check for Leak: 9878
+    Yard Waste Pick-Up Request: 9874
+    Stray Animal Complaint: 9099
+    Sewer Cleaning Inspection Request: 8386
+    Alley Light Out Complaint: 8307
+    Sidewalk Inspection Request: 7881
+
+YEAR: 2022
+  Records: 1,783,858
+  Date Range: 2022-01-01 00:00:24 to 2022-12-31 23:52:19
+  Unique SR Numbers: 1,783,858
+  Duplicate SR Numbers: 0
+  Unique SR Types: 105
+  Unique Departments: 14
+  Missing Latitude: 0.07%
+  Missing Longitude: 0.07%
+  Missing Ward: 0.11%
+  Missing Community Area: 0.11%
+  Missing Zip Code: 5.24%
+  Status Distribution: {'Completed': 1756915, 'Canceled': 19873, 'Open': 7070}
+  Top 30 SR Types:
+    311 INFORMATION ONLY CALL: 633431
+    Aircraft Noise Complaint: 325772
+    Graffiti Removal Request: 91664
+    Pothole in Street Complaint: 64138
+    Rodent Baiting/Rat Complaint: 50201
+    Street Light Out Complaint: 48538
+    Abandoned Vehicle Complaint: 44859
+    Garbage Cart Maintenance: 44622
+    Tree Trim Request (NO LONGER BEING ACCEPTED): 27956
+    Tree Debris Clean-Up Request: 24289
+    Traffic Signal Out Complaint: 24177
+    Building Violation: 21517
+    Blue Recycling Cart: 16800
+    Tree Removal Inspection: 15993
+    Tree Planting Request: 15694
+    Sign Repair Request - All Other Signs: 14630
+    Tree Emergency: 14077
+    Sanitation Code Violation: 14066
+    Dead Animal Pick-Up Request: 12749
+    Fly Dumping Complaint: 11734
+    Stray Animal Complaint: 11388
+    Yard Waste Pick-Up Request: 10881
+    Ice and Snow Removal Request: 10688
+    Alley Pothole Complaint: 10357
+    Check for Leak: 10352
+    Weed Removal Request: 9843
+    Sewer Cleaning Inspection Request: 8920
+    Buildings - Plumbing Violation: 8246
+    Water On Street Complaint: 8212
+    Water Lead Test Kit Request: 8098
+
+YEAR: 2023
+  Records: 1,781,009
+  Date Range: 2023-01-01 00:01:17 to 2023-12-31 23:58:01
+  Unique SR Numbers: 1,781,009
+  Duplicate SR Numbers: 0
+  Unique SR Types: 105
+  Unique Departments: 14
+  Missing Latitude: 0.04%
+  Missing Longitude: 0.04%
+  Missing Ward: 0.07%
+  Missing Community Area: 0.07%
+  Missing Zip Code: 19.54%
+  Status Distribution: {'Completed': 1743259, 'Canceled': 25474, 'Open': 12275, 'Closed': 1}
+  Top 30 SR Types:
+    311 INFORMATION ONLY CALL: 659021
+    Aircraft Noise Complaint: 308218
+    Graffiti Removal Request: 85835
+    Pothole in Street Complaint: 49066
+    Rodent Baiting/Rat Complaint: 48647
+    Garbage Cart Maintenance: 47187
+    Abandoned Vehicle Complaint: 44953
+    Tree Trim Request (NO LONGER BEING ACCEPTED): 40962
+    Street Light Out Complaint: 37690
+    Building Violation: 27701
+    Traffic Signal Out Complaint: 23595
+    Tree Debris Clean-Up Request: 22923
+    Tree Planting Request: 22233
+    Blue Recycling Cart: 18612
+    Tree Removal Inspection: 18491
+    Water in Basement Complaint: 17450
+    Dead Animal Pick-Up Request: 14228
+    Yard Waste Pick-Up Request: 13339
+    Tree Emergency: 13291
+    Sanitation Code Violation: 13111
+    Stray Animal Complaint: 12762
+    Sign Repair Request - All Other Signs: 12262
+    Fly Dumping Complaint: 12050
+    Sewer Cleaning Inspection Request: 10491
+    Alley Pothole Complaint: 10181
+    Water On Street Complaint: 10144
+    Sidewalk Inspection Request: 9064
+    Water Lead Test Kit Request: 9037
+    Check for Leak: 8741
+    Report an Injured Animal: 8191
+
+YEAR: 2024
+  Records: 1,913,929
+  Date Range: 2024-01-01 00:00:12 to 2024-12-31 23:59:43
+  Unique SR Numbers: 1,913,929
+  Duplicate SR Numbers: 0
+  Unique SR Types: 107
+  Unique Departments: 14
+  Missing Latitude: 0.06%
+  Missing Longitude: 0.06%
+  Missing Ward: 0.09%
+  Missing Community Area: 0.09%
+  Missing Zip Code: 11.02%
+  Status Distribution: {'Completed': 1848913, 'Canceled': 39504, 'Open': 25512}
+  Top 30 SR Types:
+    311 INFORMATION ONLY CALL: 685581
+    Aircraft Noise Complaint: 343797
+    Graffiti Removal Request: 99366
+    Pothole in Street Complaint: 51243
+    Abandoned Vehicle Complaint: 49988
+    Garbage Cart Maintenance: 49121
+    Rodent Baiting/Rat Complaint: 45732
+    Tree Trim Request (NO LONGER BEING ACCEPTED): 42834
+    Street Light Out Complaint: 39171
+    Tree Debris Clean-Up Request: 33951
+    Tree Emergency: 28287
+    Traffic Signal Out Complaint: 26354
+    Tree Removal Inspection: 20690
+    Building Violation: 20600
+    Blue Recycling Cart: 20201
+    Tree Planting Request: 17710
+    Sign Repair Request - All Other Signs: 16887
+    Dead Animal Pick-Up Request: 16564
+    Yard Waste Pick-Up Request: 15033
+    Water Lead Test Kit Request: 14533
+    Sanitation Code Violation: 13602
+    Stray Animal Complaint: 12952
+    Fly Dumping Complaint: 12307
+    Water On Street Complaint: 11648
+    Finance Parking Code Enforcement Review: 11137
+    Sidewalk Inspection Request: 10447
+    Sewer Cleaning Inspection Request: 10095
+    Report an Injured Animal: 9823
+    Check for Leak: 9694
+    Alley Pothole Complaint: 9674
+
+YEAR: 2025
+  Records: 1,960,595
+  Date Range: 2025-01-01 00:01:27 to 2025-12-31 23:59:32
+  Unique SR Numbers: 1,960,595
+  Duplicate SR Numbers: 0
+  Unique SR Types: 105
+  Unique Departments: 14
+  Missing Latitude: 0.06%
+  Missing Longitude: 0.06%
+  Missing Ward: 0.1%
+  Missing Community Area: 0.1%
+  Missing Zip Code: 12.01%
+  Status Distribution: {'Completed': 1890253, 'Open': 36615, 'Canceled': 33727}
+  Top 30 SR Types:
+    311 INFORMATION ONLY CALL: 691302
+    Aircraft Noise Complaint: 364926
+    Graffiti Removal Request: 94893
+    Abandoned Vehicle Complaint: 52937
+    Garbage Cart Maintenance: 50160
+    Pothole in Street Complaint: 44729
+    Rodent Baiting/Rat Complaint: 44181
+    Tree Trim Request (NO LONGER BEING ACCEPTED): 42858
+    Street Light Out Complaint: 35939
+    Traffic Signal Out Complaint: 28525
+    Tree Debris Clean-Up Request: 28098
+    Tree Emergency: 26514
+    Blue Recycling Cart: 21782
+    Finance Parking Code Enforcement Review: 20377
+    Building Violation: 19972
+    Water in Basement Complaint: 19279
+    Tree Removal Inspection: 19198
+    Dead Animal Pick-Up Request: 16860
+    Yard Waste Pick-Up Request: 16465
+    Water Lead Test Kit Request: 16360
+    Fly Dumping Complaint: 15402
+    Sanitation Code Violation: 14492
+    Stray Animal Complaint: 13376
+    Sign Repair Request - All Other Signs: 13303
+    Check for Leak: 11494
+    Tree Planting Request: 11357
+    Water On Street Complaint: 10983
+    Snow – Uncleared Sidewalk Complaint: 9667
+    Report an Injured Animal: 9456
+    Missed Garbage Pick-Up Complaint: 9294
+
+COMBINED (2020-2025)
+  Records: 11,309,296
+  Date Range: 2020-01-01 00:00:15 to 2025-12-31 23:59:32
+  Unique SR Numbers: 11,309,296
+  Duplicate SR Numbers: 0
+  Unique SR Types: 109
+  Unique Departments: 15
+  Missing Latitude: 0.07%
+  Missing Longitude: 0.07%
+  Missing Ward: 0.11%
+  Missing Community Area: 0.11%
+  Missing Zip Code: 7.94%
+  Status Distribution: {'Completed': 11056191, 'Canceled': 151478, 'Open': 101626, 'Closed': 1}
+
+TOP 100 COMPLAINT TYPES (2020-2025)
+--------------------------------------------------------------------------------
+
+    1. 311 INFORMATION ONLY CALL: 4,184,158 (37.0%)
+    2. Aircraft Noise Complaint: 1,918,574 (16.96%)
+    3. Graffiti Removal Request: 576,163 (5.09%)
+    4. Rodent Baiting/Rat Complaint: 308,726 (2.73%)
+    5. Garbage Cart Maintenance: 303,778 (2.69%)
+    6. Pothole in Street Complaint: 287,700 (2.54%)
+    7. Street Light Out Complaint: 282,239 (2.5%)
+    8. Abandoned Vehicle Complaint: 269,189 (2.38%)
+    9. Tree Trim Request (NO LONGER BEING ACCEPTED): 225,630 (2.0%)
+   10. Tree Debris Clean-Up Request: 167,420 (1.48%)
+   11. Traffic Signal Out Complaint: 145,575 (1.29%)
+   12. Building Violation: 129,510 (1.15%)
+   13. Tree Emergency: 124,685 (1.1%)
+   14. Blue Recycling Cart: 119,594 (1.06%)
+   15. Weed Removal Request: 117,820 (1.04%)
+   16. Sign Repair Request - All Other Signs: 116,383 (1.03%)
+   17. Tree Removal Inspection: 106,462 (0.94%)
+   18. Sanitation Code Violation: 88,689 (0.78%)
+   19. Dead Animal Pick-Up Request: 85,728 (0.76%)
+   20. Tree Planting Request: 77,800 (0.69%)
+   21. Yard Waste Pick-Up Request: 75,627 (0.67%)
+   22. Fly Dumping Complaint: 73,638 (0.65%)
+   23. Stray Animal Complaint: 69,047 (0.61%)
+   24. Water Lead Test Kit Request: 65,635 (0.58%)
+   25. Check for Leak: 59,182 (0.52%)
+   26. Water in Basement Complaint: 58,741 (0.52%)
+   27. Sewer Cleaning Inspection Request: 58,394 (0.52%)
+   28. Water On Street Complaint: 55,445 (0.49%)
+   29. Alley Pothole Complaint: 55,204 (0.49%)
+   30. Alley Light Out Complaint: 53,808 (0.48%)
+   31. Report an Injured Animal: 50,922 (0.45%)
+   32. Missed Garbage Pick-Up Complaint: 50,659 (0.45%)
+   33. Sidewalk Inspection Request: 49,564 (0.44%)
+   34. Inspect Public Way Request: 45,513 (0.4%)
+   35. Buildings - Plumbing Violation: 45,131 (0.4%)
+   36. Open Fire Hydrant Complaint: 42,411 (0.38%)
+   37. Ice and Snow Removal Request: 41,867 (0.37%)
+   38. Recycling Pick Up: 39,326 (0.35%)
+   39. Vicious Animal Complaint: 38,117 (0.34%)
+   40. Vacant/Abandoned Building Complaint: 35,082 (0.31%)
+   41. Nuisance Animal Complaint: 34,402 (0.3%)
+   42. Street Cleaning Request: 31,922 (0.28%)
+   43. Finance Parking Code Enforcement Review: 31,514 (0.28%)
+   44. Clean Vacant Lot Request: 31,000 (0.27%)
+   45. No Building Permit and Construction Violation: 30,678 (0.27%)
+   46. Sewer Cave-In Inspection Request: 30,495 (0.27%)
+   47. Snow – Uncleared Sidewalk Complaint: 30,457 (0.27%)
+   48. Sign Repair Request - Stop Sign: 29,437 (0.26%)
+   49. Business Complaints: 29,269 (0.26%)
+   50. Street Light Pole Damage Complaint: 28,306 (0.25%)
+   51. No Water Complaint: 22,842 (0.2%)
+   52. City Vehicle Sticker Violation: 20,680 (0.18%)
+   53. Pet Wellness Check Request: 18,705 (0.17%)
+   54. Cab Feedback: 17,506 (0.15%)
+   55. Restaurant Complaint: 16,923 (0.15%)
+   56. Snow - Object/Dibs Removal Request: 15,103 (0.13%)
+   57. Shared Cost Sidewalk Program Request: 13,710 (0.12%)
+   58. Sign Repair Request - One Way Sign: 13,581 (0.12%)
+   59. E-Scooter Parking Complaint: 13,520 (0.12%)
+   60. Low Water Pressure Complaint: 12,300 (0.11%)
+   61. Coyote Interaction Complaint: 9,778 (0.09%)
+   62. Vehicle Parked in Bike Lane Complaint: 9,257 (0.08%)
+   63. Water Lead Test Visit Request: 9,070 (0.08%)
+   64. Alley Sewer Inspection Request: 8,663 (0.08%)
+   65. Consumer Fraud Complaint: 8,002 (0.07%)
+   66. Divvy Bike Parking Complaint: 7,863 (0.07%)
+   67. Wire Basket Request: 6,796 (0.06%)
+   68. Street Light On During Day Complaint: 6,138 (0.05%)
+   69. Street Light Pole Door Missing Complaint: 5,063 (0.04%)
+   70. Bee/Wasp Removal: 4,970 (0.04%)
+   71. Water Quality Concern: 4,589 (0.04%)
+   72. Consumer Retail Business Complaint: 4,550 (0.04%)
+   73. Dead Bird: 4,414 (0.04%)
+   74. Bicycle Request/Complaint: 4,242 (0.04%)
+   75. Sign Repair Request - Do Not Enter Sign: 4,141 (0.04%)
+   76. Porch Inspection Request: 3,160 (0.03%)
+   77. Viaduct Light Out Complaint: 2,428 (0.02%)
+   78. Shared Housing/Vacation Rental Complaint: 2,358 (0.02%)
+   79. Cable TV Complaint: 2,258 (0.02%)
+   80. Recycling Inspection Request: 2,048 (0.02%)
+   81. Sidewalk Café/Outdoor Dining Complaint: 1,947 (0.02%)
+   82. Home Buyer Program Info Request: 1,899 (0.02%)
+   83. Clean and Green Program Request: 1,856 (0.02%)
+   84. Liquor Establishment Complaint: 1,752 (0.02%)
+   85. Lead Inspection Request: 1,721 (0.02%)
+   86. Public Vehicle Complaint: 1,684 (0.01%)
+   87. Animal In Trap Complaint: 1,643 (0.01%)
+   88. Commercial Fire Safety Inspection Request: 1,637 (0.01%)
+   89. Protected Bike Lane - Debris Removal: 1,563 (0.01%)
+   90. Paid Sick Leave Violation: 1,444 (0.01%)
+   91. No Air Conditioning: 1,424 (0.01%)
+   92. Wage Complaint: 1,372 (0.01%)
+   93. Pushcart Food Vendor Complaint: 1,285 (0.01%)
+   94. Ridesharing Complaint: 1,136 (0.01%)
+   95. Tobacco - General Complaint: 1,089 (0.01%)
+   96. Snow Removal - Protected Bike Lane or Bridge Sidewalk: 932 (0.01%)
+   97. Tobacco - Sale to Minors Complaint: 793 (0.01%)
+   98. Bungalow/Vintage Home Information Request: 618 (0.01%)
+   99. Inaccurate Fuel Pump Complaint: 498 (0.0%)
+  100. No Solicitation Complaint: 367 (0.0%)
+
+COMPLAINT TYPE PERSISTENCE ACROSS YEARS
+--------------------------------------------------------------------------------
+
+  Present in 1 year(s): 1 complaint types
+  Present in 2 year(s): 2 complaint types
+  Present in 3 year(s): 1 complaint types
+  Present in 4 year(s): 3 complaint types
+  Present in 5 year(s): 2 complaint types
+  Present in 6 year(s): 100 complaint types
+
+RECOMMENDED COMPLAINT TYPES FOR RESEARCH
+--------------------------------------------------------------------------------
+
+  311 INFORMATION ONLY CALL
+    Total: 4,184,158, Years: 6/6, CV: 0.117, Geo: 100.0%, Wards: 50
+    Suitability Score: 5.262
+
+  Aircraft Noise Complaint
+    Total: 1,918,574, Years: 6/6, CV: 0.113, Geo: 100.0%, Wards: 47
+    Suitability Score: 5.023
+
+  Graffiti Removal Request
+    Total: 576,163, Years: 6/6, CV: 0.088, Geo: 99.6%, Wards: 50
+    Suitability Score: 4.670
+
+  Garbage Cart Maintenance
+    Total: 303,778, Years: 6/6, CV: 0.097, Geo: 100.0%, Wards: 50
+    Suitability Score: 4.478
+
+  Rodent Baiting/Rat Complaint
+    Total: 308,726, Years: 6/6, CV: 0.153, Geo: 99.9%, Wards: 50
+    Suitability Score: 4.477
+
+  Pothole in Street Complaint
+    Total: 287,700, Years: 6/6, CV: 0.195, Geo: 99.7%, Wards: 50
+    Suitability Score: 4.451
+
+  Street Light Out Complaint
+    Total: 282,239, Years: 6/6, CV: 0.289, Geo: 99.9%, Wards: 50
+    Suitability Score: 4.436
+
+  Abandoned Vehicle Complaint
+    Total: 269,189, Years: 6/6, CV: 0.152, Geo: 99.9%, Wards: 50
+    Suitability Score: 4.436
+
+  Tree Trim Request (NO LONGER BEING ACCEPTED)
+    Total: 225,630, Years: 6/6, CV: 0.160, Geo: 99.9%, Wards: 50
+    Suitability Score: 4.382
+
+  Tree Debris Clean-Up Request
+    Total: 167,420, Years: 6/6, CV: 0.183, Geo: 99.9%, Wards: 50
+    Suitability Score: 4.290
+
+  Traffic Signal Out Complaint
+    Total: 145,575, Years: 6/6, CV: 0.115, Geo: 99.8%, Wards: 50
+    Suitability Score: 4.255
+
+  Building Violation
+    Total: 129,510, Years: 6/6, CV: 0.148, Geo: 100.0%, Wards: 50
+    Suitability Score: 4.217
+
+  Blue Recycling Cart
+    Total: 119,594, Years: 6/6, CV: 0.095, Geo: 100.0%, Wards: 50
+    Suitability Score: 4.198
+
+  Tree Emergency
+    Total: 124,685, Years: 6/6, CV: 0.323, Geo: 99.8%, Wards: 50
+    Suitability Score: 4.187
+
+  Tree Removal Inspection
+    Total: 106,462, Years: 6/6, CV: 0.113, Geo: 100.0%, Wards: 50
+    Suitability Score: 4.161
+
+  Sign Repair Request - All Other Signs
+    Total: 116,383, Years: 6/6, CV: 0.425, Geo: 99.7%, Wards: 50
+    Suitability Score: 4.156
+
+  Weed Removal Request
+    Total: 117,820, Years: 6/6, CV: 0.943, Geo: 99.9%, Wards: 50
+    Suitability Score: 4.109
+
+  Sanitation Code Violation
+    Total: 88,689, Years: 6/6, CV: 0.129, Geo: 99.9%, Wards: 50
+    Suitability Score: 4.105
+
+  Dead Animal Pick-Up Request
+    Total: 85,728, Years: 6/6, CV: 0.139, Geo: 99.9%, Wards: 50
+    Suitability Score: 4.094
+
+  Fly Dumping Complaint
+    Total: 73,638, Years: 6/6, CV: 0.132, Geo: 99.9%, Wards: 50
+    Suitability Score: 4.049
+
+  Yard Waste Pick-Up Request
+    Total: 75,627, Years: 6/6, CV: 0.220, Geo: 100.0%, Wards: 50
+    Suitability Score: 4.048
+
+  Stray Animal Complaint
+    Total: 69,047, Years: 6/6, CV: 0.161, Geo: 99.9%, Wards: 50
+    Suitability Score: 4.026
+
+  Tree Planting Request
+    Total: 77,800, Years: 6/6, CV: 0.526, Geo: 99.9%, Wards: 50
+    Suitability Score: 4.026
+
+  Water Lead Test Kit Request
+    Total: 65,635, Years: 6/6, CV: 0.363, Geo: 99.9%, Wards: 50
+    Suitability Score: 3.991
+
+  Check for Leak
+    Total: 59,182, Years: 6/6, CV: 0.100, Geo: 99.8%, Wards: 50
+    Suitability Score: 3.986
+
+  Sewer Cleaning Inspection Request
+    Total: 58,394, Years: 6/6, CV: 0.150, Geo: 99.8%, Wards: 50
+    Suitability Score: 3.977
+
+  Alley Pothole Complaint
+    Total: 55,204, Years: 6/6, CV: 0.122, Geo: 99.9%, Wards: 50
+    Suitability Score: 3.963
+
+  Water On Street Complaint
+    Total: 55,445, Years: 6/6, CV: 0.231, Geo: 99.9%, Wards: 50
+    Suitability Score: 3.954
+
+  Report an Injured Animal
+    Total: 50,922, Years: 6/6, CV: 0.115, Geo: 99.9%, Wards: 50
+    Suitability Score: 3.940
+
+  Missed Garbage Pick-Up Complaint
+    Total: 50,659, Years: 6/6, CV: 0.185, Geo: 100.0%, Wards: 50
+    Suitability Score: 3.931
+
+
+RESEARCH DATASET RECOMMENDATION
+================================================================================
+
+Based on the audit of 11.3M records across 2020-2025, the following complaint types
+are most suitable for the research pipeline:
+
+Historical complaints -> Future complaint prediction -> Officer assignment
+-> Field verification -> Actual outcome -> Feedback
+
+1. 311 INFORMATION ONLY CALL
+   - Frequency: 4,184,158 records over 6 years (697,360/year avg)
+   - Temporal stability: Present in 6/6 years, CV=0.117
+   - Geographic coverage: 50/50 wards, 77/77 community areas
+   - Coordinate completeness: 100.0%
+   - Department routing: 1 departments
+   - Suitability score: 5.262
+   - Why suitable: high volume enables robust modeling; consistent presence every year; low year-to-year variation; excellent geographic data for spatial prediction; broad citywide distribution
+
+1. Aircraft Noise Complaint
+   - Frequency: 1,918,574 records over 6 years (319,762/year avg)
+   - Temporal stability: Present in 6/6 years, CV=0.113
+   - Geographic coverage: 47/50 wards, 58/77 community areas
+   - Coordinate completeness: 100.0%
+   - Department routing: 1 departments
+   - Suitability score: 5.023
+   - Why suitable: high volume enables robust modeling; consistent presence every year; low year-to-year variation; excellent geographic data for spatial prediction; broad citywide distribution
+
+1. Graffiti Removal Request
+   - Frequency: 576,163 records over 6 years (96,027/year avg)
+   - Temporal stability: Present in 6/6 years, CV=0.088
+   - Geographic coverage: 50/50 wards, 77/77 community areas
+   - Coordinate completeness: 99.6%
+   - Department routing: 1 departments
+   - Suitability score: 4.670
+   - Why suitable: high volume enables robust modeling; consistent presence every year; low year-to-year variation; excellent geographic data for spatial prediction; broad citywide distribution
+
+1. Garbage Cart Maintenance
+   - Frequency: 303,778 records over 6 years (50,630/year avg)
+   - Temporal stability: Present in 6/6 years, CV=0.097
+   - Geographic coverage: 50/50 wards, 77/77 community areas
+   - Coordinate completeness: 100.0%
+   - Department routing: 1 departments
+   - Suitability score: 4.478
+   - Why suitable: high volume enables robust modeling; consistent presence every year; low year-to-year variation; excellent geographic data for spatial prediction; broad citywide distribution
+
+1. Rodent Baiting/Rat Complaint
+   - Frequency: 308,726 records over 6 years (51,454/year avg)
+   - Temporal stability: Present in 6/6 years, CV=0.153
+   - Geographic coverage: 50/50 wards, 77/77 community areas
+   - Coordinate completeness: 99.9%
+   - Department routing: 1 departments
+   - Suitability score: 4.477
+   - Why suitable: high volume enables robust modeling; consistent presence every year; low year-to-year variation; excellent geographic data for spatial prediction; broad citywide distribution
+
+1. Pothole in Street Complaint
+   - Frequency: 287,700 records over 6 years (47,950/year avg)
+   - Temporal stability: Present in 6/6 years, CV=0.195
+   - Geographic coverage: 50/50 wards, 77/77 community areas
+   - Coordinate completeness: 99.7%
+   - Department routing: 1 departments
+   - Suitability score: 4.451
+   - Why suitable: high volume enables robust modeling; consistent presence every year; low year-to-year variation; excellent geographic data for spatial prediction; broad citywide distribution
+
+1. Street Light Out Complaint
+   - Frequency: 282,239 records over 6 years (47,040/year avg)
+   - Temporal stability: Present in 6/6 years, CV=0.289
+   - Geographic coverage: 50/50 wards, 77/77 community areas
+   - Coordinate completeness: 99.9%
+   - Department routing: 1 departments
+   - Suitability score: 4.436
+   - Why suitable: high volume enables robust modeling; consistent presence every year; low year-to-year variation; excellent geographic data for spatial prediction; broad citywide distribution
+
+1. Abandoned Vehicle Complaint
+   - Frequency: 269,189 records over 6 years (44,865/year avg)
+   - Temporal stability: Present in 6/6 years, CV=0.152
+   - Geographic coverage: 50/50 wards, 77/77 community areas
+   - Coordinate completeness: 99.9%
+   - Department routing: 1 departments
+   - Suitability score: 4.436
+   - Why suitable: high volume enables robust modeling; consistent presence every year; low year-to-year variation; excellent geographic data for spatial prediction; broad citywide distribution
+
+1. Tree Trim Request (NO LONGER BEING ACCEPTED)
+   - Frequency: 225,630 records over 6 years (37,605/year avg)
+   - Temporal stability: Present in 6/6 years, CV=0.160
+   - Geographic coverage: 50/50 wards, 77/77 community areas
+   - Coordinate completeness: 99.9%
+   - Department routing: 1 departments
+   - Suitability score: 4.382
+   - Why suitable: high volume enables robust modeling; consistent presence every year; low year-to-year variation; excellent geographic data for spatial prediction; broad citywide distribution
+
+1. Tree Debris Clean-Up Request
+   - Frequency: 167,420 records over 6 years (27,903/year avg)
+   - Temporal stability: Present in 6/6 years, CV=0.183
+   - Geographic coverage: 50/50 wards, 77/77 community areas
+   - Coordinate completeness: 99.9%
+   - Department routing: 1 departments
+   - Suitability score: 4.290
+   - Why suitable: high volume enables robust modeling; consistent presence every year; low year-to-year variation; excellent geographic data for spatial prediction; broad citywide distribution
+
+1. Traffic Signal Out Complaint
+   - Frequency: 145,575 records over 6 years (24,262/year avg)
+   - Temporal stability: Present in 6/6 years, CV=0.115
+   - Geographic coverage: 50/50 wards, 77/77 community areas
+   - Coordinate completeness: 99.8%
+   - Department routing: 1 departments
+   - Suitability score: 4.255
+   - Why suitable: high volume enables robust modeling; consistent presence every year; low year-to-year variation; excellent geographic data for spatial prediction; broad citywide distribution
+
+1. Building Violation
+   - Frequency: 129,510 records over 6 years (21,585/year avg)
+   - Temporal stability: Present in 6/6 years, CV=0.148
+   - Geographic coverage: 50/50 wards, 77/77 community areas
+   - Coordinate completeness: 100.0%
+   - Department routing: 1 departments
+   - Suitability score: 4.217
+   - Why suitable: high volume enables robust modeling; consistent presence every year; low year-to-year variation; excellent geographic data for spatial prediction; broad citywide distribution
+
+1. Blue Recycling Cart
+   - Frequency: 119,594 records over 6 years (19,932/year avg)
+   - Temporal stability: Present in 6/6 years, CV=0.095
+   - Geographic coverage: 50/50 wards, 77/77 community areas
+   - Coordinate completeness: 100.0%
+   - Department routing: 1 departments
+   - Suitability score: 4.198
+   - Why suitable: high volume enables robust modeling; consistent presence every year; low year-to-year variation; excellent geographic data for spatial prediction; broad citywide distribution
+
+1. Tree Emergency
+   - Frequency: 124,685 records over 6 years (20,781/year avg)
+   - Temporal stability: Present in 6/6 years, CV=0.323
+   - Geographic coverage: 50/50 wards, 77/77 community areas
+   - Coordinate completeness: 99.8%
+   - Department routing: 1 departments
+   - Suitability score: 4.187
+   - Why suitable: high volume enables robust modeling; consistent presence every year; low year-to-year variation; excellent geographic data for spatial prediction; broad citywide distribution
+
+1. Tree Removal Inspection
+   - Frequency: 106,462 records over 6 years (17,744/year avg)
+   - Temporal stability: Present in 6/6 years, CV=0.113
+   - Geographic coverage: 50/50 wards, 77/77 community areas
+   - Coordinate completeness: 100.0%
+   - Department routing: 1 departments
+   - Suitability score: 4.161
+   - Why suitable: high volume enables robust modeling; consistent presence every year; low year-to-year variation; excellent geographic data for spatial prediction; broad citywide distribution
+
+1. Sign Repair Request - All Other Signs
+   - Frequency: 116,383 records over 6 years (19,397/year avg)
+   - Temporal stability: Present in 6/6 years, CV=0.425
+   - Geographic coverage: 50/50 wards, 77/77 community areas
+   - Coordinate completeness: 99.7%
+   - Department routing: 1 departments
+   - Suitability score: 4.156
+   - Why suitable: high volume enables robust modeling; consistent presence every year; low year-to-year variation; excellent geographic data for spatial prediction; broad citywide distribution
+
+1. Weed Removal Request
+   - Frequency: 117,820 records over 6 years (19,637/year avg)
+   - Temporal stability: Present in 6/6 years, CV=0.943
+   - Geographic coverage: 50/50 wards, 77/77 community areas
+   - Coordinate completeness: 99.9%
+   - Department routing: 1 departments
+   - Suitability score: 4.109
+   - Why suitable: high volume enables robust modeling; consistent presence every year; excellent geographic data for spatial prediction; broad citywide distribution
+
+1. Sanitation Code Violation
+   - Frequency: 88,689 records over 6 years (14,782/year avg)
+   - Temporal stability: Present in 6/6 years, CV=0.129
+   - Geographic coverage: 50/50 wards, 77/77 community areas
+   - Coordinate completeness: 99.9%
+   - Department routing: 1 departments
+   - Suitability score: 4.105
+   - Why suitable: high volume enables robust modeling; consistent presence every year; low year-to-year variation; excellent geographic data for spatial prediction; broad citywide distribution
+
+1. Dead Animal Pick-Up Request
+   - Frequency: 85,728 records over 6 years (14,288/year avg)
+   - Temporal stability: Present in 6/6 years, CV=0.139
+   - Geographic coverage: 50/50 wards, 77/77 community areas
+   - Coordinate completeness: 99.9%
+   - Department routing: 1 departments
+   - Suitability score: 4.094
+   - Why suitable: high volume enables robust modeling; consistent presence every year; low year-to-year variation; excellent geographic data for spatial prediction; broad citywide distribution
+
+1. Fly Dumping Complaint
+   - Frequency: 73,638 records over 6 years (12,273/year avg)
+   - Temporal stability: Present in 6/6 years, CV=0.132
+   - Geographic coverage: 50/50 wards, 77/77 community areas
+   - Coordinate completeness: 99.9%
+   - Department routing: 1 departments
+   - Suitability score: 4.049
+   - Why suitable: high volume enables robust modeling; consistent presence every year; low year-to-year variation; excellent geographic data for spatial prediction; broad citywide distribution
+
+
+COMPLAINT TYPES TO EXCLUDE FROM FORECASTING TARGET:
+--------------------------------------------------------------------------------
+  - 311 INFORMATION ONLY CALL: Non-actionable, no field response needed
+  - Aircraft Noise Complaint: Handled by Aviation Dept, no field officer dispatch
+  - Types with <1000 total records: Insufficient data for modeling
+  - Types present in <4 years: Unstable temporal patterns
+  - Types with >5% missing coordinates: Poor spatial prediction capability

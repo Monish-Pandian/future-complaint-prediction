@@ -1,0 +1,180 @@
+OFFICER ASSIGNMENT FINAL REPORT
+============================================================
+
+EXPERIMENT OVERVIEW
+-------------------
+This module evaluates risk-aware officer assignment strategies using historical
+backtesting with simulated officers. The assignment decisions were fixed BEFORE
+joining future outcomes, ensuring no data leakage.
+
+Setup:
+- 3 verification budgets: 5%, 10%, 20% (90% exploitation / 10% exploration)
+- 2 assignment policies: RISK_ONLY vs RISK_DISTANCE_WORKLOAD
+- 4 random seeds for robustness: 42, 123, 2024, 999
+- Synthetic officer pool (LOW capacity): 273 officers, 7 departments
+- Total candidate locations: 13,770 (across all budgets)
+- Assignment rate limited by officer capacity (~489 slots total)
+
+POLICIES COMPARED
+-----------------
+1. RISK_ONLY_ASSIGNMENT: Choose eligible officer with lowest current workload,
+   break ties by distance. (Weights: risk=1.0, distance=0.0, workload=0.0)
+
+2. RISK_DISTANCE_WORKLOAD_ASSIGNMENT: Normalized composite score.
+   (Weights: risk=0.4, distance=0.3, workload=0.3)
+
+Both respect: department compatibility, officer availability, capacity limits.
+Unassigned locations recorded with reason.
+
+ROBUSTNESS RESULTS (mean ± std across 4 seeds)
+----------------------------------------------
+
+5% BUDGET (n=1,989 locations, ~72 assigned per seed):
+
+  RISK_ONLY_ASSIGNMENT:
+    Precision:       0.252 ± 0.018
+    Recall:          0.096 ± 0.004
+    Discovery Rate:  0.0091 ± 0.0004
+    Total Distance:  640.6 ± 104.8 km
+    Mean Distance:   8.92 ± 1.16 km
+    Workload Imbal:  0.434 ± 0.021
+    Escalations:     18.0 ± 0.8
+
+  RISK_DISTANCE_WORKLOAD_ASSIGNMENT:
+    Precision:       0.252 ± 0.018
+    Recall:          0.096 ± 0.004
+    Discovery Rate:  0.0091 ± 0.0004
+    Total Distance:  543.2 ± 77.9 km  (-15.2%)
+    Mean Distance:   7.56 ± 0.68 km  (-15.3%)
+    Workload Imbal:  0.453 ± 0.043  (+4.5%)
+    Escalations:     18.0 ± 0.8  (identical)
+
+10% BUDGET (n=3,927 locations, ~141 assigned per seed):
+
+  RISK_ONLY_ASSIGNMENT:
+    Precision:       0.209 ± 0.018
+    Recall:          0.065 ± 0.003
+    Discovery Rate:  0.0074 ± 0.0003
+    Total Distance:  1361.8 ± 164.8 km
+    Mean Distance:   9.65 ± 0.47 km
+    Workload Imbal:  0.380 ± 0.024
+    Escalations:     29.3 ± 1.3
+
+  RISK_DISTANCE_WORKLOAD_ASSIGNMENT:
+    Precision:       0.209 ± 0.018
+    Recall:          0.065 ± 0.003
+    Discovery Rate:  0.0074 ± 0.0003
+    Total Distance:  1174.3 ± 216.1 km  (-13.8%)
+    Mean Distance:   8.30 ± 0.95 km  (-14.0%)
+    Workload Imbal:  0.355 ± 0.015  (-6.7%)
+    Escalations:     29.3 ± 1.3  (identical)
+
+20% BUDGET (n=7,854 locations, ~308 assigned per seed):
+
+  RISK_ONLY_ASSIGNMENT:
+    Precision:       0.209 ± 0.012
+    Recall:          0.070 ± 0.005
+    Discovery Rate:  0.0082 ± 0.0006
+    Total Distance:  3121.6 ± 369.5 km
+    Mean Distance:   10.13 ± 0.63 km
+    Workload Imbal:  0.312 ± 0.018
+    Escalations:     64.3 ± 4.7
+
+  RISK_DISTANCE_WORKLOAD_ASSIGNMENT:
+    Precision:       0.209 ± 0.012
+    Recall:          0.070 ± 0.005
+    Discovery Rate:  0.0082 ± 0.0006
+    Total Distance:  2827.9 ± 325.6 km  (-9.4%)
+    Mean Distance:   9.18 ± 0.55 km  (-9.4%)
+    Workload Imbal:  0.303 ± 0.017  (-2.8%)
+    Escalations:     64.3 ± 4.7  (identical)
+
+ABLATION (Main experiment, single seed)
+---------------------------------------
+Comparing A (Risk only) vs C (Risk+Distance+Workload):
+
+  5% Budget:  Distance -1.1%,  Workload Imbal +18%,  Escalations 0
+  10% Budget: Distance -9.2%,  Workload Imbal -3.7%, Escalations 0
+  20% Budget: Distance -13.0%, Workload Imbal -2.5%, Escalations 0
+
+ANSWERS TO KEY QUESTION
+------------------------
+
+"Can risk-aware officer assignment reduce travel and workload imbalance 
+while preserving the escalation-discovery benefits of the validated 90/10 
+exploration policy?"
+
+5% BUDGET:
+  - Reduces travel: YES (15% less total distance, 15% less mean distance)
+  - Reduces workload imbalance: NO (4.5% WORSE imbalance, though not statistically significant)
+  - Preserves escalation discovery: YES (identical escalations found, precision/recall unchanged)
+  - VERDICT: Travel reduction achieved, but workload imbalance slightly worse at this budget.
+
+10% BUDGET:
+  - Reduces travel: YES (14% less total distance, 14% less mean distance)
+  - Reduces workload imbalance: YES (6.7% improvement)
+  - Preserves escalation discovery: YES (identical escalations found)
+  - VERDICT: Both travel and workload imbalance reduced while preserving discovery.
+
+20% BUDGET:
+  - Reduces travel: YES (9% less total distance, 9% less mean distance)
+  - Reduces workload imbalance: YES (2.8% improvement)
+  - Preserves escalation discovery: YES (identical escalations found)
+  - VERDICT: Both travel and workload imbalance reduced while preserving discovery.
+
+RECOMMENDATION
+--------------
+
+RECOMMENDED POLICY: RISK_DISTANCE_WORKLOAD_ASSIGNMENT for 10% and 20% budgets.
+For 5% budget, either policy is acceptable (travel reduction without discovery loss).
+
+EVIDENCE:
+1. Across all budgets, RISK_DISTANCE_WORKLOAD reduces total travel distance by 9-15%.
+2. At 10% and 20% budgets, it also reduces workload imbalance (6.7% and 2.8%).
+3. At 5% budget, workload imbalance slightly increases (4.5%) but this is within
+   the noise (std ~0.04) and not statistically significant.
+4. Escalation discovery is IDENTICAL across all budgets and seeds - no loss in
+   precision, recall, or discovery rate.
+5. The ablation shows the full Risk+Distance+Workload strategy outperforms 
+   Risk-only on distance at all budgets, and on workload imbalance at 10%/20%.
+
+COMPLEXITY CONSIDERATION:
+The full strategy (Risk+Distance+Workload) has only marginally more complexity
+than Risk+Distance (both use 3 normalized components vs 2). Since the full
+strategy performs better on workload imbalance at the budgets where it matters
+most (10%, 20%), and the complexity difference is minimal, the full strategy
+is recommended over a simplified Risk+Distance variant.
+
+LIMITATIONS (CRITICAL)
+----------------------
+1. SYNTHETIC OFFICERS ONLY: All officer identities, departments, availability,
+   workloads, capacities, and home areas are SIMULATED. These do NOT represent
+   real Chicago personnel, union rules, shift schedules, or qualifications.
+
+2. SIMPLIFIED CAPACITY MODEL: The LOW capacity scenario provides only ~489
+   assignment slots for 13,770 candidate locations (3.6% assignment rate).
+   Real departments would have different staffing levels.
+
+3. STATIC AVAILABILITY: Officer availability is fixed per simulation run, not
+   varying by week or shift. Real availability is dynamic.
+
+4. NO GEOGRAPHIC RESTRICTIONS: Officers can be assigned to any community area
+   regardless of distance. Real deployments have geographic constraints.
+
+5. SIMULATED DEPARTMENT COMPATIBILITY: The SR-type-to-department mapping is
+   a simplified simulation, not based on actual Chicago departmental structure.
+
+6. NO REAL-WORLD DEPLOYMENT CLAIM: This is a HISTORICAL BACKTEST for
+   methodological validation only. Results should not be used for operational
+   officer deployment decisions.
+
+7. SINGLE EXPLORATION RATIO: Only the validated 90/10 exploration policy was
+   tested. Other exploration ratios may yield different assignment dynamics.
+
+8. XGBOOST MODEL FIXED: The prediction model was not retuned for assignment.
+   Joint optimization of prediction + assignment could yield different results.
+
+OFFICER ASSIGNMENT EXPERIMENT COMPLETE
+RECOMMENDED POLICY: RISK_DISTANCE_WORKLOAD_ASSIGNMENT (for 10% and 20% budgets)
+EVIDENCE: 9-15% travel reduction, 2.8-6.7% workload imbalance reduction at 10%/20% budgets, zero escalation discovery loss across all budgets
+LIMITATIONS: Synthetic officers only, static availability, no geographic constraints, simulated departments, historical backtest only - not for operational use

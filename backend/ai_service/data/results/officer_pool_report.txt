@@ -1,0 +1,60 @@
+SIMULATED OFFICER POOL REPORT
+============================================================
+
+IMPORTANT LIMITATIONS:
+  - This is a SYNTHETIC officer pool for HISTORICAL BACKTESTING ONLY
+  - Officer identities, availability, and workload are SIMULATED
+  - These do NOT represent real Chicago personnel or departments
+  - Department compatibility is labeled as SIMULATED DEPARTMENT COMPATIBILITY
+  - Do not use for operational decision-making
+
+RANDOM SEED: 42
+
+NUMBER OF SIMULATED OFFICERS:
+  LOW: 273
+  MEDIUM: 539
+  HIGH: 1078
+  TOTAL: 1890
+
+DEPARTMENTS / CATEGORIES (SIMULATED DEPARTMENT COMPATIBILITY):
+  SIMULATED DEPARTMENT COMPATIBILITY: Building & Safety Inspections: 270 officers
+  SIMULATED DEPARTMENT COMPATIBILITY: Community Maintenance: 270 officers
+  SIMULATED DEPARTMENT COMPATIBILITY: Electrical & Lighting: 270 officers
+  SIMULATED DEPARTMENT COMPATIBILITY: Infrastructure Repair: 270 officers
+  SIMULATED DEPARTMENT COMPATIBILITY: Sanitation & Recycling: 270 officers
+  SIMULATED DEPARTMENT COMPATIBILITY: Vector Control: 270 officers
+  SIMULATED DEPARTMENT COMPATIBILITY: Vehicle & Traffic Operations: 270 officers
+
+CAPACITY ASSUMPTIONS (synthetic, for backtesting):
+  LOW: ~0.5 officers per community area per category
+    - max_assignments base: 5 (±2)
+    - availability probability: 80%
+  MEDIUM: ~1.0 officers per community area per category
+    - max_assignments base: 10 (±2)
+    - availability probability: 85%
+  HIGH: ~2.0 officers per community area per category
+    - max_assignments base: 15 (±2)
+    - availability probability: 90%
+
+AVAILABILITY ASSUMPTIONS:
+  - Each officer has independent availability probability per scenario
+  - Availability is static in this simulation (does not vary by week)
+  - Current workload randomly assigned between 0 and max_assignments
+
+WORKLOAD ASSUMPTIONS:
+  - max_assignments: maximum concurrent assignments an officer can handle
+  - current_workload: current active assignments (randomly initialized)
+  - Available capacity = max_assignments - current_workload (if available=True)
+
+HOME AREA ASSIGNMENT:
+  - Officers randomly assigned to one of 77 community areas
+  - Home area does not restrict assignment in this simulation
+
+LIMITATIONS:
+  1. No real officer data used - all synthetic
+  2. No union rules, shift schedules, or qualifications modeled
+  3. Availability is static, not time-varying
+  4. Home area proximity not enforced in assignment
+  5. Department compatibility is simulated mapping only
+  6. Three capacity scenarios provided - no recommendation on which to use
+  7. Workload does not update dynamically in this module

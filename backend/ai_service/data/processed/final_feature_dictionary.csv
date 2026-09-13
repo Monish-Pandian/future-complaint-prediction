@@ -1,0 +1,38 @@
+feature_name,data_type,description,source,latest_possible_information_date,uses_future_information,allowed_as_model_feature,missing_count,missing_pct
+community_area,int64,base feature,base,static,False,True,0,0.0
+week_start,datetime64[us],base feature,base,week T,False,True,0,0.0
+week_end,datetime64[us],base feature,base,week T,False,True,0,0.0
+year,int64,base feature,base,week T,False,True,0,0.0
+week_of_year,int64,base feature,base,week T,False,True,0,0.0
+year_week,str,base feature,base,week T,False,True,0,0.0
+sr_type,str,base feature,base,static,False,True,0,0.0
+complaint_count,int64,base feature,base,week T,False,False,0,0.0
+complaints_last_1_week,int64,lag_rolling feature,lag_rolling,week T-1,False,True,0,0.0
+complaints_last_2_week,int64,lag_rolling feature,lag_rolling,week T-1,False,True,0,0.0
+complaints_last_4_week,int64,lag_rolling feature,lag_rolling,week T-1,False,True,0,0.0
+complaints_last_8_week,int64,lag_rolling feature,lag_rolling,week T-1,False,True,0,0.0
+complaints_last_12_week,int64,lag_rolling feature,lag_rolling,week T-1,False,True,0,0.0
+rolling_mean_4_weeks,float64,lag_rolling feature,lag_rolling,week T-1,False,True,3080,1.27
+rolling_max_4_weeks,float64,lag_rolling feature,lag_rolling,week T-1,False,True,3080,1.27
+rolling_std_4_weeks,float64,lag_rolling feature,lag_rolling,week T-1,False,True,3080,1.27
+rolling_mean_8_weeks,float64,lag_rolling feature,lag_rolling,week T-1,False,True,6160,2.55
+rolling_max_8_weeks,float64,lag_rolling feature,lag_rolling,week T-1,False,True,6160,2.55
+rolling_std_8_weeks,float64,lag_rolling feature,lag_rolling,week T-1,False,True,6160,2.55
+rolling_mean_12_weeks,float64,lag_rolling feature,lag_rolling,week T-1,False,True,9240,3.82
+rolling_max_12_weeks,float64,lag_rolling feature,lag_rolling,week T-1,False,True,9240,3.82
+rolling_std_12_weeks,float64,lag_rolling feature,lag_rolling,week T-1,False,True,9240,3.82
+month,int64,seasonal feature,seasonal,week T,False,True,0,0.0
+quarter,int64,seasonal feature,seasonal,week T,False,True,0,0.0
+season,str,seasonal feature,seasonal,week T,False,True,0,0.0
+same_week_previous_year_count,float64,seasonal feature,seasonal,week T-52,False,True,40810,16.88
+same_month_previous_year_count,float64,seasonal feature,seasonal,week T-52,False,True,37730,15.61
+previous_year_same_community_count,float64,seasonal feature,seasonal,week T-52,False,True,770,0.32
+previous_year_same_complaint_count,float64,seasonal feature,seasonal,week T-52,False,True,770,0.32
+ward,float64,spatial feature,spatial,static,False,True,0,0.0
+total_complaints_all_types_last_1_week,float64,spatial feature,spatial,week T-1,False,True,770,0.32
+total_complaints_all_types_last_4_weeks,float64,spatial feature,spatial,week T-1,False,True,3080,1.27
+total_complaints_all_types_last_8_weeks,float64,spatial feature,spatial,week T-1,False,True,6160,2.55
+total_complaints_all_types_last_12_weeks,float64,spatial feature,spatial,week T-1,False,True,9240,3.82
+distinct_complaint_types_last_4_weeks,int64,spatial feature,spatial,week T-1,False,True,0,0.0
+distinct_complaint_types_last_8_weeks,int64,spatial feature,spatial,week T-1,False,True,0,0.0
+distinct_complaint_types_last_12_weeks,int64,spatial feature,spatial,week T-1,False,True,0,0.0

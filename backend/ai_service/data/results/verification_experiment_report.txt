@@ -1,0 +1,233 @@
+================================================================================
+BUDGET-CONSTRAINED OFFICER VERIFICATION EXPERIMENT REPORT
+EXPLOITATION vs EXPLORATION FOR FEEDBACK-BIAS REDUCTION
+================================================================================
+
+1. RESEARCH QUESTION
+------------------------------------------------------------
+Does explicitly allocating part of a limited officer-verification budget
+to exploration reduce feedback-selection bias compared with sending
+officers only to the highest-risk predictions?
+
+2. DATASET
+------------------------------------------------------------
+Source: Chicago 311 service requests
+Test period: 2025 (52 weeks)
+Community areas: 77
+Complaint types: 10
+Total candidate observations: 39270
+Average candidates per week: 770.0
+
+3. ESCALATION TARGET DEFINITION
+------------------------------------------------------------
+escalation_target = 1 if future_complaint_count >= 1.5 * rolling_mean_4_weeks
+escalation_target = 0 otherwise
+Valid rows: 39270
+Positive escalations: 9143 (23.3%)
+Negative: 30127 (76.7%)
+
+4. VERIFICATION BUDGET DEFINITION
+------------------------------------------------------------
+For each week, verification_budget = ceil(N_candidates * K)
+Budgets tested: K = 5%, 10%, 20%
+
+5. EXPLOIT_ONLY POLICY
+------------------------------------------------------------
+For each week: rank all candidates by predicted escalation probability,
+select top K% for verification.
+
+6. EXPLOIT_EXPLORE POLICY
+------------------------------------------------------------
+90% exploitation / 10% exploration split
+Exploitation: top 90% of budget slots by predicted risk
+Exploration: random 10% from remaining candidates (seed=42)
+No overlap between exploitation and exploration selections
+
+7. SIMULATION METHODOLOGY
+------------------------------------------------------------
+HISTORICAL BACKTEST / SIMULATED FIELD VERIFICATION
+For each selected candidate, compare predicted risk with actual
+next-week historical outcome (future_complaint_count).
+actual_escalation = escalation_target (evaluation only)
+DOES NOT represent real physical officer inspection.
+
+8. LEAKAGE SAFEGUARDS
+------------------------------------------------------------
+- Selection uses ONLY prediction-time information:
+  predicted_probability, community_area, sr_type, week_start,
+  historical features, rolling features, spatial features
+- NOT used for selection: future_complaint, future_complaint_count,
+  escalation_target, any future information
+- Chronological weekly cycles (no random splits)
+- Reproducible random seed = 42 for exploration
+
+9. PRECISION RESULTS
+------------------------------------------------------------
+  Budget 5%:
+    EXPLOIT_ONLY:  Precision = 0.0850
+    EXPLOIT_EXPLORE: Precision = 0.0940
+    Difference: +0.0090
+  Budget 10%:
+    EXPLOIT_ONLY:  Precision = 0.0973
+    EXPLOIT_EXPLORE: Precision = 0.1138
+    Difference: +0.0166
+  Budget 20%:
+    EXPLOIT_ONLY:  Precision = 0.1119
+    EXPLOIT_EXPLORE: Precision = 0.1173
+    Difference: +0.0053
+
+10. RECALL RESULTS
+------------------------------------------------------------
+  Budget 5%:
+    EXPLOIT_ONLY:  Recall = 0.0185
+    EXPLOIT_EXPLORE: Recall = 0.0205
+    Difference: +0.0020
+  Budget 10%:
+    EXPLOIT_ONLY:  Recall = 0.0418
+    EXPLOIT_EXPLORE: Recall = 0.0489
+    Difference: +0.0071
+  Budget 20%:
+    EXPLOIT_ONLY:  Recall = 0.0961
+    EXPLOIT_EXPLORE: Recall = 0.1007
+    Difference: +0.0046
+
+11. DISCOVERY RESULTS
+------------------------------------------------------------
+  Budget 5%:
+    EXPLOIT_ONLY:  Discovered = 169, Cost/Discovery = 11.77
+    EXPLOIT_EXPLORE: Discovered = 187, Cost/Discovery = 10.64
+    Exploration discoveries: 35
+  Budget 10%:
+    EXPLOIT_ONLY:  Discovered = 382, Cost/Discovery = 10.28
+    EXPLOIT_EXPLORE: Discovered = 447, Cost/Discovery = 8.79
+    Exploration discoveries: 112
+  Budget 20%:
+    EXPLOIT_ONLY:  Discovered = 879, Cost/Discovery = 8.94
+    EXPLOIT_EXPLORE: Discovered = 921, Cost/Discovery = 8.53
+    Exploration discoveries: 157
+
+12. GEOGRAPHIC COVERAGE
+------------------------------------------------------------
+  Budget 5%:
+    EXPLOIT_ONLY:  Unique areas = 32
+    EXPLOIT_EXPLORE: Unique areas = 68
+  Budget 10%:
+    EXPLOIT_ONLY:  Unique areas = 49
+    EXPLOIT_EXPLORE: Unique areas = 76
+  Budget 20%:
+    EXPLOIT_ONLY:  Unique areas = 61
+    EXPLOIT_EXPLORE: Unique areas = 77
+
+13. SELECTION CONCENTRATION
+------------------------------------------------------------
+  Budget 5%:
+    EXPLOIT_ONLY:  Top10% concentration = 21.88%, Top20% = 43.75%
+    EXPLOIT_EXPLORE: Top10% concentration = 10.29%, Top20% = 22.06%
+  Budget 10%:
+    EXPLOIT_ONLY:  Top10% concentration = 14.29%, Top20% = 30.61%
+    EXPLOIT_EXPLORE: Top10% concentration = 9.21%, Top20% = 19.74%
+  Budget 20%:
+    EXPLOIT_ONLY:  Top10% concentration = 11.48%, Top20% = 24.59%
+    EXPLOIT_EXPLORE: Top10% concentration = 9.09%, Top20% = 19.48%
+
+14. LOW-RISK DISCOVERY
+------------------------------------------------------------
+  Budget 5%:
+    Low-risk discoveries (exploration): 16
+    Total exploration discoveries: 35
+  Budget 10%:
+    Low-risk discoveries (exploration): 97
+    Total exploration discoveries: 112
+  Budget 20%:
+    Low-risk discoveries (exploration): 90
+    Total exploration discoveries: 157
+
+15. STATISTICAL COMPARISON
+------------------------------------------------------------
+Paired weekly t-tests (same candidate populations):
+Bootstrap 95% CI (10,000 resamples) for Recall@K and Discovery Rate
+
+  Budget 5%:
+    Recall: Exploit=0.0171, Explore=0.0194, Diff=+0.0023 (p=0.0084, CI=[0.0007, 0.0039])
+    Precision: Exploit=0.0850, Explore=0.0940, Diff=+0.0090 (p=0.0146)
+    Discovered: Exploit=3.3, Explore=3.7, Diff=+0.4 (p=0.0146, CI=[0.1, 0.6])
+    Unique areas: Exploit=18.2, Explore=19.3, Diff=+1.1 (p=0.0000)
+    Top10% concentration: Exploit=37.55%, Explore=34.80%, Diff=-2.75% (p=0.0000)
+    Low-risk discoveries: Exploit=0.0, Explore=0.3, Diff=+0.3 (p=0.0000)
+  Budget 10%:
+    Recall: Exploit=0.0387, Explore=0.0463, Diff=+0.0076 (p=0.0000, CI=[0.0051, 0.0101])
+    Precision: Exploit=0.0973, Explore=0.1138, Diff=+0.0166 (p=0.0000)
+    Discovered: Exploit=7.5, Explore=8.8, Diff=+1.3 (p=0.0000, CI=[0.8, 1.7])
+    Unique areas: Exploit=32.5, Explore=35.5, Diff=+3.1 (p=0.0000)
+    Top10% concentration: Exploit=21.72%, Explore=19.72%, Diff=-2.00% (p=0.0000)
+    Low-risk discoveries: Exploit=0.0, Explore=1.9, Diff=+1.9 (p=0.0000)
+  Budget 20%:
+    Recall: Exploit=0.0896, Explore=0.0948, Diff=+0.0052 (p=0.0041, CI=[0.0019, 0.0086])
+    Precision: Exploit=0.1119, Explore=0.1173, Diff=+0.0053 (p=0.0066)
+    Discovered: Exploit=17.2, Explore=18.1, Diff=+0.8 (p=0.0066, CI=[0.3, 1.4])
+    Unique areas: Exploit=51.5, Explore=54.3, Diff=+2.8 (p=0.0000)
+    Top10% concentration: Exploit=13.62%, Explore=12.91%, Diff=-0.71% (p=0.0000)
+    Low-risk discoveries: Exploit=0.0, Explore=1.9, Diff=+1.9 (p=0.0000)
+
+16. LIMITATIONS
+------------------------------------------------------------
+- Simulated verification using historical outcomes, not real officer inspections
+- Assumes perfect compliance and accurate historical recording
+- No model retraining with feedback (single-shot simulation)
+- Fixed 90/10 split not optimized
+- Escalation target based on rolling_mean_4_weeks availability
+- Chicago-specific patterns may not generalize
+
+17. RESEARCH INTERPRETATION
+------------------------------------------------------------
+  Budget 5%:
+    Precision change: +0.0090 (gain)
+    Recall change: +0.0020 (gain)
+    Additional escalations discovered: +18.0
+    Additional unique areas covered: +36.0
+    Concentration reduction: -11.58%
+    Low-risk discoveries enabled: 16.0
+  Budget 10%:
+    Precision change: +0.0166 (gain)
+    Recall change: +0.0071 (gain)
+    Additional escalations discovered: +65.0
+    Additional unique areas covered: +27.0
+    Concentration reduction: -5.08%
+    Low-risk discoveries enabled: 97.0
+  Budget 20%:
+    Precision change: +0.0053 (gain)
+    Recall change: +0.0046 (gain)
+    Additional escalations discovered: +42.0
+    Additional unique areas covered: +16.0
+    Concentration reduction: -2.38%
+    Low-risk discoveries enabled: 90.0
+
+18. RECOMMENDED POLICY
+------------------------------------------------------------
+Based on the trade-off between precision cost and recall/coverage gain:
+  Budget 5%: EXPLOIT_EXPLORE recommended if recall prioritized over precision
+  Budget 10%: EXPLOIT_EXPLORE recommended if recall prioritized over precision
+  Budget 20%: EXPLOIT_EXPLORE recommended if recall prioritized over precision
+
+19. FINAL RESEARCH QUESTION ANSWER
+------------------------------------------------------------
+"Under a limited verification budget, does allocating a small fraction
+of verification capacity to randomized exploration reduce
+feedback-selection concentration and discover additional future
+civic escalations compared with exploitation-only dispatch?"
+
+  Budget 5%:
+    Concentration reduced: YES (top10% concentration 21.9% -> 10.3%, reduction 11.6%)
+    Additional escalations discovered: YES (18.0 more, including 16.0 low-risk)
+    Precision cost: -0.0090 (acceptable)
+    Verdict: Exploration IS BENEFICIAL at 5% budget
+  Budget 10%:
+    Concentration reduced: YES (top10% concentration 14.3% -> 9.2%, reduction 5.1%)
+    Additional escalations discovered: YES (65.0 more, including 97.0 low-risk)
+    Precision cost: -0.0166 (acceptable)
+    Verdict: Exploration IS BENEFICIAL at 10% budget
+  Budget 20%:
+    Concentration reduced: YES (top10% concentration 11.5% -> 9.1%, reduction 2.4%)
+    Additional escalations discovered: YES (42.0 more, including 90.0 low-risk)
+    Precision cost: -0.0053 (acceptable)
+    Verdict: Exploration IS BENEFICIAL at 20% budget

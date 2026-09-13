@@ -1,0 +1,51 @@
+OFFICER ASSIGNMENT INPUT REPORT
+==================================================
+
+SOURCE FILES:
+  - data/results/verification_decisions.csv
+  - data/results/verification_policy_comparison.csv
+  - data/results/exploration_ratio_comparison.csv
+
+ROW COUNTS:
+  Total rows in verification_decisions.csv: 27540
+  Rows after filtering (policy=EXPLOIT_EXPLORE, budgets=5%,10%,20%): 13770
+
+BUDGETS:
+  5%: 1989 locations
+  10%: 3927 locations
+  20%: 7854 locations
+
+NUMBER OF CANDIDATE LOCATIONS:
+  Total: 13770
+
+EXPLOITATION COUNT:
+  EXPLOIT: 12342
+
+EXPLORATION COUNT:
+  EXPLORE: 1428
+
+MISSING VALUES:
+  week_start: 0
+  community_area: 0
+  sr_type: 0
+  predicted_probability: 0
+  prediction_rank: 0
+  selection_type: 0
+  budget: 0
+  policy: 0
+
+DUPLICATE COUNT:
+  Exact duplicate rows: 0
+  Duplicate location/week/sr_type combinations: 5457
+  (Note: duplicates across budgets are expected - each budget is a separate scenario)
+
+VALIDATION PROBLEMS:
+  Invalid probabilities (<0 or >1): 0
+  Invalid budgets (not 5%, 10%, 20%): 0
+
+EXPLORATION RATIO VALIDATION (per budget):
+  Budget 5%: EXPLOIT=1785, EXPLORE=204, Total=1989, Exploration Ratio=10.3%
+  Budget 10%: EXPLOIT=3519, EXPLORE=408, Total=3927, Exploration Ratio=10.4%
+  Budget 20%: EXPLOIT=7038, EXPLORE=816, Total=7854, Exploration Ratio=10.4%
+
+OFFICER ASSIGNMENT INPUT READY

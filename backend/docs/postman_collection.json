@@ -1,0 +1,320 @@
+{
+  "info": {
+    "_postman_id": "8d3e9112-a12b-4578-bc45-civic-forecasting-api",
+    "name": "Civic Complaint Forecasting & Verification API",
+    "description": "Postman Collection for Proactive Civic Complaint Forecasting with Resource-Constrained Verification and Feedback.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "officerToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Authentication",
+      "item": [
+        {
+          "name": "Register Officer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Officer Jordan Reed\",\n  \"email\": \"jordan.reed@civic.gov\",\n  \"password\": \"Password123!\",\n  \"department\": \"Streets & Sanitation\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@civic.gov\",\n  \"password\": \"AdminPass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login Officer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"jordan.reed@civic.gov\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Profile (Me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{officerToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Admin Operations",
+      "item": [
+        {
+          "name": "Admin Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/admin/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "dashboard"]
+            }
+          }
+        },
+        {
+          "name": "Global Heatmap",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/admin/heatmap",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "heatmap"]
+            }
+          }
+        },
+        {
+          "name": "List All Predictions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/admin/predictions?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "predictions"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Prediction Full 7-Node Trace",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/admin/predictions/PRED-83921",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "predictions", "PRED-83921"]
+            }
+          }
+        },
+        {
+          "name": "Auto-Assign Prediction",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/admin/assignments/auto-assign/6a8ed15ebdd2e2b8996112bf",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "assignments", "auto-assign", "6a8ed15ebdd2e2b8996112bf"]
+            }
+          }
+        },
+        {
+          "name": "List All Officers",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/admin/officers",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "officers"]
+            }
+          }
+        },
+        {
+          "name": "Soft Deactivate Officer",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/admin/officers/OFF-101",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "officers", "OFF-101"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Officer Operations",
+      "item": [
+        {
+          "name": "Officer Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{officerToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/officer/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["officer", "dashboard"]
+            }
+          }
+        },
+        {
+          "name": "Officer Assigned Predictions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{officerToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/officer/predictions",
+              "host": ["{{baseUrl}}"],
+              "path": ["officer", "predictions"]
+            }
+          }
+        },
+        {
+          "name": "Officer Assignments",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{officerToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/officer/assignments",
+              "host": ["{{baseUrl}}"],
+              "path": ["officer", "assignments"]
+            }
+          }
+        },
+        {
+          "name": "Accept Assignment",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{officerToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/officer/assignments/ASGN-9021/accept",
+              "host": ["{{baseUrl}}"],
+              "path": ["officer", "assignments", "ASGN-9021", "accept"]
+            }
+          }
+        },
+        {
+          "name": "Start Assignment (IN_PROGRESS)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{officerToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/officer/assignments/ASGN-9021/start",
+              "host": ["{{baseUrl}}"],
+              "path": ["officer", "assignments", "ASGN-9021", "start"]
+            }
+          }
+        },
+        {
+          "name": "Submit Field Verification",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{officerToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"predictionId\": \"PRED-83921\",\n  \"outcome\": \"PROBLEM_CONFIRMED\",\n  \"severity\": \"HIGH\",\n  \"notes\": \"Observed major road damage at intersection.\",\n  \"latitude\": 41.8781,\n  \"longitude\": -87.6298\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/officer/verifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["officer", "verifications"]
+            }
+          }
+        },
+        {
+          "name": "Department Heatmap",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{officerToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/officer/heatmap",
+              "host": ["{{baseUrl}}"],
+              "path": ["officer", "heatmap"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Geospatial Heatmap",
+      "item": [
+        {
+          "name": "Nearby Proximity Query",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{officerToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/heatmap/nearby?latitude=41.8781&longitude=-87.6298&radiusKm=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["heatmap", "nearby"],
+              "query": [
+                { "key": "latitude", "value": "41.8781" },
+                { "key": "longitude", "value": "-87.6298" },
+                { "key": "radiusKm", "value": "5" }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

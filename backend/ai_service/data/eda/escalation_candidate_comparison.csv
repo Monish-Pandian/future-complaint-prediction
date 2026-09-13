@@ -1,0 +1,7 @@
+candidate,total_samples,positive_samples,negative_samples,positive_rate
+A_count_ge_2,241780,193265,48515,0.799
+B_count_ge_3,241780,172139,69641,0.712
+C_count_ge_5,241780,138889,102891,0.574
+D_gt_rolling_4w,241780,101041,140739,0.418
+E_ge_1.5x_rolling_4w,241780,56970,184810,0.236
+F_ge_2x_rolling_4w,241780,36579,205201,0.151

@@ -1,0 +1,82 @@
+OFFICER ASSIGNMENT REPORT — RISK_ONLY_ASSIGNMENT
+============================================================
+
+ASSIGNMENT POLICY: RISK_ONLY_ASSIGNMENT
+WEIGHTS: risk=1.0, distance=0.0, workload=0.0
+
+SUMMARY:
+  Total locations: 13770
+  Assigned: 489
+  Unassigned: 13281
+  Assignment rate: 3.6%
+
+DISTANCE:
+  Average distance (km): 9.51
+
+WORKLOAD DISTRIBUTION:
+  Min: 3.0
+  Max: 7.0
+  Mean: 4.93
+  Std: 1.39
+
+COMPATIBILITY:
+  Department compatible rate: 100.0%
+
+CAPACITY:
+  Capacity violations: 0
+
+UNASSIGNED REASONS:
+  no_eligible_officer: 13281
+
+ASSIGNMENT ASSUMPTIONS:
+  - Synthetic officer pool (LOW capacity scenario)
+  - Department compatibility via SR type mapping
+  - Distance = haversine between officer home_area and community_area centroids
+  - Workload tracked per officer, max_assignments = capacity
+  - Officers static availability (available=True/False)
+  - No future outcomes used in assignment
+  - Risk normalized across all candidates
+  - Distance normalized per-location across eligible officers
+  - Workload normalized per-location across eligible officers
+
+
+OFFICER ASSIGNMENT REPORT — RISK_DISTANCE_WORKLOAD_ASSIGNMENT
+============================================================
+
+ASSIGNMENT POLICY: RISK_DISTANCE_WORKLOAD_ASSIGNMENT
+WEIGHTS: risk=0.4, distance=0.3, workload=0.3
+
+SUMMARY:
+  Total locations: 13770
+  Assigned: 489
+  Unassigned: 13281
+  Assignment rate: 3.6%
+
+DISTANCE:
+  Average distance (km): 8.50
+
+WORKLOAD DISTRIBUTION:
+  Min: 3.0
+  Max: 7.0
+  Mean: 4.93
+  Std: 1.39
+
+COMPATIBILITY:
+  Department compatible rate: 100.0%
+
+CAPACITY:
+  Capacity violations: 0
+
+UNASSIGNED REASONS:
+  no_eligible_officer: 13281
+
+ASSIGNMENT ASSUMPTIONS:
+  - Synthetic officer pool (LOW capacity scenario)
+  - Department compatibility via SR type mapping
+  - Distance = haversine between officer home_area and community_area centroids
+  - Workload tracked per officer, max_assignments = capacity
+  - Officers static availability (available=True/False)
+  - No future outcomes used in assignment
+  - Risk normalized across all candidates
+  - Distance normalized per-location across eligible officers
+  - Workload normalized per-location across eligible officers

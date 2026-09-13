@@ -1,0 +1,61 @@
+Chicago 311 Sample Report
+==================================================
+
+Number of rows: 10000
+Number of columns: 11
+
+Column names:
+  - sr_number
+  - sr_type
+  - owner_department
+  - status
+  - created_date
+  - closed_date
+  - zip_code
+  - ward
+  - community_area
+  - latitude
+  - longitude
+
+Missing value counts:
+  sr_number: 0 (0.0%)
+  sr_type: 0 (0.0%)
+  owner_department: 0 (0.0%)
+  status: 0 (0.0%)
+  created_date: 0 (0.0%)
+  closed_date: 3052 (30.5%)
+  zip_code: 1216 (12.2%)
+  ward: 57 (0.6%)
+  community_area: 56 (0.6%)
+  latitude: 55 (0.5%)
+  longitude: 55 (0.5%)
+
+Date range: 2026-08-21 11:35:09 to 2026-08-23 03:14:10
+
+Number of unique complaint types: 87
+
+Top 20 complaint types:
+  1. 311 INFORMATION ONLY CALL: 3347
+  2. Aircraft Noise Complaint: 2730
+  3. Graffiti Removal Request: 459
+  4. Garbage Cart Maintenance: 204
+  5. Tree Debris Clean-Up Request: 202
+  6. Rodent Baiting/Rat Complaint: 188
+  7. Pothole in Street Complaint: 168
+  8. Abandoned Vehicle Complaint: 167
+  9. Street Light Out Complaint: 138
+  10. Tree Emergency: 132
+  11. Building Violation: 123
+  12. Finance Parking Code Enforcement Review: 110
+  13. Blue Recycling Cart: 104
+  14. Yard Waste Pick-Up Request: 103
+  15. Tree Trim Request (NO LONGER BEING ACCEPTED): 102
+  16. Tree Removal Inspection: 100
+  17. Sanitation Code Violation: 98
+  18. Traffic Signal Out Complaint: 95
+  19. E-Scooter Parking Complaint: 81
+  20. Dead Animal Pick-Up Request: 78
+
+Number of unique community areas: 77
+
+Number of unique wards: 50

@@ -1,0 +1,11 @@
+import pandas as pd
+candidates = pd.read_csv('data/results/officer_assignment_candidates.csv')
+print('Total candidates:', len(candidates))
+print('By sr_type:')
+print(candidates['sr_type'].value_counts())
+print()
+print('By budget:')
+print(candidates['budget'].value_counts())
+print()
+print('By selection_type:')
+print(candidates['selection_type'].value_counts())

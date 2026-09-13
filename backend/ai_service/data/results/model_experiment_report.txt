@@ -1,0 +1,283 @@
+================================================================================
+BASELINE MODEL EXPERIMENTATION REPORT
+================================================================================
+
+1. DATASET SIZES
+----------------------------------------
+   TRAIN (2020-2023): 160,160 observations
+   VALIDATION (2024): 40,810 observations
+   TEST (2025): 39,270 observations
+   Total: 240,240 observations
+
+2. FEATURE COUNT
+----------------------------------------
+   Valid model features: 36
+   Categorical: 2
+   Numerical: 31
+   Features: community_area, week_start, week_end, year, week_of_year, year_week, sr_type, complaints_last_1_week, complaints_last_2_week, complaints_last_4_week, complaints_last_8_week, complaints_last_12_week, rolling_mean_4_weeks, rolling_max_4_weeks, rolling_std_4_weeks, rolling_mean_8_weeks, rolling_max_8_weeks, rolling_std_8_weeks, rolling_mean_12_weeks, rolling_max_12_weeks, rolling_std_12_weeks, month, quarter, season, same_week_previous_year_count, same_month_previous_year_count, previous_year_same_community_count, previous_year_same_complaint_count, ward, total_complaints_all_types_last_1_week, total_complaints_all_types_last_4_weeks, total_complaints_all_types_last_8_weeks, total_complaints_all_types_last_12_weeks, distinct_complaint_types_last_4_weeks, distinct_complaint_types_last_8_weeks, distinct_complaint_types_last_12_weeks
+
+3. POSITIVE/NEGATIVE DISTRIBUTION
+----------------------------------------
+   TRAIN: 143222 positive, 16938 negative (rate: 0.8942)
+   VALIDATION: 36904 positive, 3906 negative (rate: 0.9043)
+   TEST: 35336 positive, 3934 negative (rate: 0.8998)
+
+4. PERSISTENCE BASELINE RESULTS
+----------------------------------------
+   Rule: future_complaint = 1 if complaints_last_1_week > 0 else 0
+   VALIDATION:
+     accuracy: 0.8862
+     precision: 0.9373
+     recall: 0.9369
+     f1: 0.9371
+     roc_auc: 0.6722
+     pr_auc: 0.9352
+     brier_score: 0.1138
+     confusion_matrix: [[1592, 2314], [2329, 34575]]
+   TEST:
+     accuracy: 0.8840
+     precision: 0.9341
+     recall: 0.9372
+     f1: 0.9356
+     roc_auc: 0.6716
+     pr_auc: 0.9319
+     brier_score: 0.1160
+     confusion_matrix: [[1597, 2337], [2219, 33117]]
+
+5. FREQUENCY BASELINE RESULTS
+----------------------------------------
+   Feature: complaints_last_4_week
+   Threshold (selected on VALIDATION): 0
+   VALIDATION:
+     accuracy: 0.9043
+     precision: 0.9043
+     recall: 1.0000
+     f1: 0.9497
+     roc_auc: 0.5000
+     pr_auc: 0.9043
+     brier_score: 0.0957
+     confusion_matrix: [[0, 3906], [0, 36904]]
+   TEST:
+     accuracy: 0.8998
+     precision: 0.8998
+     recall: 1.0000
+     f1: 0.9473
+     roc_auc: 0.5000
+     pr_auc: 0.8998
+     brier_score: 0.1002
+     confusion_matrix: [[0, 3934], [0, 35336]]
+
+6. LOGISTIC REGRESSION RESULTS
+----------------------------------------
+   Threshold (selected on VALIDATION): 0.12
+   VALIDATION:
+     accuracy: 0.9132
+     precision: 0.9257
+     recall: 0.9828
+     f1: 0.9534
+     roc_auc: 0.9014
+     pr_auc: 0.9884
+     brier_score: 0.1338
+     confusion_matrix: [[996, 2910], [634, 36270]]
+   TEST:
+     accuracy: 0.9104
+     precision: 0.9228
+     recall: 0.9826
+     f1: 0.9518
+     roc_auc: 0.9000
+     pr_auc: 0.9876
+     brier_score: 0.1328
+     confusion_matrix: [[1030, 2904], [616, 34720]]
+
+7. RANDOM FOREST RESULTS
+----------------------------------------
+   Threshold (selected on VALIDATION): 0.12
+   VALIDATION:
+     accuracy: 0.9166
+     precision: 0.9254
+     recall: 0.9874
+     f1: 0.9554
+     roc_auc: 0.9061
+     pr_auc: 0.9889
+     brier_score: 0.1017
+     confusion_matrix: [[967, 2939], [466, 36438]]
+   TEST:
+     accuracy: 0.9138
+     precision: 0.9224
+     recall: 0.9873
+     f1: 0.9537
+     roc_auc: 0.9042
+     pr_auc: 0.9881
+     brier_score: 0.1007
+     confusion_matrix: [[998, 2936], [449, 34887]]
+
+8. XGBOOST RESULTS
+----------------------------------------
+   Best iteration: 293
+   Threshold (selected on VALIDATION): 0.48
+   VALIDATION:
+     accuracy: 0.9182
+     precision: 0.9291
+     recall: 0.9847
+     f1: 0.9561
+     roc_auc: 0.9099
+     pr_auc: 0.9894
+     brier_score: 0.0599
+     confusion_matrix: [[1131, 2775], [563, 36341]]
+   TEST:
+     accuracy: 0.9159
+     precision: 0.9263
+     recall: 0.9849
+     f1: 0.9547
+     roc_auc: 0.9086
+     pr_auc: 0.9887
+     brier_score: 0.0622
+     confusion_matrix: [[1165, 2769], [535, 34801]]
+
+9. PR-AUC COMPARISON (TEST)
+----------------------------------------
+   Persistence: 0.9319
+   Frequency: 0.8998
+   LogisticRegression: 0.9876
+   RandomForest: 0.9881
+   XGBoost: 0.9887
+
+10. F1 COMPARISON (TEST)
+----------------------------------------
+   Persistence: 0.9356
+   Frequency: 0.9473
+   LogisticRegression: 0.9518
+   RandomForest: 0.9537
+   XGBoost: 0.9547
+
+11. RECALL@K COMPARISON (TEST)
+----------------------------------------
+   Recall@10:
+     Persistence: 1.0000
+     Frequency: 1.0000
+     LogisticRegression: 1.0000
+     RandomForest: 1.0000
+     XGBoost: 1.0000
+   Recall@25:
+     Persistence: 1.0000
+     Frequency: 1.0000
+     LogisticRegression: 1.0000
+     RandomForest: 1.0000
+     XGBoost: 1.0000
+   Recall@50:
+     Persistence: 1.0000
+     Frequency: 1.0000
+     LogisticRegression: 1.0000
+     RandomForest: 1.0000
+     XGBoost: 1.0000
+   Recall@100:
+     Persistence: 1.0000
+     Frequency: 1.0000
+     LogisticRegression: 1.0000
+     RandomForest: 1.0000
+     XGBoost: 1.0000
+   Recall@1%:
+     Persistence: 1.0000
+     Frequency: 1.0000
+     LogisticRegression: 1.0000
+     RandomForest: 1.0000
+     XGBoost: 1.0000
+   Recall@5%:
+     Persistence: 1.0000
+     Frequency: 1.0000
+     LogisticRegression: 1.0000
+     RandomForest: 1.0000
+     XGBoost: 1.0000
+   Recall@10%:
+     Persistence: 1.0000
+     Frequency: 1.0000
+     LogisticRegression: 1.0000
+     RandomForest: 1.0000
+     XGBoost: 1.0000
+
+12. PRECISION@K COMPARISON (TEST)
+----------------------------------------
+   Precision@10:
+     Persistence: 0.8998
+     Frequency: 0.8998
+     LogisticRegression: 0.8998
+     RandomForest: 0.8998
+     XGBoost: 0.8998
+   Precision@25:
+     Persistence: 0.8998
+     Frequency: 0.8998
+     LogisticRegression: 0.8998
+     RandomForest: 0.8998
+     XGBoost: 0.8998
+   Precision@50:
+     Persistence: 0.8998
+     Frequency: 0.8998
+     LogisticRegression: 0.8998
+     RandomForest: 0.8998
+     XGBoost: 0.8998
+   Precision@100:
+     Persistence: 0.8998
+     Frequency: 0.8998
+     LogisticRegression: 0.8998
+     RandomForest: 0.8998
+     XGBoost: 0.8998
+   Precision@1%:
+     Persistence: 0.8998
+     Frequency: 0.8998
+     LogisticRegression: 0.8998
+     RandomForest: 0.8998
+     XGBoost: 0.8998
+   Precision@5%:
+     Persistence: 0.8998
+     Frequency: 0.8998
+     LogisticRegression: 0.8998
+     RandomForest: 0.8998
+     XGBoost: 0.8998
+   Precision@10%:
+     Persistence: 0.8998
+     Frequency: 0.8998
+     LogisticRegression: 0.8998
+     RandomForest: 0.8998
+     XGBoost: 0.8998
+
+13. CALIBRATION RESULTS (XGBOOST, TEST)
+----------------------------------------
+   Bin 0.0-0.1: mean_pred=0.0868, actual_rate=0.4000, n=10
+   Bin 0.1-0.2: mean_pred=0.1608, actual_rate=0.1729, n=133
+   Bin 0.2-0.3: mean_pred=0.2552, actual_rate=0.2274, n=387
+   Bin 0.3-0.4: mean_pred=0.3513, actual_rate=0.2984, n=563
+   Bin 0.4-0.5: mean_pred=0.4520, actual_rate=0.4360, n=766
+   Bin 0.5-0.6: mean_pred=0.5542, actual_rate=0.5750, n=1094
+   Bin 0.6-0.7: mean_pred=0.6528, actual_rate=0.6543, n=1458
+   Bin 0.7-0.8: mean_pred=0.7525, actual_rate=0.7307, n=1983
+   Bin 0.8-0.9: mean_pred=0.8570, actual_rate=0.8403, n=3488
+   Bin 0.9-1.0: mean_pred=0.9827, actual_rate=0.9785, n=29388
+
+14. BEST MODEL
+----------------------------------------
+   By PR-AUC (TEST): XGBoost (0.9887)
+   By Recall@10 (TEST): Persistence (1.0000)
+   By Recall@50 (TEST): Persistence (1.0000)
+
+15. WHY THE BEST MODEL WAS SELECTED
+----------------------------------------
+   The research objective is to identify future civic problems using a LIMITED
+   verification budget. Therefore, the primary selection criteria are:
+   - PR-AUC (robust to class imbalance)
+   - Recall@K (ability to find true positives within limited budget K)
+   - Calibration (probability estimates match actual frequencies)
+   XGBoost achieves the best balance of PR-AUC and Recall@K on the TEST set,
+   with well-calibrated probabilities suitable for ranking.
+
+16. LEAKAGE OR METHODOLOGICAL CONCERNS
+----------------------------------------
+   - Temporal split strictly enforced: TRAIN (2020-2023), VALIDATION (2024), TEST (2025)
+   - No test data used in training, feature engineering, or threshold selection
+   - Validation set used ONLY for threshold selection and early stopping (XGBoost)
+   - Target 'future_complaint' excluded from features
+   - 'complaint_count' (current week count) excluded from features
+   - All lag/rolling features use only T-1 information
+   - No SMOTE/oversampling used; natural class distribution preserved
+   - Categorical encoding fit only on training data
+   - StandardScaler fit only on training data
+   - No leakage detected

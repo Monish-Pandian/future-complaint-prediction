@@ -1,0 +1,231 @@
+@keyframes heroEnter {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(18px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+}
+
+@keyframes labelEnter {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+}
+
+@keyframes titleEnter {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(30px);
+
+        filter:
+            blur(8px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0);
+
+        filter:
+            blur(0);
+    }
+}
+
+@keyframes fadeUp {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+}
+
+@keyframes navbarEnter {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translate(-50%, -12px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translate(-50%, 0);
+    }
+}
+
+@keyframes titleGradient {
+
+    0% {
+        background-position:
+            0% 50%;
+    }
+
+    100% {
+        background-position:
+            100% 50%;
+    }
+}
+
+@keyframes nodePulse {
+
+    0%,
+    100% {
+        opacity: 0.35;
+
+        transform:
+            scale(0.85);
+    }
+
+    50% {
+        opacity: 1;
+
+        transform:
+            scale(1.15);
+    }
+}
+
+@keyframes nodeRing {
+
+    0% {
+        opacity: 0.6;
+
+        transform:
+            translate(-50%, -50%)
+            scale(0.5);
+    }
+
+    100% {
+        opacity: 0;
+
+        transform:
+            translate(-50%, -50%)
+            scale(1.8);
+    }
+}
+
+@keyframes gridShift {
+
+    from {
+        background-position:
+            0 0,
+            0 0;
+    }
+
+    to {
+        background-position:
+            70px 70px,
+            70px 70px;
+    }
+}
+
+@keyframes topologyMove {
+
+    from {
+        transform:
+            rotate(-12deg)
+            scale(1.2)
+            translate(0, 0);
+    }
+
+    to {
+        transform:
+            rotate(-12deg)
+            scale(1.2)
+            translate(40px, -30px);
+    }
+}
+
+@keyframes authContentEnter {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+}
+
+@keyframes authPanelEnter {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(24px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+}
+
+@keyframes authSpin {
+
+    to {
+        transform:
+            rotate(360deg);
+    }
+}
+
+@keyframes pageEnter {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+}

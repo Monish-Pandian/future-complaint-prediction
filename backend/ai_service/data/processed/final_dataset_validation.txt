@@ -1,0 +1,50 @@
+FINAL DATASET VALIDATION REPORT
+============================================================
+
+1. Final row count: 240240
+2. Final column count: 39
+3. Number of community areas: 77
+4. Number of complaint types: 10
+5. Number of weeks: 312
+
+6. Train dimensions: (160160, 40)
+7. Validation dimensions: (40810, 40)
+8. Test dimensions: (39270, 40)
+
+9. Target distribution (overall):
+   Positive: 215462 (89.69%)
+   Negative: 24778 (10.31%)
+
+10. Target distribution by complaint type (overall):
+   Abandoned Vehicle Complaint: 95.20% positive (24024 rows)
+   Blue Recycling Cart: 87.66% positive (24024 rows)
+   Building Violation: 87.56% positive (24024 rows)
+   Garbage Cart Maintenance: 95.79% positive (24024 rows)
+   Graffiti Removal Request: 84.46% positive (24024 rows)
+   Pothole in Street Complaint: 94.00% positive (24024 rows)
+   Rodent Baiting/Rat Complaint: 91.57% positive (24024 rows)
+   Street Light Out Complaint: 94.26% positive (24024 rows)
+   Traffic Signal Out Complaint: 86.69% positive (24024 rows)
+   Tree Debris Clean-Up Request: 79.67% positive (24024 rows)
+
+11. Missing value summary: 0 total missing values after treatment
+
+12. Duplicate-key result: 0 duplicates (must be 0)
+
+13. Leakage audit result: PASS - No leakage detected
+
+14. Temporal split result:
+   TRAIN: 160160 rows (2020-01-06 to 2023-12-25)
+   VALIDATION: 40810 rows (2024-01-01 to 2024-12-30)
+   TEST: 39270 rows (2025-01-06 to 2025-12-22)
+
+15. Always-positive baseline:
+   TRAIN: Acc=0.8942, Prec=0.8942, Rec=1.0000, F1=0.9442
+   VALIDATION: Acc=0.9043, Prec=0.9043, Rec=1.0000, F1=0.9497
+   TEST: Acc=0.8998, Prec=0.8998, Rec=1.0000, F1=0.9473
+
+16. Warnings:
+   - Severe class imbalance (~90% positive)
+   - Do not use accuracy as primary metric
+   - Rolling features for first 12 weeks filled with 0 (insufficient history)
+   - Seasonal features for first year filled with 0 (no previous year data)

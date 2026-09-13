@@ -1,0 +1,645 @@
+openapi: 3.0.3
+info:
+  title: Civic Complaint Forecasting & Verification API
+  description: >
+    RESTful Express.js Backend API for "Proactive Civic Complaint Forecasting with
+    Resource-Constrained Verification and Feedback".
+    
+    Provides role-based access control, AI-driven dispatch simulation, field verification,
+    ground-truth evaluation, and iterative retraining feedback loops.
+  version: 1.0.0
+  contact:
+    name: Civic Forecasting Research & Development
+servers:
+  - url: http://localhost:5000/api/v1
+    description: Local Development Server (v1)
+  - url: http://localhost:5001/api/v1
+    description: Isolated Automated Test Server (v1)
+
+tags:
+  - name: Health
+    description: System and database connectivity diagnostic endpoints
+  - name: Authentication
+    description: User registration, JWT login, and profile retrieval
+  - name: Admin - Overview
+    description: Global municipal dashboards, heatmaps, and verification monitoring
+  - name: Admin - Predictions
+    description: Citywide predicted problems management and 7-node lifecycle trace
+  - name: Admin - Assignments
+    description: AI dispatch engine triggering and assignment monitoring
+  - name: Admin - Verifications
+    description: Monitoring field observations and evaluation linkages
+  - name: Admin - Officers
+    description: Municipal officer management and soft deactivation
+  - name: Officer - Dashboard & Tasks
+    description: Department-scoped dashboard and assigned prediction task lists
+  - name: Officer - Assignments
+    description: Task acceptance, in-progress state transitions, and rejection
+  - name: Officer - Field Verifications
+    description: Submitting field observations and recording ground truth
+  - name: Officer - Heatmap
+    description: Department-isolated geospatial GeoJSON feature collections
+  - name: Geospatial Heatmap
+    description: Radius-based geospatial proximity heatmap queries
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check and MongoDB status
+      responses:
+        '200':
+          description: Service is healthy and database is connected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: Database service unavailable
+
+  /auth/register:
+    post:
+      tags: [Authentication]
+      summary: Register a new Officer user account
+      description: Public registration endpoint. Restricted to OFFICER role creation only.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Officer user successfully registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSuccessResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          description: Role escalation attempt (role=ADMIN is blocked)
+        '409':
+          description: Email already registered
+
+  /auth/login:
+    post:
+      tags: [Authentication]
+      summary: Authenticate user credentials and receive JWT Bearer token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Successful authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSuccessResponse'
+        '401':
+          description: Invalid email or password
+        '403':
+          description: Account is deactivated
+
+  /auth/me:
+    get:
+      tags: [Authentication]
+      summary: Get current authenticated user profile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User profile data
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/logout:
+    post:
+      tags: [Authentication]
+      summary: Invalidate user session
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successfully logged out
+
+  /admin/dashboard:
+    get:
+      tags: [Admin - Overview]
+      summary: Global municipal operational dashboard metrics
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Citywide dashboard aggregated metrics
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/heatmap:
+    get:
+      tags: [Admin - Overview]
+      summary: Global citywide GeoJSON heatmap FeatureCollection
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: department
+          schema: { type: string }
+        - in: query
+          name: riskLevel
+          schema: { type: string, enum: [CRITICAL, HIGH, MEDIUM, LOW] }
+        - in: query
+          name: complaintType
+          schema: { type: string }
+      responses:
+        '200':
+          description: GeoJSON FeatureCollection of all departments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeoJSONFeatureCollection'
+
+  /admin/predictions:
+    get:
+      tags: [Admin - Predictions]
+      summary: List all predicted problems with filters and pagination
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 10 }
+        - in: query
+          name: department
+          schema: { type: string }
+        - in: query
+          name: riskLevel
+          schema: { type: string, enum: [CRITICAL, HIGH, MEDIUM, LOW] }
+        - in: query
+          name: verificationStatus
+          schema: { type: string }
+      responses:
+        '200':
+          description: Paginated list of predicted problems
+    post:
+      tags: [Admin - Predictions]
+      summary: Create new predicted problem forecast
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePredictionRequest'
+      responses:
+        '201':
+          description: Predicted problem created
+
+  /admin/predictions/run-cycle:
+    post:
+      tags: [Admin - Predictions]
+      summary: Trigger AI prediction cycle ingestion via AI Service adapter
+      description: Orchestrates prediction cycle generation, strict schema validation, idempotency checks, and batch MongoDB persistence.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cycleNumber: { type: integer, example: 105 }
+                modelVersion: { type: string, example: "baseline-spatial-v1" }
+                areas:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      communityArea: { type: string, example: "Near North Side" }
+                      ward: { type: string, example: "Ward 42" }
+                      department: { type: string, example: "Streets & Sanitation" }
+                      complaintType: { type: string, example: "Pothole Wave" }
+      responses:
+        '201':
+          description: Prediction cycle completed and predictions persisted
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '502':
+          description: AI Service communication failure
+        '504':
+          description: AI Service timeout
+
+  /admin/predictions/{id}:
+    get:
+      tags: [Admin - Predictions]
+      summary: Get predicted problem and complete 7-node lifecycle trace
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Prediction with full relational graph (Cycle, Officer, Assignment, Verification, Evaluation, Feedback)
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /admin/assignments:
+    get:
+      tags: [Admin - Assignments]
+      summary: List all officer assignments
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Paginated list of assignments
+
+  /admin/assignments/auto-assign/{predictionId}:
+    post:
+      tags: [Admin - Assignments]
+      summary: Trigger AI / heuristic dispatch algorithm for a predicted problem
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: predictionId
+          required: true
+          schema: { type: string }
+      responses:
+        '201':
+          description: Officer assigned successfully
+
+  /admin/verifications:
+    get:
+      tags: [Admin - Verifications]
+      summary: List all field verifications across all departments
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of field verifications
+
+  /admin/officers:
+    get:
+      tags: [Admin - Officers]
+      summary: List municipal officers with filters
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of officers
+    post:
+      tags: [Admin - Officers]
+      summary: Create new officer record and provision user login
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOfficerRequest'
+      responses:
+        '201':
+          description: Officer created successfully
+
+  /admin/officers/{id}:
+    get:
+      tags: [Admin - Officers]
+      summary: Get officer profile and assignment summary
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Officer profile
+    patch:
+      tags: [Admin - Officers]
+      summary: Update officer details
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Officer updated
+    delete:
+      tags: [Admin - Officers]
+      summary: Soft deactivate officer (preserves historical data)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Officer deactivated (active=false, availability=OFF_DUTY)
+
+  /officer/dashboard:
+    get:
+      tags: [Officer - Dashboard & Tasks]
+      summary: Officer personal dashboard and department metrics
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Officer dashboard data
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /officer/predictions:
+    get:
+      tags: [Officer - Dashboard & Tasks]
+      summary: List predicted problems assigned to authenticated officer
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of assigned predictions
+
+  /officer/assignments:
+    get:
+      tags: [Officer - Assignments]
+      summary: List assignments for authenticated officer
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Officer assignments
+
+  /officer/assignments/{id}/accept:
+    patch:
+      tags: [Officer - Assignments]
+      summary: Officer accepts assigned prediction (AI_ASSIGNED -> ACCEPTED)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Assignment accepted
+
+  /officer/assignments/{id}/start:
+    patch:
+      tags: [Officer - Assignments]
+      summary: Officer starts verification task (ACCEPTED -> IN_PROGRESS)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Assignment started
+
+  /officer/verifications:
+    get:
+      tags: [Officer - Field Verifications]
+      summary: List verifications submitted by authenticated officer
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Officer verification history
+    post:
+      tags: [Officer - Field Verifications]
+      summary: Submit field verification observation for assigned prediction
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitVerificationRequest'
+      responses:
+        '201':
+          description: Verification submitted, ground-truth evaluation generated, and feedback linked
+        '403':
+          description: Forbidden (Prediction not assigned to requesting officer)
+        '409':
+          description: Duplicate verification already submitted for this assignment
+
+  /officer/heatmap:
+    get:
+      tags: [Officer - Heatmap]
+      summary: Department-scoped GeoJSON heatmap
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Department-isolated GeoJSON FeatureCollection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeoJSONFeatureCollection'
+
+  /heatmap/nearby:
+    get:
+      tags: [Geospatial Heatmap]
+      summary: Radius-based spatial heatmap query
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: latitude
+          required: true
+          schema: { type: number, minimum: -90, maximum: 90 }
+        - in: query
+          name: longitude
+          required: true
+          schema: { type: number, minimum: -180, maximum: 180 }
+        - in: query
+          name: radiusKm
+          schema: { type: number, default: 5, minimum: 0.1, maximum: 100 }
+      responses:
+        '200':
+          description: GeoJSON FeatureCollection of nearby predictions
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        data:
+          type: object
+          properties:
+            status: { type: string, example: healthy }
+            database: { type: string, example: connected }
+            timestamp: { type: string, format: date-time }
+
+    RegisterRequest:
+      type: object
+      required: [name, email, password]
+      properties:
+        name: { type: string, example: "Officer Jane Doe" }
+        email: { type: string, format: email, example: "jane.doe@civic.gov" }
+        password: { type: string, minLength: 6, example: "Password123!" }
+        department: { type: string, example: "Streets & Sanitation" }
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email, example: "admin@civic.gov" }
+        password: { type: string, example: "AdminPass123!" }
+
+    AuthSuccessResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        data:
+          type: object
+          properties:
+            user:
+              type: object
+              properties:
+                id: { type: string }
+                name: { type: string }
+                email: { type: string }
+                role: { type: string, enum: [ADMIN, OFFICER] }
+                department: { type: string }
+            token: { type: string, description: "JWT Bearer Token" }
+
+    CreatePredictionRequest:
+      type: object
+      required: [complaintType, department, probability, riskScore, riskLevel]
+      properties:
+        complaintType: { type: string, example: "Pothole Wave" }
+        department: { type: string, example: "Streets & Sanitation" }
+        communityArea: { type: string, example: "Near North Side" }
+        ward: { type: string, example: "Ward 42" }
+        location:
+          type: object
+          properties:
+            type: { type: string, example: "Point" }
+            coordinates:
+              type: array
+              items: { type: number }
+              example: [-87.6298, 41.8781]
+        probability: { type: number, minimum: 0, maximum: 1, example: 0.88 }
+        riskScore: { type: number, minimum: 0, maximum: 100, example: 85.0 }
+        riskLevel: { type: string, enum: [CRITICAL, HIGH, MEDIUM, LOW], example: "HIGH" }
+
+    CreateOfficerRequest:
+      type: object
+      required: [name, employeeCode, officerId, department]
+      properties:
+        name: { type: string, example: "Marcus Vance" }
+        employeeCode: { type: string, example: "EMP-MV-101" }
+        officerId: { type: string, example: "OFF-MV-101" }
+        department: { type: string, example: "Streets & Sanitation" }
+        phone: { type: string, example: "312-555-0199" }
+        email: { type: string, format: email, example: "marcus.vance@civic.gov" }
+        password: { type: string, minLength: 6, example: "OfficerPass123!" }
+
+    SubmitVerificationRequest:
+      type: object
+      required: [predictionId, outcome]
+      properties:
+        predictionId: { type: string, example: "PRED-83921" }
+        outcome:
+          type: string
+          enum: [PROBLEM_CONFIRMED, PROBLEM_NOT_FOUND, DIFFERENT_PROBLEM, DUPLICATE, UNABLE_TO_VERIFY]
+          example: "PROBLEM_CONFIRMED"
+        severity:
+          type: string
+          enum: [CRITICAL, HIGH, MEDIUM, LOW]
+          example: "HIGH"
+        notes: { type: string, example: "Field inspection confirmed severe roadway pothole cluster." }
+        evidenceUrl: { type: string, example: "https://evidence.civic.gov/img/pothole-01.jpg" }
+        latitude: { type: number, minimum: -90, maximum: 90, example: 41.8781 }
+        longitude: { type: number, minimum: -180, maximum: 180, example: -87.6298 }
+
+    GeoJSONFeatureCollection:
+      type: object
+      properties:
+        type: { type: string, example: "FeatureCollection" }
+        features:
+          type: array
+          items:
+            type: object
+            properties:
+              type: { type: string, example: "Feature" }
+              geometry:
+                type: object
+                properties:
+                  type: { type: string, example: "Point" }
+                  coordinates:
+                    type: array
+                    items: { type: number }
+                    example: [-87.6298, 41.8781]
+              properties:
+                type: object
+                properties:
+                  predictionId: { type: string }
+                  complaintType: { type: string }
+                  department: { type: string }
+                  riskScore: { type: number }
+                  riskLevel: { type: string }
+
+    ErrorResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        message: { type: string, example: "Error message details" }
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field: { type: string }
+              message: { type: string }
+
+  responses:
+    Unauthorized:
+      description: Authentication required or invalid Bearer token
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    Forbidden:
+      description: Access forbidden for requesting user's role or department
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    NotFound:
+      description: Requested resource was not found
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    ValidationError:
+      description: Request payload failed schema validation
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }

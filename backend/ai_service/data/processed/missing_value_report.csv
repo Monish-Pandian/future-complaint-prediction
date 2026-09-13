@@ -1,0 +1,18 @@
+feature,missing_before,treatment,missing_after
+rolling_mean_4_weeks,3080,filled with 0 (insufficient history for rolling mean),0
+rolling_max_4_weeks,3080,filled with 0 (insufficient history for rolling max),0
+rolling_std_4_weeks,3080,filled with 0 (insufficient history for rolling std),0
+rolling_mean_8_weeks,6160,filled with 0 (insufficient history for rolling mean),0
+rolling_max_8_weeks,6160,filled with 0 (insufficient history for rolling max),0
+rolling_std_8_weeks,6160,filled with 0 (insufficient history for rolling std),0
+rolling_mean_12_weeks,9240,filled with 0 (insufficient history for rolling mean),0
+rolling_max_12_weeks,9240,filled with 0 (insufficient history for rolling max),0
+rolling_std_12_weeks,9240,filled with 0 (insufficient history for rolling std),0
+same_week_previous_year_count,40810,filled with 0 (no previous year data),0
+same_month_previous_year_count,37730,filled with 0 (no previous year data),0
+previous_year_same_community_count,770,filled with 0 (no previous year data),0
+previous_year_same_complaint_count,770,filled with 0 (no previous year data),0
+total_complaints_all_types_last_1_week,770,filled with 0 (no historical all-type complaints),0
+total_complaints_all_types_last_4_weeks,3080,filled with 0 (no historical all-type complaints),0
+total_complaints_all_types_last_8_weeks,6160,filled with 0 (no historical all-type complaints),0
+total_complaints_all_types_last_12_weeks,9240,filled with 0 (no historical all-type complaints),0
