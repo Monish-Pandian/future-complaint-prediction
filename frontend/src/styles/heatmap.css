@@ -1,6 +1,6 @@
 /* ============================================================
-   SPATIAL RISK INTELLIGENCE — HEATMAP STYLES
-   Urban Intelligence Command Center — 70/30 Hero Map Layout
+   MODULE 8E — SPATIAL RISK INTELLIGENCE & CIVIC RISK MAP
+   Urban Intelligence Command Map — 70/30 Hero Map Layout
    ============================================================ */
 
 .heatmap-page {
@@ -8,36 +8,9 @@
   width: 100%;
   max-width: 1600px;
   margin: 0 auto;
-}
-
-/* Header */
-.heatmap-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-.heatmap-header-left {
   display: flex;
   flex-direction: column;
-}
-
-.heatmap-title {
-  margin: 0;
-  font-size: 26px;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.heatmap-subtitle {
-  margin-top: 4px;
-  color: var(--text-muted);
-  font-size: 12px;
-  line-height: 1.4;
+  gap: 16px;
 }
 
 /* =========================================
@@ -47,47 +20,48 @@
 .heatmap-summary-compact-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 14px;
 }
 
 /* =========================================
-   COMPACT FILTER TOOLBAR (ABOVE MAP)
+   FILTER / CONTROL TOOLBAR (ABOVE MAP)
    ========================================= */
 
-.heatmap-compact-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  padding: 10px 14px;
+.map-toolbar-card {
+  padding: 12px 16px;
   background: var(--bg-surface);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
-  margin-bottom: 16px;
 }
 
-.heatmap-search-box {
+.map-toolbar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.map-search-wrapper {
   display: flex;
   align-items: center;
   gap: 8px;
   flex: 1;
-  min-width: 220px;
-  padding: 6px 10px;
+  min-width: 240px;
+  padding: 6px 12px;
   background: var(--bg-primary);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text-muted);
   transition: border-color var(--transition-fast);
 }
 
-.heatmap-search-box:focus-within {
+.map-search-wrapper:focus-within {
   border-color: var(--accent);
   color: var(--text-primary);
 }
 
-.heatmap-toolbar-input {
+.map-search-input {
   width: 100%;
   background: transparent;
   border: none;
@@ -96,41 +70,74 @@
   font-size: 12.5px;
 }
 
-.heatmap-toolbar-input::placeholder {
+.map-search-input::placeholder {
   color: var(--text-muted);
 }
 
-.heatmap-toolbar-select {
-  padding: 7px 10px;
+.map-search-clear {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.map-search-clear:hover {
+  color: var(--text-primary);
+}
+
+.map-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.map-filter-label {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.map-select {
+  padding: 6px 10px;
   background: var(--bg-primary);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
   font-size: 12px;
   outline: none;
   cursor: pointer;
   transition: border-color var(--transition-fast);
+  max-width: 200px;
 }
 
-.heatmap-toolbar-select:focus {
+.map-select:focus {
   border-color: var(--accent);
 }
 
-.heatmap-toolbar-reset {
-  padding: 7px 12px;
+.map-count-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  border: 1px solid var(--glass-border);
-  background: transparent;
-  color: var(--text-muted);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  white-space: nowrap;
 }
 
-.heatmap-toolbar-reset:hover {
-  background: var(--bg-surface-hover);
-  color: var(--text-primary);
+.map-count-badge .count-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
 }
 
 /* =========================================
@@ -142,16 +149,15 @@
   grid-template-columns: 7fr 3fr;
   gap: 16px;
   align-items: start;
-  margin-bottom: 24px;
 }
 
 /* Left Hero Map (70%) */
 .heatmap-map-wrapper {
   position: relative;
   width: 100%;
-  height: 620px;
+  height: 680px;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--border);
   background: var(--bg-surface);
   overflow: hidden;
   box-shadow: var(--shadow-md);
@@ -160,6 +166,7 @@
 .heatmap-map-container {
   width: 100%;
   height: 100%;
+  background: #1a1d24;
 }
 
 /* Floating Custom Map Controls */
@@ -174,13 +181,13 @@
 }
 
 .map-control-btn {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--border);
   background: var(--bg-surface);
   color: var(--text-primary);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -193,66 +200,77 @@
 .map-control-btn:hover {
   background: var(--bg-surface-hover);
   color: var(--accent);
+  border-color: var(--accent);
 }
 
 /* Floating Compact Risk Legend */
-.heatmap-floating-legend {
+.risk-floating-legend {
   position: absolute;
   bottom: 16px;
   left: 16px;
   z-index: 1000;
   padding: 10px 14px;
   border-radius: var(--radius-md);
-  background: var(--bg-surface);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-md);
+  background: rgba(18, 20, 29, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
   gap: 6px;
   pointer-events: auto;
 }
 
+.legend-header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 4px;
+}
+
 .legend-title {
   font-size: 9.5px;
-  font-family: var(--font-mono);
   font-weight: 700;
   letter-spacing: 0.08em;
   color: var(--text-muted);
   text-transform: uppercase;
 }
 
-.legend-items-row {
+.legend-items-list {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.legend-item {
+.legend-item-row {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
   font-size: 11px;
-  font-weight: 600;
-  color: var(--text-secondary);
 }
 
-.legend-dot {
+.legend-color-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
 }
 
-.legend-dot.critical { background: var(--critical); }
-.legend-dot.high { background: var(--warning); }
-.legend-dot.medium { background: var(--info); }
-.legend-dot.low { background: var(--success); }
+.legend-item-label {
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 52px;
+}
+
+.legend-item-range {
+  color: var(--text-muted);
+  font-size: 10px;
+}
 
 /* Overlays inside map (Loading, Error, Empty) */
 .map-overlay {
   position: absolute;
   inset: 0;
   z-index: 1001;
-  background: var(--bg-surface);
+  background: rgba(15, 17, 23, 0.88);
+  backdrop-filter: blur(4px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -261,115 +279,313 @@
   text-align: center;
 }
 
-/* Right Area Intelligence Panel (30%) */
-.risk-detail-panel {
-  background: var(--bg-surface);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  padding: 20px;
-  box-shadow: var(--shadow-sm);
+/* =========================================
+   LEAFLET POPUP STYLES
+   ========================================= */
+
+.leaflet-popup-content-wrapper {
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
+  padding: 0 !important;
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px !important;
+  line-height: 1.4 !important;
+}
+
+.leaflet-popup-tip {
+  background: var(--bg-surface) !important;
+}
+
+.map-popup-card {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 6px;
+  min-width: 220px;
 }
 
-.identity-id {
-  font-size: 10px;
-  font-family: var(--font-mono);
-  font-weight: 700;
-  color: var(--accent);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.meta-grid-2col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 12px;
-  background: var(--bg-primary);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--glass-border);
-}
-
-.meta-field {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.meta-field-label {
-  font-size: 9.5px;
-  font-family: var(--font-mono);
-  color: var(--text-muted);
-  text-transform: uppercase;
-  font-weight: 700;
-}
-
-.meta-field-val {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.detail-section-block {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.section-block-title {
-  font-size: 10px;
-  font-family: var(--font-mono);
-  font-weight: 700;
-  color: var(--text-muted);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.tier-box {
+.popup-header-badges {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 12px;
-  background: var(--bg-primary);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--glass-border);
+  gap: 8px;
 }
 
-.btn-apply-filters {
-  padding: 8px 14px;
-  border-radius: var(--radius-sm);
-  background: var(--accent);
-  color: #ffffff;
-  font-size: 11.5px;
+.popup-issue-title {
+  margin: 0;
+  font-size: 14px;
   font-weight: 700;
-  border: none;
-  cursor: pointer;
-  transition: opacity var(--transition-fast);
-}
-
-.btn-apply-filters:hover {
-  opacity: 0.9;
-}
-
-.btn-reset-filters {
-  padding: 8px 12px;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--text-secondary);
-  border: 1px solid var(--glass-border);
-  font-size: 11.5px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.btn-reset-filters:hover {
-  background: var(--bg-surface-hover);
   color: var(--text-primary);
 }
 
-/* Toast Message */
+.popup-sub-location {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.popup-details-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 6px 8px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.popup-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+}
+
+.popup-label {
+  color: var(--text-muted);
+}
+
+.popup-val {
+  color: var(--text-secondary);
+}
+
+/* =========================================
+   RIGHT SIDE COLUMN (30%)
+   ========================================= */
+
+.heatmap-side-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Area Intelligence Card */
+.risk-detail-card {
+  background: var(--bg-surface);
+}
+
+.area-intel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.area-intel-title {
+  margin: 2px 0 0 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.area-intel-sub {
+  margin: 2px 0 0 0;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.area-metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.area-metric-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.area-metric-label {
+  font-size: 9.5px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.area-metric-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.area-metric-sub {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.area-specs-table {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 14px;
+}
+
+.area-spec-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+}
+
+.area-spec-label {
+  color: var(--text-muted);
+}
+
+.area-spec-val {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.area-ops-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.area-ops-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.area-ops-card {
+  padding: 10px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.area-op-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+}
+
+.area-op-label {
+  color: var(--text-muted);
+}
+
+.area-op-officer {
+  font-size: 11px;
+  color: var(--text-secondary);
+  padding: 4px 8px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-sm);
+  border-left: 2px solid var(--accent);
+}
+
+.area-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+/* =========================================
+   TOP RISK AREAS RANKED HOTSPOTS PANEL
+   ========================================= */
+
+.top-risk-panel-card {
+  background: var(--bg-surface);
+}
+
+.top-risk-mini-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.top-risk-mini-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.top-risk-mini-item:hover {
+  background: var(--bg-surface-hover);
+  border-color: var(--accent);
+  transform: translateX(2px);
+}
+
+.top-risk-mini-item.selected {
+  background: var(--bg-surface-hover);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.top-risk-rank {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 20px;
+}
+
+.top-risk-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.top-risk-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.top-risk-sub {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.top-risk-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.top-risk-score {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* =========================================
+   TOAST NOTIFICATION
+   ========================================= */
+
 .map-toast {
   position: fixed;
   bottom: 24px;
@@ -384,17 +600,40 @@
   box-shadow: var(--shadow-lg);
 }
 
-/* Responsive Breakpoints */
-@media (max-width: 1024px) {
-  .heatmap-summary-compact-grid {
-    grid-template-columns: 1fr;
-  }
+/* =========================================
+   RESPONSIVE BREAKPOINTS
+   ========================================= */
 
+@media (max-width: 1180px) {
   .heatmap-main-layout {
     grid-template-columns: 1fr;
   }
 
   .heatmap-map-wrapper {
-    height: 480px;
+    height: 520px;
   }
 }
+
+@media (max-width: 768px) {
+  .heatmap-summary-compact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .map-toolbar-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .map-select {
+    max-width: 100%;
+  }
+
+  .area-actions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .heatmap-map-wrapper {
+    height: 420px;
+  }
+}
+

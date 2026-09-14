@@ -3,35 +3,25 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => {
-    try {
-      const savedTheme = localStorage.getItem('civic_theme');
-      if (savedTheme === 'light' || savedTheme === 'dark') {
-        return savedTheme;
-      }
-    } catch {
-      // Ignore localStorage access errors
-    }
-    return 'dark'; // Default to Dark Mode
-  });
+  const [theme] = useState('dark');
 
   useEffect(() => {
     try {
-      document.documentElement.setAttribute('data-theme', theme);
-      localStorage.setItem('civic_theme', theme);
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('civic_theme', 'dark');
     } catch (e) {
       console.warn('Could not persist theme preference:', e);
     }
-  }, [theme]);
+  }, []);
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    // COMAI is permanently dark mode only
   };
 
-  const isDark = theme === 'dark';
+  const isDark = true;
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, isDark }}>
+    <ThemeContext.Provider value={{ theme: 'dark', toggleTheme, isDark: true }}>
       {children}
     </ThemeContext.Provider>
   );

@@ -52,7 +52,7 @@ export default function OfficerPerformanceTable({
         <div className="prediction-table-count">
           Showing {pagination.total > 0 ? (pagination.page - 1) * pagination.limit + 1 : 0}–
           {Math.min(pagination.page * pagination.limit, pagination.total || 0)} of{' '}
-          {pagination.total || 0} officers (DEMO DATA)
+          {pagination.total || 0} officers
         </div>
       </div>
 

@@ -71,10 +71,10 @@ const helmetOptions = {
  */
 const authRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // 20 attempts per IP per window
+  max: IS_PROD ? 20 : 500, // 20 in production, 500 in dev/test runner
   standardHeaders: true,
   legacyHeaders: false,
-  skip: () => IS_TEST, // Bypass in automated test runner
+  skip: () => IS_TEST || process.env.NODE_ENV === 'test',
   message: {
     success: false,
     message: 'Too many authentication attempts from this IP. Please try again after 15 minutes.',

@@ -32,7 +32,7 @@ export default function OfficerVerificationChart({ timeline = [] }) {
     <div className="info-card" aria-label="Verification Activity Timeline Chart">
       <div className="info-card-header">
         <h3 className="info-card-title">VERIFICATION ACTIVITY</h3>
-        <span className="dashboard-panel-tag">DEMO DATA</span>
+        <span className="dashboard-panel-tag">FIELD TELEMETRY</span>
       </div>
 
       <div style={{ width: '100%', height: '220px' }}>

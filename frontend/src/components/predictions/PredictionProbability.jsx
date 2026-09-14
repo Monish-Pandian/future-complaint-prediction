@@ -16,7 +16,7 @@ export default function PredictionProbability({ probability = 0.87, confidence =
     <div className="info-card" aria-label="Predicted Probability Panel">
       <div className="info-card-header">
         <h3 className="info-card-title">PREDICTED PROBABILITY</h3>
-        <span className="dashboard-panel-tag">DEMO MODEL OUTPUT</span>
+        <span className="dashboard-panel-tag">xgb-test-v1</span>
       </div>
 
       <div className="probability-visual-container">

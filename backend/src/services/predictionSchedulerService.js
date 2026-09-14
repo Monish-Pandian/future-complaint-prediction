@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { PredictionCycle, CYCLE_STATUS } = require('../models/PredictionCycle');
 const { SystemSetting } = require('../models/SystemSetting');
-const { aiService } = require('./aiService');
+const aiService = require('./aiService');
 const { ModelTrainingRun } = require('../models/ModelTrainingRun');
 const { HistoricalComplaint } = require('../models/HistoricalComplaint');
 
@@ -37,8 +37,18 @@ class PredictionSchedulerService {
   }
 
   _parseInterval(interval) {
-    const match = interval.match(/^(\d+)\s*(minutes?|hours?|days?|weeks?)$/i);
-    if (!match) return 24 * 60 * 60 * 1000;
+    if (!interval) return 7 * 24 * 60 * 60 * 1000;
+
+    const normalized = typeof interval === 'string' ? interval.trim().toLowerCase() : '';
+    if (normalized === 'weekly' || normalized === '1 week' || normalized === '7 days') {
+      return 7 * 24 * 60 * 60 * 1000;
+    }
+    if (normalized === 'daily' || normalized === '1 day' || normalized === '24 hours') {
+      return 24 * 60 * 60 * 1000;
+    }
+
+    const match = normalized.match(/^(\d+)\s*(minutes?|hours?|days?|weeks?)$/i);
+    if (!match) return 7 * 24 * 60 * 60 * 1000;
 
     const value = parseInt(match[1]);
     const unit = match[2].toLowerCase();
@@ -57,7 +67,7 @@ class PredictionSchedulerService {
       case 'weeks':
         return value * 7 * 24 * 60 * 60 * 1000;
       default:
-        return 24 * 60 * 60 * 1000;
+        return 7 * 24 * 60 * 60 * 1000;
     }
   }
 

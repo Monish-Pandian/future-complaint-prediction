@@ -217,7 +217,7 @@ export function EditOfficerModal({ isOpen, officer, onClose, onSubmit, departmen
 
     try {
       setIsSubmitting(true);
-      await onSubmit(officer.id || officer._id || officer.officerId, formData);
+      await onSubmit(formData);
       onClose();
     } catch (err) {
       setFormError(err.response?.data?.message || err.message || 'Failed to update officer.');
@@ -282,7 +282,7 @@ export function EditOfficerModal({ isOpen, officer, onClose, onSubmit, departmen
                   <option value="AVAILABLE">AVAILABLE</option>
                   <option value="BUSY">BUSY</option>
                   <option value="ON_LEAVE">ON LEAVE</option>
-                  <option value="OFFLINE">OFFLINE</option>
+                  <option value="OFF_DUTY">OFF DUTY</option>
                 </select>
               </div>
             </div>

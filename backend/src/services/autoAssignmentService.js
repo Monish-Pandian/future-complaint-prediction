@@ -153,44 +153,51 @@ async function autoAssignCandidates(predictionCycleId, options = {}) {
     officerWorkloadMap.set(officer._id.toString(), workloadAfter);
     officersUsed.add(officer._id.toString());
 
-    // Update VerificationCandidate
+    const predDocId = candidate.predictionId?._id || candidate.predictionId;
+
+    // Idempotency / duplicate check: check if assignment already exists for this prediction
+    let assignment = await Assignment.findOne({ predictionId: predDocId });
+
+    if (!assignment) {
+      const assignmentId = `ASGN-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
+      assignment = await Assignment.create({
+        assignmentId,
+        predictionId: predDocId,
+        officerId: officer._id,
+        department: candidate.department,
+        distanceKm: Math.round(distanceKm * 100) / 100,
+        estimatedTravelMinutes: Math.round((distanceKm / 30) * 60), // Assume 30 km/h average speed
+        currentWorkload: workloadBefore,
+        availability: officer.availability,
+        departmentMatch: true,
+        assignmentScore: Math.round(score * 1000) / 1000,
+        status: ASSIGNMENT_STATUS.AI_ASSIGNED,
+        assignedAt: new Date(),
+        reasoning: 'Automated heuristic decision engine assignment',
+      });
+
+      await Officer.findByIdAndUpdate(officer._id, {
+        $set: { currentWorkload: workloadAfter },
+      });
+    }
+
+    // Update VerificationCandidate with assigned officer AND assignedAssignment link
     await VerificationCandidate.findByIdAndUpdate(candidate._id, {
       $set: {
         assignedOfficer: officer._id,
-        assignedAt: new Date(),
+        assignedAssignment: assignment._id,
+        assignedAt: assignment.assignedAt || new Date(),
         status: VERIFICATION_CANDIDATE_STATUS.ASSIGNED,
       },
     });
 
     // Update Prediction with assigned officer
-    await Prediction.findByIdAndUpdate(candidate.predictionId, {
+    await Prediction.findByIdAndUpdate(predDocId, {
       $set: {
         assignedOfficer: officer._id,
         assignedOfficerId: officer._id,
         verificationStatus: 'ASSIGNED',
       },
-    });
-
-    // Create Assignment record
-    const assignmentId = `ASGN-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
-    await Assignment.create({
-      assignmentId,
-      predictionId: candidate.predictionId,
-      officerId: officer._id,
-      department: candidate.department,
-      distanceKm: Math.round(distanceKm * 100) / 100,
-      estimatedTravelMinutes: Math.round((distanceKm / 30) * 60), // Assume 30 km/h average speed
-      currentWorkload: workloadBefore,
-      availability: officer.availability,
-      departmentMatch: true,
-      assignmentScore: Math.round(score * 1000) / 1000,
-      status: ASSIGNMENT_STATUS.AI_ASSIGNED,
-      assignedAt: new Date(),
-      reasoning: 'Automated heuristic decision engine assignment',
-    });
-
-    await Officer.findByIdAndUpdate(officer._id, {
-      $set: { currentWorkload: workloadAfter },
     });
 
     assignments.push({

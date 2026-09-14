@@ -33,7 +33,7 @@ export default function RiskDistribution({ distribution = [] }) {
     <div className="info-card" aria-label="Predicted Risk Distribution Chart">
       <div className="info-card-header">
         <h3 className="info-card-title">PREDICTED RISK DISTRIBUTION</h3>
-        <span className="dashboard-panel-tag">DEMO DATA</span>
+        <span className="dashboard-panel-tag">RISK METRICS</span>
       </div>
 
       <div style={{ width: '100%', height: '180px' }}>

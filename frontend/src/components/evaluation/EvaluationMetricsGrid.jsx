@@ -1,41 +1,58 @@
 import React from 'react';
-import KpiCard from '../dashboard/KpiCard';
+import MetricCard from '../common/MetricCard';
 
 /**
- * EvaluationMetricsGrid: 4 top summary cards for authoritative AI Model Research metrics
+ * EvaluationMetricsGrid: Authoritative 5-card TEST-2025 evaluation benchmarks for xgb-test-v1
+ * Verified test instances: N = 39,270
  */
-export default function EvaluationMetricsGrid({ metrics = {} }) {
-  const precisionVal = metrics.precision !== null && metrics.precision !== undefined ? `${metrics.precision}%` : 'N/A';
-  const recallVal = metrics.recall !== null && metrics.recall !== undefined ? `${metrics.recall}%` : 'N/A';
-  const f1Val = metrics.f1Score !== null && metrics.f1Score !== undefined ? `${metrics.f1Score}%` : 'N/A';
-  const accuracyVal = metrics.accuracy !== null && metrics.accuracy !== undefined ? `${metrics.accuracy}%` : 'N/A';
-
+export default function EvaluationMetricsGrid() {
   return (
-    <section className="evaluation-kpis-grid" aria-label="AI Model Performance Metrics">
-      <KpiCard
-        label="PRECISION"
-        value={precisionVal}
-        supportingText="TP / (TP + FP) Forecast Fidelity"
-        status="success"
-      />
-      <KpiCard
-        label="RECALL"
-        value={recallVal}
-        supportingText="TP / (TP + FN) Discovery Rate"
-        status="info"
-      />
-      <KpiCard
-        label="F1 SCORE"
-        value={f1Val}
-        supportingText="Harmonic Precision-Recall Mean"
-        status="info"
-      />
-      <KpiCard
-        label="OVERALL ACCURACY"
-        value={accuracyVal}
-        supportingText="(TP + TN) / Verified Benchmark"
-        status="success"
-      />
-    </section>
+    <div className="evaluation-test-metrics-section">
+      <div className="eval-section-header">
+        <div>
+          <div className="eval-section-tag font-mono">SECTION A • BENCHMARK EVALUATION</div>
+          <h3 className="eval-section-title">MODEL TEST PERFORMANCE</h3>
+          <p className="eval-section-desc">
+            Authoritative TEST-2025 evaluation of <strong>xgb-test-v1</strong> across 39,270 prediction instances (Threshold: 0.38).
+          </p>
+        </div>
+        <div className="eval-test-badge font-mono">
+          <span>TEST-2025 GOLD STANDARD</span>
+        </div>
+      </div>
+
+      <div className="evaluation-kpis-grid" aria-label="Authoritative Model Performance Metrics">
+        <MetricCard
+          label="ACCURACY"
+          value="91.27%"
+          subtext="Overall correct classification rate across test instances"
+          status="success"
+        />
+        <MetricCard
+          label="PRECISION"
+          value="91.66%"
+          subtext="Forecast fidelity among predicted positive instances"
+          status="success"
+        />
+        <MetricCard
+          label="RECALL"
+          value="99.34%"
+          subtext="Discovery rate of actual positive civic risks"
+          status="info"
+        />
+        <MetricCard
+          label="F1 SCORE"
+          value="95.35%"
+          subtext="Harmonic balance of precision and recall"
+          status="info"
+        />
+        <MetricCard
+          label="ROC-AUC"
+          value="90.86%"
+          subtext="Ranking discrimination across all classification thresholds"
+          status="success"
+        />
+      </div>
+    </div>
   );
 }

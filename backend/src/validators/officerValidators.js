@@ -1,11 +1,18 @@
 const ApiError = require('../utils/apiError');
 const { AVAILABILITY_STATUS } = require('../models/Officer');
 
+const normalizeAvailability = (status) => {
+  if (!status || typeof status !== 'string') return null;
+  const upper = status.toUpperCase().trim();
+  if (upper === 'OFFLINE') return AVAILABILITY_STATUS.OFF_DUTY;
+  return upper;
+};
+
 /**
  * Validate officer creation request
  */
 const validateCreateOfficer = (req, res, next) => {
-  const { name, department, employeeCode, phone, skills, availability, location } = req.body;
+  const { name, department, employeeCode, phone, skills, availability, location, maxAssignments, homeCommunityArea } = req.body;
   const errors = [];
 
   if (!name || typeof name !== 'string' || !name.trim()) {
@@ -20,14 +27,24 @@ const validateCreateOfficer = (req, res, next) => {
     errors.push('Employee code is required');
   }
 
-  if (availability && !Object.values(AVAILABILITY_STATUS).includes(availability.toUpperCase())) {
-    errors.push(
-      `Invalid availability status. Allowed values: ${Object.values(AVAILABILITY_STATUS).join(', ')}`
-    );
+  if (availability) {
+    const normalized = normalizeAvailability(availability);
+    if (!Object.values(AVAILABILITY_STATUS).includes(normalized)) {
+      errors.push(
+        `Invalid availability status. Allowed values: ${Object.values(AVAILABILITY_STATUS).join(', ')}`
+      );
+    }
   }
 
   if (skills && !Array.isArray(skills)) {
     errors.push('Skills must be an array of strings');
+  }
+
+  if (maxAssignments !== undefined) {
+    const val = Number(maxAssignments);
+    if (isNaN(val) || val < 0) {
+      errors.push('maxAssignments must be a non-negative number');
+    }
   }
 
   if (location) {
@@ -59,17 +76,27 @@ const validateCreateOfficer = (req, res, next) => {
  * Validate officer update request
  */
 const validateUpdateOfficer = (req, res, next) => {
-  const { availability, skills, location } = req.body;
+  const { availability, skills, location, maxAssignments, homeCommunityArea } = req.body;
   const errors = [];
 
-  if (availability && !Object.values(AVAILABILITY_STATUS).includes(availability.toUpperCase())) {
-    errors.push(
-      `Invalid availability status. Allowed values: ${Object.values(AVAILABILITY_STATUS).join(', ')}`
-    );
+  if (availability) {
+    const normalized = normalizeAvailability(availability);
+    if (!Object.values(AVAILABILITY_STATUS).includes(normalized)) {
+      errors.push(
+        `Invalid availability status. Allowed values: ${Object.values(AVAILABILITY_STATUS).join(', ')}`
+      );
+    }
   }
 
   if (skills && !Array.isArray(skills)) {
     errors.push('Skills must be an array of strings');
+  }
+
+  if (maxAssignments !== undefined) {
+    const val = Number(maxAssignments);
+    if (isNaN(val) || val < 0) {
+      errors.push('maxAssignments must be a non-negative number');
+    }
   }
 
   if (location && location.coordinates) {
@@ -111,10 +138,13 @@ const validateUpdateStatus = (req, res, next) => {
     errors.push('"active" must be a boolean (true or false)');
   }
 
-  if (availability && !Object.values(AVAILABILITY_STATUS).includes(availability.toUpperCase())) {
-    errors.push(
-      `Invalid availability status. Allowed values: ${Object.values(AVAILABILITY_STATUS).join(', ')}`
-    );
+  if (availability) {
+    const normalized = normalizeAvailability(availability);
+    if (!Object.values(AVAILABILITY_STATUS).includes(normalized)) {
+      errors.push(
+        `Invalid availability status. Allowed values: ${Object.values(AVAILABILITY_STATUS).join(', ')}`
+      );
+    }
   }
 
   if (errors.length > 0) {

@@ -1,13 +1,15 @@
 import React from 'react';
 import {
   renderVerificationOutcomeBadge,
+  renderVerificationLifecycleBadge,
   renderEvaluationBadge,
   renderFeedbackPill,
 } from './VerificationBadges';
 import { renderRiskBadge } from '../predictions/PredictionBadges';
+import EmptyState from '../common/EmptyState';
 
 /**
- * VerificationTable: Sortable table displaying field inspection records & evaluation outcomes
+ * VerificationTable: Sortable, accessible table displaying field inspection records & evaluation outcomes
  */
 export default function VerificationTable({
   verifications = [],
@@ -18,6 +20,7 @@ export default function VerificationTable({
   onSort,
   onPageChange,
   onInspect,
+  onResetFilters,
 }) {
   const handleSortClick = (field) => {
     if (onSort) {
@@ -40,10 +43,10 @@ export default function VerificationTable({
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
             <polyline points="22 4 12 14.01 9 11.01"></polyline>
           </svg>
-          Ground Truth Verification Logs & Feedback Queue
+          Ground Truth Verification Logs
         </div>
         <div className="verification-table-count">
-          Showing {verifications.length} of {pagination.total || verifications.length} verified logs
+          Showing {verifications.length} of {pagination.total || verifications.length} records
         </div>
       </div>
 
@@ -53,21 +56,21 @@ export default function VerificationTable({
           <thead>
             <tr>
               <th className="sortable" onClick={() => handleSortClick('verificationId')}>
-                Verification ID{getSortIndicator('verificationId')}
+                Prediction Ref{getSortIndicator('verificationId')}
               </th>
-              <th>Complaint / Prediction</th>
-              <th>Area / Ward</th>
               <th>Forecast Risk</th>
-              <th>Field Inspector</th>
+              <th>Community / Ward</th>
+              <th>Complaint Type</th>
+              <th>Field Officer</th>
+              <th>Status</th>
               <th className="sortable" onClick={() => handleSortClick('outcome')}>
                 Field Outcome{getSortIndicator('outcome')}
               </th>
-              <th>AI Evaluation</th>
-              <th>Feedback Pipeline</th>
+              <th>Evaluation Result</th>
               <th className="sortable" onClick={() => handleSortClick('verifiedAt')}>
-                Verified At{getSortIndicator('verifiedAt')}
+                Updated{getSortIndicator('verifiedAt')}
               </th>
-              <th style={{ textAlign: 'right' }}>Actions</th>
+              <th style={{ textAlign: 'right' }}>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -88,103 +91,129 @@ export default function VerificationTable({
               ))
             ) : verifications.length === 0 ? (
               <tr>
-                <td colSpan={10} style={{ padding: '48px 24px', textAlign: 'center' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)' }}>
-                      No Verification Records Found
-                    </div>
-                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>
-                      No field verification logs match the selected filter criteria or search parameters.
-                    </p>
-                  </div>
+                <td colSpan={10} style={{ padding: '36px 20px', textAlign: 'center' }}>
+                  <EmptyState
+                    title="No verification records available"
+                    description="No verification cases match the current filters or search criteria."
+                    action={
+                      onResetFilters && (
+                        <button
+                          type="button"
+                          className="verification-btn verification-btn-secondary"
+                          onClick={onResetFilters}
+                        >
+                          Clear Filters
+                        </button>
+                      )
+                    }
+                  />
                 </td>
               </tr>
             ) : (
-              verifications.map((item) => (
-                <tr key={item.id || item.verificationId}>
-                  {/* Verification ID */}
-                  <td>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontWeight: '700', color: '#10b981', fontSize: '12px' }}>
-                      {item.verificationId}
-                    </span>
-                  </td>
+              verifications.map((item) => {
+                const riskLevel = item.prediction?.riskLevel || 'LOW';
+                const isHighRisk = riskLevel === 'CRITICAL' || riskLevel === 'HIGH';
+                const prob = item.prediction?.probability !== undefined
+                  ? Math.round(item.prediction.probability * 100)
+                  : item.prediction?.riskScore || 50;
 
-                  {/* Complaint & Prediction Ref */}
-                  <td>
-                    <div style={{ fontWeight: '600', color: 'var(--text-primary)', marginBottom: '2px' }}>
-                      {item.prediction?.complaintType || 'Civic Complaint'}
-                    </div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)' }}>
-                      Ref: {item.prediction?.predictionId || 'N/A'}
-                    </div>
-                  </td>
+                return (
+                  <tr key={item.id || item.verificationId || item._id}>
+                    {/* Prediction Ref & Priority */}
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span className="font-mono text-bold" style={{ color: '#10b981', fontSize: '12px' }}>
+                          {item.verificationId}
+                        </span>
+                        {isHighRisk && (
+                          <span className="verif-priority-pill" title="High Risk Verification Candidate">
+                            Priority
+                          </span>
+                        )}
+                      </div>
+                      <div className="font-mono text-muted" style={{ fontSize: '11px', marginTop: '2px' }}>
+                        Ref: {item.prediction?.predictionId || 'N/A'}
+                      </div>
+                    </td>
 
-                  {/* Area & Ward */}
-                  <td>
-                    <div style={{ color: 'var(--text-primary)', fontWeight: '500' }}>
-                      {item.prediction?.communityArea || 'Chicago'}
-                    </div>
-                    <span style={{ display: 'inline-block', padding: '2px 6px', borderRadius: '4px', background: 'rgba(255, 255, 255, 0.05)', fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                      {item.prediction?.ward || 'Ward 1'}
-                    </span>
-                  </td>
+                    {/* Forecast Risk & Score */}
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        {renderRiskBadge(riskLevel)}
+                        <span className="font-mono text-muted" style={{ fontSize: '11px' }}>
+                          {prob}%
+                        </span>
+                      </div>
+                    </td>
 
-                  {/* Forecast Risk */}
-                  <td>
-                    {renderRiskBadge(item.prediction?.riskLevel || 'LOW')}
-                  </td>
+                    {/* Community / Ward */}
+                    <td>
+                      <div style={{ color: 'var(--text-primary)', fontWeight: '500' }}>
+                        {item.prediction?.communityArea || 'Chicago'}
+                      </div>
+                      <span className="verif-ward-badge font-mono">
+                        {item.prediction?.ward || 'Ward 1'}
+                      </span>
+                    </td>
 
-                  {/* Field Inspector */}
-                  <td>
-                    <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>
-                      {item.officer?.name || 'Unassigned'}
-                    </div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)' }}>
-                      {item.officer?.officerId || 'OFF-N/A'}
-                    </div>
-                  </td>
+                    {/* Complaint Type */}
+                    <td>
+                      <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>
+                        {item.prediction?.complaintType || 'Civic Infrastructure'}
+                      </div>
+                      <div className="font-mono text-muted" style={{ fontSize: '11px' }}>
+                        {item.officer?.department || item.prediction?.department || 'Municipal'}
+                      </div>
+                    </td>
 
-                  {/* Field Outcome */}
-                  <td>
-                    {renderVerificationOutcomeBadge(item.outcome)}
-                  </td>
+                    {/* Field Officer */}
+                    <td>
+                      <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>
+                        {item.officer?.name || 'Unassigned'}
+                      </div>
+                      <div className="font-mono text-muted" style={{ fontSize: '11px' }}>
+                        {item.officer?.officerId || 'OFF-N/A'}
+                      </div>
+                    </td>
 
-                  {/* AI Evaluation */}
-                  <td>
-                    {renderEvaluationBadge(item.evaluation?.classification)}
-                  </td>
+                    {/* Workflow Status */}
+                    <td>
+                      {renderVerificationLifecycleBadge(item.assignment?.status || 'COMPLETED')}
+                    </td>
 
-                  {/* Feedback Pipeline */}
-                  <td>
-                    {renderFeedbackPill(item.feedback?.feedbackStatus)}
-                  </td>
+                    {/* Field Outcome */}
+                    <td>
+                      {renderVerificationOutcomeBadge(item.outcome)}
+                    </td>
 
-                  {/* Timestamp */}
-                  <td>
-                    <span style={{ fontSize: '12px', fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}>
-                      {new Date(item.verifiedAt).toLocaleDateString()}
-                    </span>
-                  </td>
+                    {/* Evaluation Result */}
+                    <td>
+                      {renderEvaluationBadge(item.evaluation?.classification)}
+                    </td>
 
-                  {/* Actions */}
-                  <td style={{ textAlign: 'right' }}>
-                    <button
-                      type="button"
-                      className="verification-btn verification-btn-secondary"
-                      style={{ padding: '6px 12px', fontSize: '11px' }}
-                      onClick={() => onInspect && onInspect(item)}
-                      title="Inspect Field Verification Details"
-                    >
-                      Inspect
-                    </button>
-                  </td>
-                </tr>
-              ))
+                    {/* Timestamp */}
+                    <td>
+                      <span className="font-mono text-secondary" style={{ fontSize: '12px' }}>
+                        {new Date(item.verifiedAt).toLocaleDateString()}
+                      </span>
+                    </td>
+
+                    {/* Action */}
+                    <td style={{ textAlign: 'right' }}>
+                      <button
+                        type="button"
+                        className="verification-btn verification-btn-secondary"
+                        style={{ padding: '6px 12px', fontSize: '11px' }}
+                        onClick={() => onInspect && onInspect(item)}
+                        title="Inspect Field Verification Details"
+                        aria-label={`Inspect verification ${item.verificationId}`}
+                      >
+                        Inspect
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -193,7 +222,7 @@ export default function VerificationTable({
       {/* Pagination Bar */}
       <div className="verification-pagination">
         <div>
-          Page {pagination.page || 1} of {pagination.totalPages || 1}
+          Page {pagination.page || 1} of {pagination.totalPages || 1} ({pagination.total || verifications.length} total)
         </div>
         <div className="verification-pagination-btns">
           <button

@@ -8,23 +8,24 @@ export default function RiskSummary({ summary = {} }) {
   return (
     <section className="heatmap-summary-compact-grid" aria-label="Spatial Risk Metrics Overview">
       <KpiCard
-        label="PREDICTED AREAS"
-        value={summary.totalPredictedAreas || 24}
-        supportingText="Municipal coverage zones"
+        label="PREDICTED SECTORS"
+        value={summary.totalPredictedAreas ?? 0}
+        supportingText="Active spatial predictions"
         status="info"
       />
       <KpiCard
         label="HIGH-RISK HOTSPOTS"
-        value={summary.highRiskAreas || 8}
-        supportingText="Risk score ≥ 75"
+        value={summary.highRiskAreas ?? 0}
+        supportingText="Risk score 70.0 – 84.9"
         status="warning"
       />
       <KpiCard
         label="CRITICAL ESCALATIONS"
-        value={summary.criticalAreas || 3}
-        supportingText="Immediate priority clusters"
+        value={summary.criticalAreas ?? 0}
+        supportingText="Risk score ≥ 85.0"
         status="critical"
       />
     </section>
   );
 }
+

@@ -6,22 +6,36 @@ import RiskLegend from '../../components/heatmap/RiskLegend';
 import RiskSummary from '../../components/heatmap/RiskSummary';
 import RiskMarkers from '../../components/heatmap/RiskMarkers';
 import RiskAreaDetails from '../../components/heatmap/RiskAreaDetails';
+import TopRiskAreasPanel from '../../components/heatmap/TopRiskAreasPanel';
+import ErrorState from '../../components/common/ErrorState';
+import EmptyState from '../../components/common/EmptyState';
 import {
   getRiskMapData,
   getRiskMapFilters,
 } from '../../api/analyticsApi';
-import {
-  heatmapSummaryStats,
-} from '../../data/heatmapMockData';
+import axiosInstance from '../../api/axiosInstance';
 import { MAP_CONFIG } from '../../config/mapConfig';
 
-const CHICAGO_CENTER = MAP_CONFIG.chicagoCenter;
-const DEFAULT_ZOOM = MAP_CONFIG.defaultZoom;
+const CHICAGO_CENTER = MAP_CONFIG.chicagoCenter || [41.8781, -87.6298];
+const DEFAULT_ZOOM = MAP_CONFIG.defaultZoom || 11;
+
+/**
+ * Inner map flyTo controller hook component
+ */
+function MapFlyTo({ target }) {
+  const map = useMap();
+  useEffect(() => {
+    if (target && typeof target.lat === 'number' && typeof target.lng === 'number') {
+      map.flyTo([target.lat, target.lng], 13, { duration: 1.2 });
+    }
+  }, [target, map]);
+  return null;
+}
 
 /**
  * Inner map controller hook component for custom zoom, locate, and reset controls
  */
-function MapControls({ onLocationError }) {
+function MapControls({ onLocationError, onResetView }) {
   const map = useMap();
 
   const handleZoomIn = () => {
@@ -34,6 +48,7 @@ function MapControls({ onLocationError }) {
 
   const handleResetView = () => {
     map.setView(CHICAGO_CENTER, DEFAULT_ZOOM);
+    if (onResetView) onResetView();
   };
 
   const handleLocateUser = () => {
@@ -99,16 +114,24 @@ function MapControls({ onLocationError }) {
 
 /**
  * Admin Spatial Risk Intelligence Page
- * Route: /heatmap
+ * Route: /risk-map & /heatmap
  */
 export default function Heatmap() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [locations, setLocations] = useState([]);
-  const [summary, setSummary] = useState(heatmapSummaryStats);
+  const [summary, setSummary] = useState({
+    totalPredictedAreas: 0,
+    highRiskAreas: 0,
+    criticalAreas: 0,
+    pendingVerification: 0,
+    assigned: 0,
+  });
   const [filterOptions, setFilterOptions] = useState({});
   const [selectedArea, setSelectedArea] = useState(null);
+  const [focusedCoords, setFocusedCoords] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
+  const [modelInfo, setModelInfo] = useState(null);
 
   const [filters, setFilters] = useState({
     search: '',
@@ -121,23 +144,36 @@ export default function Heatmap() {
     assignmentStatus: 'All assignment statuses',
   });
 
-  // Track if current data is from live API or fallback
-  const [isLive, setIsLive] = useState(false);
-
-  // Load filter options on mount
+  // Load filter options and active model metadata on mount
   useEffect(() => {
-    async function loadFilters() {
+    async function loadMetadata() {
       try {
-        const options = await getRiskMapFilters();
-        setFilterOptions(options || {});
+        const [optsRes, modelRes] = await Promise.allSettled([
+          getRiskMapFilters(),
+          axiosInstance.get('/admin/model/active'),
+        ]);
+
+        if (optsRes.status === 'fulfilled') {
+          setFilterOptions(optsRes.value || {});
+        }
+
+        if (modelRes.status === 'fulfilled' && modelRes.value?.data?.data) {
+          setModelInfo(modelRes.value.data.data);
+        } else {
+          setModelInfo({
+            modelVersion: 'xgb-test-v1',
+            threshold: 0.38,
+            requiredFeatureCount: 36,
+          });
+        }
       } catch (err) {
-        console.warn('Could not load dynamic map filter options:', err);
+        console.warn('Could not load map metadata:', err);
       }
     }
-    loadFilters();
+    loadMetadata();
   }, []);
 
-  // Fetch geographic risk map dataset
+  // Fetch geographic risk map dataset from live API
   const loadMapData = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -149,10 +185,15 @@ export default function Heatmap() {
         const data = response.data;
         const locs = data.locations || [];
         setLocations(locs);
-        setSummary(data.summary || heatmapSummaryStats);
-        setIsLive(Boolean(response.isLive));
+        setSummary(data.summary || {
+          totalPredictedAreas: locs.length,
+          highRiskAreas: locs.filter(l => l.riskLevel === 'HIGH').length,
+          criticalAreas: locs.filter(l => l.riskLevel === 'CRITICAL').length,
+          pendingVerification: locs.filter(l => l.verificationStatus?.includes('PENDING')).length,
+          assigned: locs.filter(l => l.assignmentStatus === 'ASSIGNED').length,
+        });
 
-        // Auto-select first high-risk location if nothing selected
+        // Auto-select first high-risk location if none is selected
         if (locs.length > 0) {
           setSelectedArea((prev) => {
             if (prev) {
@@ -200,6 +241,13 @@ export default function Heatmap() {
   // Handle selection of a specific risk point
   const handleSelectArea = (area) => {
     setSelectedArea(area);
+    if (area) {
+      const lat = area.location?.lat ?? (area.location?.coordinates ? area.location.coordinates[1] : null);
+      const lng = area.location?.lng ?? (area.location?.coordinates ? area.location.coordinates[0] : null);
+      if (lat != null && lng != null) {
+        setFocusedCoords({ lat, lng });
+      }
+    }
   };
 
   // Handle location errors
@@ -220,29 +268,43 @@ export default function Heatmap() {
           </div>
         )}
 
-        {/* Top Header */}
-        <header className="heatmap-header">
-          <div className="heatmap-header-left">
-            <h1 className="heatmap-title">Spatial Risk Intelligence</h1>
-            <p className="heatmap-subtitle">
-              Predicted civic complaint risk across municipal areas &bull; Chicago &bull; Forecast Window: Next 7 Days
+        {/* Command Action Bar */}
+        <div className="stitch-command-bar">
+          <div className="stitch-command-title-wrap">
+            <div className="stitch-telemetry-badge">
+              <span className="stitch-live-dot" />
+              <span>SPATIAL RISK INTELLIGENCE • 77 CHICAGO COMMUNITY AREAS</span>
+            </div>
+            <h1 className="stitch-page-title">Civic Risk Map</h1>
+            <p className="stitch-page-desc">
+              Spatial view of predicted future complaint risk across Chicago communities
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span className={`verification-mode-pill ${isLive ? 'live' : 'demo'}`}>
-              <span
-                style={{
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  backgroundColor: isLive ? '#10b981' : '#f59e0b',
-                }}
-              />
-              {isLive ? 'Real API Data' : 'Demo Data'}
-            </span>
+          <div className="stitch-command-actions">
+            <div className="header-model-badge" style={{ padding: '6px 12px' }}>
+              <span className="header-model-dot" aria-hidden="true" />
+              <span>Model: {modelInfo?.modelVersion || 'xgb-test-v1'}</span>
+            </div>
+
+            <div className="system-status" style={{ padding: '6px 12px' }}>
+              <span className="system-status-dot" aria-hidden="true" />
+              <span>THRESHOLD: {modelInfo?.threshold?.toFixed(2) || '0.38'}</span>
+            </div>
+
+            <button
+              type="button"
+              className="stitch-btn-secondary"
+              onClick={loadMapData}
+              title="Refresh spatial data without triggering a new prediction cycle"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+              </svg>
+              <span>Refresh Map</span>
+            </button>
           </div>
-        </header>
+        </div>
 
         {/* 3 Compact Intelligence KPI Summary Cards */}
         <RiskSummary summary={summary} />
@@ -253,9 +315,10 @@ export default function Heatmap() {
           filterOptions={filterOptions}
           onChange={handleFilterChange}
           onReset={handleResetFilters}
+          totalMatching={locations.length}
         />
 
-        {/* Main 70% Map / 30% Intelligence Panel Layout */}
+        {/* Main 70% Map / 30% Intelligence Panels Layout */}
         <div className="heatmap-main-layout">
           {/* 70% Map Section */}
           <div className="heatmap-map-wrapper" role="region" aria-label="Chicago Spatial Risk Map">
@@ -272,7 +335,12 @@ export default function Heatmap() {
                 url={MAP_CONFIG.tileUrl}
               />
 
-              <MapControls onLocationError={handleLocationToast} />
+              <MapControls
+                onLocationError={handleLocationToast}
+                onResetView={() => setFocusedCoords(null)}
+              />
+
+              <MapFlyTo target={focusedCoords} />
 
               <RiskMarkers
                 locations={locations}
@@ -287,47 +355,50 @@ export default function Heatmap() {
             {/* Loading Overlay */}
             {loading && (
               <div className="map-overlay" role="status">
-                <div className="empty-icon" style={{ animation: 'spin 1.2s infinite linear' }}>
-                  ⏳
+                <div className="loading-spinner" aria-hidden="true" />
+                <div className="empty-state-title" style={{ marginTop: '12px' }}>
+                  LOADING PREDICTED RISK DATA...
                 </div>
-                <div className="empty-title">LOADING PREDICTED RISK DATA...</div>
               </div>
             )}
 
             {/* Error Overlay */}
             {error && !loading && (
               <div className="map-overlay" role="alert">
-                <div className="error-icon">⚠️</div>
-                <div className="error-title">UNABLE TO LOAD RISK MAP</div>
-                <div className="error-subtitle">{error}</div>
-                <button type="button" onClick={loadMapData} className="btn-retry">
-                  RETRY
-                </button>
+                <ErrorState
+                  title="Risk map data unavailable"
+                  description={error}
+                  onRetry={loadMapData}
+                  retryLabel="Retry Request"
+                />
               </div>
             )}
 
             {/* Empty State Overlay */}
             {!loading && !error && locations.length === 0 && (
               <div className="map-overlay">
-                <div className="empty-icon">🔍</div>
-                <div className="empty-title">NO PREDICTED RISK AREAS FOUND</div>
-                <div className="empty-subtitle">
-                  No prediction hotspots match the current filter criteria.
-                </div>
-                <button
-                  type="button"
-                  onClick={handleResetFilters}
-                  className="btn-retry"
-                  style={{ marginTop: '12px' }}
-                >
-                  RESET FILTERS
-                </button>
+                <EmptyState
+                  title="No geographic risk data available"
+                  description="No predictions match the selected filters."
+                  actionLabel="Reset filters"
+                  onAction={handleResetFilters}
+                />
               </div>
             )}
           </div>
 
-          {/* 30% Area Intelligence Panel */}
-          <RiskAreaDetails area={selectedArea} />
+          {/* 30% Side Intelligence Column */}
+          <div className="heatmap-side-column">
+            {/* Selected Area Intelligence Card */}
+            <RiskAreaDetails area={selectedArea} />
+
+            {/* Top Risk Areas Ranked Hotspots */}
+            <TopRiskAreasPanel
+              locations={locations}
+              selectedAreaId={selectedArea?.id}
+              onSelectArea={handleSelectArea}
+            />
+          </div>
         </div>
       </div>
     </PageTransition>

@@ -256,31 +256,47 @@ export default function VerificationCandidatesPage() {
   return (
     <PageTransition>
       <div className="verification-candidates-page">
-        {/* Header */}
-        <header className="verification-header-wrapper">
-          <div className="verification-title-group">
-            <div className="auth-label" style={{ marginBottom: '4px' }}>
-              VERIFICATION CANDIDATE SELECTION
+        {/* Stitch Ground Truth Verification Command Action Bar */}
+        <div className="stitch-command-bar">
+          <div className="stitch-command-title-wrap">
+            <div className="stitch-telemetry-badge">
+              <span className="stitch-live-dot" />
+              <span>GROUND TRUTH VERIFICATION PIPELINE • 90/10 TRIAGE POOL</span>
             </div>
-            <h1>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-              </svg>
-              Verification Candidates — 90/10 Exploitation/Exploration
-            </h1>
-            <p className="verification-subtitle">
-              Select verification candidates from completed prediction cycles. Monitor 90% exploitation / 10% exploration allocation.
+            <h1 className="stitch-page-title">Verification Candidates — 90/10 Strategy</h1>
+            <p className="stitch-page-desc">
+              Select verification candidates from active prediction cycles. Monitor 90% exploitation vs 10% blind exploration balance to eliminate feedback loops.
             </p>
           </div>
 
-          <div className="verification-meta-actions">
-            <span className={`verification-mode-pill ${isLive ? 'live' : 'demo'}`}>
-              <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: isLive ? '#4dd6a8' : '#ecd06f' }} />
-              {isLive ? 'Live API Data' : 'Demo Data'}
-            </span>
+          <div className="stitch-command-actions">
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              background: 'var(--bg-surface)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '11px',
+              fontFamily: 'var(--font-mono)'
+            }}>
+              <span style={{ color: 'var(--text-muted)' }}>STRATEGY: </span>
+              <span style={{ color: 'var(--accent)', fontWeight: '700' }}>90% Exploit / 10% Explore</span>
+            </div>
+            <button
+              type="button"
+              className="stitch-btn-primary"
+              onClick={handleSelectCandidates}
+              disabled={isSelecting || !selectedCycleId || isLoading}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <span>Run 90/10 Selection</span>
+            </button>
           </div>
-        </header>
+        </div>
 
         {/* Error State */}
         {error && (

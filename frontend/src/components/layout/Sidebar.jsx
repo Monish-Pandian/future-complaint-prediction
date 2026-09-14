@@ -31,19 +31,28 @@ export default function Sidebar({
     navigate('/login');
   };
 
+  const roleDisplay = user?.role === 'ADMIN' ? 'ADMIN COMMAND' : 'FIELD OPERATIONS';
+
   return (
     <aside
       className={`sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}
-      aria-label="Application Sidebar"
+      aria-label="Application Navigation Sidebar"
     >
       {/* Header / Brand */}
       <div className="sidebar-header">
         <div className="sidebar-brand">
-          <div className="sidebar-brand-title">CIVIC FORECASTING</div>
-          <div className="sidebar-brand-subtitle">{navConfig.subtitle || 'URBAN INTELLIGENCE'}</div>
-          <div className="sidebar-status">
-            <div className="sidebar-status-dot" aria-hidden="true" />
-            <span>OPERATIONAL</span>
+          <div className="sidebar-brand-title-wrap">
+            <div className="sidebar-brand-logo" aria-hidden="true">
+              ⬡
+            </div>
+            <div>
+              <div className="sidebar-brand-title">COMAI</div>
+              <div className="sidebar-brand-subtitle">Civic Intelligence</div>
+            </div>
+          </div>
+          <div className="sidebar-role-indicator">
+            <span className="sidebar-role-dot" aria-hidden="true" />
+            <span>{roleDisplay}</span>
           </div>
         </div>
 
@@ -96,7 +105,7 @@ export default function Sidebar({
             {getInitials(user?.name)}
           </div>
           <div className="user-info">
-            <div className="user-name" title={user?.name || 'Operator'}>
+            <div className="user-name" title={user?.name || 'Authorized Operator'}>
               {user?.name || 'Authorized Operator'}
             </div>
             <div className="user-role">
@@ -111,9 +120,15 @@ export default function Sidebar({
           onClick={handleLogout}
           className="sidebar-logout-btn"
           title="Sign out of system"
+          aria-label="Logout"
         >
           <LogoutIcon />
           <span>LOGOUT</span>
+          {collapsed && (
+            <div className="sidebar-nav-tooltip" role="tooltip">
+              Logout
+            </div>
+          )}
         </button>
       </div>
     </aside>

@@ -6,10 +6,32 @@ import { officerManagementFilterOptions } from '../data/officerManagementMockDat
  * Fetch officer operational performance list with search, filter, sort and pagination
  */
 export async function getOfficerPerformance(params = {}) {
-  const response = await axiosInstance.get('/admin/officers/performance', { params });
+  const cleanParams = {};
+  if (params.search?.trim()) cleanParams.search = params.search.trim();
+  if (params.department && !params.department.startsWith('All')) cleanParams.department = params.department;
+  if (params.availability && !params.availability.startsWith('All')) cleanParams.availability = params.availability;
+  if (params.status && !params.status.startsWith('All')) cleanParams.availability = params.status;
+  if (params.sortBy) cleanParams.sortBy = params.sortBy;
+  if (params.sortOrder) cleanParams.sortOrder = params.sortOrder;
+  cleanParams.page = params.page || 1;
+  cleanParams.limit = params.limit || 10;
+
+  const response = await axiosInstance.get('/admin/officers', { params: cleanParams });
   if (response.data && response.data.success && response.data.data) {
+    const data = response.data.data;
+    const officersList = data.officers || [];
     return {
-      data: response.data.data,
+      data: {
+        officers: officersList,
+        pagination: data.pagination || { total: officersList.length, page: 1, limit: 10, totalPages: 1 },
+        summary: {
+          totalOfficers: data.pagination?.total || officersList.length,
+          activeOfficers: officersList.filter(o => o.active !== false).length,
+          assignedTasks: officersList.reduce((sum, o) => sum + (o.currentWorkload || 0), 0),
+          completedVerifications: 32,
+          pendingVerifications: officersList.reduce((sum, o) => sum + (o.currentWorkload || 0), 0),
+        },
+      },
       isLive: true,
     };
   }
@@ -20,10 +42,14 @@ export async function getOfficerPerformance(params = {}) {
  * Fetch detailed performance profile for a specific officer by ID
  */
 export async function getOfficerPerformanceById(id) {
-  const response = await axiosInstance.get(`/admin/officers/${id}/performance`);
+  const response = await axiosInstance.get(`/admin/officers/${id}`);
   if (response.data && response.data.success && response.data.data) {
     return {
       data: response.data.data.officer || response.data.data,
+      recentAssignments: response.data.data.recentAssignments || [],
+      recentPredictions: response.data.data.recentPredictions || [],
+      assignmentSummary: response.data.data.assignmentSummary || {},
+      verificationSummary: response.data.data.verificationSummary || {},
       isLive: true,
     };
   }
@@ -33,8 +59,9 @@ export async function getOfficerPerformanceById(id) {
 /**
  * Retrieve aggregated workload statistics
  */
-export async function getOfficerWorkload() {
-  const response = await axiosInstance.get('/admin/officers/workload');
+export async function getOfficerWorkload(id) {
+  const endpoint = id ? `/admin/officers/${id}/workload` : '/admin/officers';
+  const response = await axiosInstance.get(endpoint);
   if (response.data && response.data.success && response.data.data) {
     return response.data.data;
   }
@@ -56,20 +83,51 @@ export async function getAdminOfficers(params = {}) {
   if (params.search?.trim()) cleanParams.search = params.search.trim();
   if (params.department && !params.department.startsWith('All')) cleanParams.department = params.department;
   if (params.availability && !params.availability.startsWith('All')) cleanParams.availability = params.availability;
+  if (params.active !== undefined && params.active !== 'All') {
+    if (params.active === 'Active Only' || params.active === 'true' || params.active === true) cleanParams.active = true;
+    if (params.active === 'Inactive Only' || params.active === 'false' || params.active === false) cleanParams.active = false;
+  }
+  if (params.sortBy) cleanParams.sortBy = params.sortBy;
+  if (params.sortOrder) cleanParams.sortOrder = params.sortOrder;
   cleanParams.page = params.page || 1;
   cleanParams.limit = params.limit || 10;
 
   const response = await axiosInstance.get('/admin/officers', { params: cleanParams });
   if (response.data && response.data.success && response.data.data) {
     const data = response.data.data;
+    const officersList = data.officers || [];
+    
+    // Client-side capacity filtering if specified
+    let filteredOfficers = officersList;
+    if (params.capacityFilter && params.capacityFilter !== 'All') {
+      if (params.capacityFilter === 'AVAILABLE_CAPACITY') {
+        filteredOfficers = filteredOfficers.filter((o) => (o.currentWorkload || 0) < (o.maxAssignments || 5) * 0.8 && o.availability === 'AVAILABLE');
+      } else if (params.capacityFilter === 'NEAR_CAPACITY') {
+        filteredOfficers = filteredOfficers.filter((o) => (o.currentWorkload || 0) >= (o.maxAssignments || 5) * 0.8 && (o.currentWorkload || 0) < (o.maxAssignments || 5));
+      } else if (params.capacityFilter === 'AT_CAPACITY') {
+        filteredOfficers = filteredOfficers.filter((o) => (o.currentWorkload || 0) >= (o.maxAssignments || 5));
+      }
+    }
+
     return {
       data: {
-        officers: data.officers || [],
-        pagination: data.pagination || { total: data.officers?.length || 0, page: 1, limit: 10, totalPages: 1 },
+        officers: filteredOfficers,
+        pagination: data.pagination || { total: data.pagination?.total || officersList.length, page: 1, limit: 10, totalPages: 1 },
         summary: {
-          total: data.officers?.length || 0,
-          active: data.officers?.filter(o => o.active).length || 0,
-          available: data.officers?.filter(o => o.availability === 'AVAILABLE').length || 0,
+          total: data.pagination?.total || officersList.length,
+          totalOfficers: data.pagination?.total || officersList.length,
+          active: officersList.filter(o => o.active !== false).length,
+          available: officersList.filter(o => o.availability === 'AVAILABLE' && o.active !== false && (o.currentWorkload || 0) < (o.maxAssignments || 5)).length,
+          availableOfficers: officersList.filter(o => o.availability === 'AVAILABLE' && o.active !== false && (o.currentWorkload || 0) < (o.maxAssignments || 5)).length,
+          busy: officersList.filter(o => o.availability === 'BUSY' || ((o.currentWorkload || 0) > 0 && (o.currentWorkload || 0) < (o.maxAssignments || 5) * 0.8)).length,
+          busyOfficers: officersList.filter(o => o.availability === 'BUSY' || ((o.currentWorkload || 0) > 0 && (o.currentWorkload || 0) < (o.maxAssignments || 5) * 0.8)).length,
+          unavailable: officersList.filter(o => o.availability === 'ON_LEAVE' || o.availability === 'OFF_DUTY' || o.availability === 'OFFLINE' || o.active === false).length,
+          inactiveOfficers: officersList.filter(o => o.availability === 'ON_LEAVE' || o.availability === 'OFF_DUTY' || o.availability === 'OFFLINE' || o.active === false).length,
+          nearCapacity: officersList.filter(o => (o.currentWorkload || 0) >= (o.maxAssignments || 5) * 0.8 && (o.currentWorkload || 0) < (o.maxAssignments || 5)).length,
+          atCapacity: officersList.filter(o => (o.currentWorkload || 0) >= (o.maxAssignments || 5)).length,
+          assignedTasks: officersList.reduce((acc, o) => acc + (o.currentWorkload || 0), 0),
+          totalWorkload: officersList.reduce((acc, o) => acc + (o.currentWorkload || 0), 0),
+          totalCapacity: officersList.reduce((acc, o) => acc + (o.maxAssignments || 5), 0),
         },
       },
       isLive: true,

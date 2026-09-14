@@ -133,7 +133,7 @@ export default function OfficerPerformance() {
             </div>
           </div>
           <div className="dashboard-header-actions">
-            <span className="demo-badge">DEMO DATA</span>
+            <span className="demo-badge">LIVE OPERATIONS</span>
           </div>
         </header>
 

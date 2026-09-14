@@ -1,38 +1,41 @@
 import {
   DashboardIcon,
   PredictionsIcon,
-  PerformanceIcon,
-  HeatmapIcon,
-  OfficersIcon,
+  RiskMapIcon,
   AssignmentsIcon,
   VerificationIcon,
-  ComplaintsIcon,
   EvaluationIcon,
+  OfficersIcon,
+  AnalyticsIcon,
+  SystemIcon,
+  ProfileIcon,
+  ComplaintsIcon,
+  HistoryIcon,
 } from '../components/common/Icons';
+
+/**
+ * Role-Based Navigation Configuration (Module 8A)
+ * Strictly defines items for ADMIN and FIELD OFFICER.
+ */
 
 export const adminNavigationGroups = [
   {
-    group: 'COMMAND CENTER',
+    group: 'CORE',
     items: [
       {
         label: 'Dashboard',
         path: '/dashboard',
         icon: DashboardIcon,
       },
-    ],
-  },
-  {
-    group: 'INTELLIGENCE',
-    items: [
       {
         label: 'Predictions',
         path: '/predictions',
         icon: PredictionsIcon,
       },
       {
-        label: 'Heatmap',
-        path: '/heatmap',
-        icon: HeatmapIcon,
+        label: 'Risk Map',
+        path: '/risk-map',
+        icon: RiskMapIcon,
       },
     ],
   },
@@ -40,39 +43,39 @@ export const adminNavigationGroups = [
     group: 'OPERATIONS',
     items: [
       {
-        label: 'Officers',
-        path: '/officers',
-        icon: OfficersIcon,
-      },
-      {
         label: 'Assignments',
         path: '/assignments',
         icon: AssignmentsIcon,
-      },
-      {
-        label: 'Verification Candidates',
-        path: '/verification/candidates',
-        icon: VerificationIcon,
       },
       {
         label: 'Verification',
         path: '/verification',
         icon: VerificationIcon,
       },
+      {
+        label: 'Evaluations',
+        path: '/evaluations',
+        icon: EvaluationIcon,
+      },
+      {
+        label: 'Officers',
+        path: '/officers',
+        icon: OfficersIcon,
+      },
     ],
   },
   {
-    group: 'ANALYTICS',
+    group: 'MANAGEMENT',
     items: [
       {
-        label: 'Officer Performance',
-        path: '/officer-performance',
-        icon: PerformanceIcon,
+        label: 'Analytics',
+        path: '/analytics',
+        icon: AnalyticsIcon,
       },
       {
-        label: 'AI Evaluation',
-        path: '/evaluation',
-        icon: EvaluationIcon,
+        label: 'Profile',
+        path: '/profile',
+        icon: ProfileIcon,
       },
     ],
   },
@@ -80,47 +83,59 @@ export const adminNavigationGroups = [
 
 export const officerNavigationGroups = [
   {
-    group: 'COMMAND CENTER',
+    group: 'FIELD OPERATIONS',
     items: [
       {
         label: 'Dashboard',
         path: '/officer',
         icon: DashboardIcon,
       },
-    ],
-  },
-  {
-    group: 'OPERATIONS',
-    items: [
       {
-        label: 'Assigned Complaints',
-        path: '/officer/complaints',
+        label: 'My Assignments',
+        path: '/officer/assignments',
         icon: ComplaintsIcon,
       },
       {
-        label: 'Department Heatmap',
-        path: '/officer/heatmap',
-        icon: HeatmapIcon,
+        label: 'Verification',
+        path: '/officer/verification',
+        icon: VerificationIcon,
+      },
+      {
+        label: 'History',
+        path: '/officer/history',
+        icon: HistoryIcon,
+      },
+      {
+        label: 'Profile',
+        path: '/officer/profile',
+        icon: ProfileIcon,
       },
     ],
   },
 ];
 
-// Flat arrays for backward compatibility
+// Flat lists of navigation items
 export const adminNavigation = adminNavigationGroups.flatMap((g) => g.items);
 export const officerNavigation = officerNavigationGroups.flatMap((g) => g.items);
 
+/**
+ * Retrieve navigation configuration tailored for the authenticated role.
+ * @param {string} role - 'ADMIN' or 'OFFICER'
+ */
 export function getNavigationForRole(role) {
   const normalizedRole = role?.toUpperCase();
   if (normalizedRole === 'ADMIN') {
     return {
+      role: 'ADMIN',
       section: 'ADMIN CONSOLE',
-      subtitle: 'URBAN OPERATIONS',
+      subtitle: 'URBAN INTELLIGENCE',
       groups: adminNavigationGroups,
       items: adminNavigation,
     };
   }
+
   return {
+    role: 'OFFICER',
     section: 'FIELD OPERATIONS',
     subtitle: 'MUNICIPAL DISPATCH',
     groups: officerNavigationGroups,

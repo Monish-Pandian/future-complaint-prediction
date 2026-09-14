@@ -84,7 +84,7 @@ export default function OfficerPerformanceDetails() {
           <Link to="/officer-performance" className="btn-back-link">
             ← BACK TO OFFICER PERFORMANCE
           </Link>
-          <span className="demo-badge">DEMO DATA</span>
+          <span className="demo-badge">OFFICER INTEL</span>
         </div>
 
         {/* Officer Identity Header */}
@@ -130,8 +130,8 @@ export default function OfficerPerformanceDetails() {
         <div className="operational-summary-box" role="region" aria-label="Operational Narrative Summary">
           <strong>OPERATIONAL SUMMARY: </strong>
           {officer.name} currently has <strong>{officer.workload?.active ?? 0} active verification tasks</strong>.
-          A total of <strong>{officer.performance?.completed ?? 0} tasks</strong> have been completed in the current
-          demo evaluation period, with <strong>{officer.performance?.confirmed ?? 0} confirmed field observations</strong>,
+          A total of <strong>{officer.performance?.completed ?? 0} tasks</strong> have been completed in the
+          active evaluation cycle, with <strong>{officer.performance?.confirmed ?? 0} confirmed field observations</strong>,
           an average turnaround time of <strong>{officer.performance?.averageVerificationFormatted || '1h 42m'}</strong>,
           and an overall completion rate of <strong>{completionPct}%</strong>.
         </div>

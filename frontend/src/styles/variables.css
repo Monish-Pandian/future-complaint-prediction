@@ -1,20 +1,21 @@
-/* ====================================================
-   URBAN INTELLIGENCE COMMAND CENTER — DESIGN TOKENS
-   Master Design System: Clean Light / Dark Tokens
-   ==================================================== */
+/* ==============================================================================
+   COMAI CIVIC INTELLIGENCE PLATFORM — GLOBAL DESIGN SYSTEM TOKENS
+   Specification: AI + Urban Intelligence + Civic Operations + Trust
+   ============================================================================== */
 
 :root,
 [data-theme="dark"],
 .dark {
-  /* Surface & Background (Dark Mode Default) */
-  --bg-base: #0b1120;
+  /* Surface & Canvas (Dark Mode Default - Tactical Slate / Obsidian) */
+  --bg-base: #090d16;
   --bg-primary: #0f172a;
   --bg-surface: #111827;
   --bg-surface-raised: #172033;
   --bg-surface-hover: #1e293b;
   --bg-surface-active: #25334d;
+  --bg-surface-recessed: #0a0f1d;
 
-  --background: #0b1120;
+  --background: #090d16;
   --surface: #111827;
   --surface-secondary: #172033;
   --surface-hover: #1e293b;
@@ -24,121 +25,143 @@
   --ui-surface: var(--bg-surface);
   --ui-surface-raised: var(--bg-surface-raised);
 
-  /* Borders */
+  /* Sidebar Tokens (Dark Professional Surface) */
+  --sidebar-bg: #090d16;
+  --sidebar-border: #1e293b;
+  --sidebar-text: #94a3b8;
+  --sidebar-text-hover: #f8fafc;
+  --sidebar-active-bg: rgba(37, 99, 235, 0.15);
+  --sidebar-active-border: #3b82f6;
+  --sidebar-active-text: #60a5fa;
+
+  /* Borders & Dividers */
   --border: #263244;
   --border-light: #1e293b;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-focus: #3b82f6;
   --glass-border: #263244;
   --glass-border-hover: #334155;
-  --glass-bg: #111827;
-  --glass-bg-hover: #172033;
+  --glass-bg: rgba(17, 24, 39, 0.85);
+  --glass-bg-hover: rgba(30, 41, 59, 0.85);
 
   /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', monospace;
+  --font-display: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', 'SFMono-Regular', Consolas, monospace;
 
   --text-primary: #f8fafc;
   --text-secondary: #cbd5e1;
   --text-muted: #64748b;
   --text-inverse: #0f172a;
 
-  /* Accent & Semantic Colors */
-  --accent: #38bdf8;
-  --accent-hover: #0284c7;
-  --accent-soft: rgba(56, 189, 248, 0.12);
-  --accent-border: rgba(56, 189, 248, 0.35);
+  /* Accent & Intelligence Colors (Professional Blue/Indigo Family) */
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-light: #3b82f6;
+  --accent-soft: rgba(37, 99, 235, 0.12);
+  --accent-border: rgba(37, 99, 235, 0.35);
+  --accent-glow: rgba(37, 99, 235, 0.4);
+  --accent-text: #60a5fa;
 
-  --success: #22c55e;
-  --success-soft: rgba(34, 197, 94, 0.12);
-  --success-border: rgba(34, 197, 94, 0.35);
+  /* Secondary Accent (Cyan / Intelligence highlight) */
+  --cyan-accent: #06b6d4;
+  --cyan-soft: rgba(6, 182, 212, 0.12);
+  --cyan-border: rgba(6, 182, 212, 0.35);
+
+  /* Semantic Risk Matrix */
+  --critical: #ef4444;
+  --critical-soft: rgba(239, 68, 68, 0.14);
+  --critical-border: rgba(239, 68, 68, 0.35);
+  --critical-text: #fca5a5;
+
+  --high: #f97316;
+  --high-soft: rgba(249, 115, 22, 0.14);
+  --high-border: rgba(249, 115, 22, 0.35);
+  --high-text: #fdba74;
+
+  --medium: #f59e0b;
+  --medium-soft: rgba(245, 158, 11, 0.14);
+  --medium-border: rgba(245, 158, 11, 0.35);
+  --medium-text: #fde047;
+
+  --low: #10b981;
+  --low-soft: rgba(16, 185, 129, 0.14);
+  --low-border: rgba(16, 185, 129, 0.35);
+  --low-text: #86efac;
+
+  /* Semantic Status Tokens */
+  --success: #10b981;
+  --success-soft: rgba(16, 185, 129, 0.14);
+  --success-border: rgba(16, 185, 129, 0.35);
+  --success-text: #34d399;
 
   --warning: #f59e0b;
-  --warning-soft: rgba(245, 158, 11, 0.12);
+  --warning-soft: rgba(245, 158, 11, 0.14);
   --warning-border: rgba(245, 158, 11, 0.35);
+  --warning-text: #fbbf24;
 
   --danger: #ef4444;
-  --danger-soft: rgba(239, 68, 68, 0.12);
+  --danger-soft: rgba(239, 68, 68, 0.14);
   --danger-border: rgba(239, 68, 68, 0.35);
+  --danger-text: #f87171;
 
-  --critical: #f43f5e;
-  --critical-soft: rgba(244, 63, 94, 0.14);
-  --critical-border: rgba(244, 63, 94, 0.4);
+  --info: #0284c7;
+  --info-soft: rgba(2, 132, 199, 0.12);
+  --info-border: rgba(2, 132, 199, 0.35);
+  --info-text: #38bdf8;
 
-  --info: #60a5fa;
-  --info-soft: rgba(96, 165, 250, 0.12);
-  --info-border: rgba(96, 165, 250, 0.35);
+  --pending: #f59e0b;
+  --pending-soft: rgba(245, 158, 11, 0.14);
+  --pending-border: rgba(245, 158, 11, 0.35);
+  --pending-text: #fbbf24;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
-  --glass-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-}
+  --in-progress: #3b82f6;
+  --in-progress-soft: rgba(59, 130, 246, 0.14);
+  --in-progress-border: rgba(59, 130, 246, 0.35);
+  --in-progress-text: #93c5fd;
 
-/* Light Theme — Exact Enterprise Specs */
-[data-theme="light"],
-.light {
-  --bg-base: #f6f8fb;
-  --bg-primary: #ffffff;
-  --bg-surface: #ffffff;
-  --bg-surface-raised: #f8fafc;
-  --bg-surface-hover: #f1f5f9;
-  --bg-surface-active: #e2e8f0;
+  --completed: #10b981;
+  --completed-soft: rgba(16, 185, 129, 0.14);
+  --completed-border: rgba(16, 185, 129, 0.35);
+  --completed-text: #34d399;
 
-  --background: #f6f8fb;
-  --surface: #ffffff;
-  --surface-secondary: #f8fafc;
-  --surface-hover: #f1f5f9;
+  --rejected: #ef4444;
+  --rejected-soft: rgba(239, 68, 68, 0.14);
+  --rejected-border: rgba(239, 68, 68, 0.35);
+  --rejected-text: #f87171;
 
-  --ui-bg: var(--bg-base);
-  --ui-bg-soft: var(--bg-primary);
-  --ui-surface: var(--bg-surface);
-  --ui-surface-raised: var(--bg-surface-raised);
+  /* Evaluation Matrix Tokens */
+  --eval-tp: #10b981;
+  --eval-tp-soft: rgba(16, 185, 129, 0.14);
+  --eval-tp-border: rgba(16, 185, 129, 0.35);
+  --eval-tp-text: #34d399;
 
-  --border: #e2e8f0;
-  --border-light: #f1f5f9;
-  --glass-border: #e2e8f0;
-  --glass-border-hover: #cbd5e1;
-  --glass-bg: #ffffff;
-  --glass-bg-hover: #f8fafc;
+  --eval-fp: #ef4444;
+  --eval-fp-soft: rgba(239, 68, 68, 0.14);
+  --eval-fp-border: rgba(239, 68, 68, 0.35);
+  --eval-fp-text: #f87171;
 
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
-  --text-inverse: #ffffff;
+  --eval-tn: #3b82f6;
+  --eval-tn-soft: rgba(59, 130, 246, 0.14);
+  --eval-tn-border: rgba(59, 130, 246, 0.35);
+  --eval-tn-text: #93c5fd;
 
-  --accent: #0284c7;
-  --accent-hover: #0369a1;
-  --accent-soft: rgba(2, 132, 199, 0.08);
-  --accent-border: rgba(2, 132, 199, 0.25);
+  --eval-undetermined: #64748b;
+  --eval-undetermined-soft: rgba(100, 116, 139, 0.14);
+  --eval-undetermined-border: rgba(100, 116, 139, 0.35);
+  --eval-undetermined-text: #94a3b8;
 
-  --success: #16a34a;
-  --success-soft: rgba(22, 163, 74, 0.08);
-  --success-border: rgba(22, 163, 74, 0.25);
-
-  --warning: #d97706;
-  --warning-soft: rgba(217, 119, 6, 0.08);
-  --warning-border: rgba(217, 119, 6, 0.25);
-
-  --danger: #dc2626;
-  --danger-soft: rgba(220, 38, 38, 0.08);
-  --danger-border: rgba(220, 38, 38, 0.25);
-
-  --critical: #e11d48;
-  --critical-soft: rgba(225, 29, 72, 0.08);
-  --critical-border: rgba(225, 29, 72, 0.25);
-
-  --info: #2563eb;
-  --info-soft: rgba(37, 99, 235, 0.08);
-  --info-border: rgba(37, 99, 235, 0.25);
-
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
-  --glass-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  /* Elevation & Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 28px rgba(0, 0, 0, 0.4);
+  --shadow-overlay: 0 16px 40px -8px rgba(0, 0, 0, 0.6), 0 0 24px -2px rgba(37, 99, 235, 0.12);
+  --glass-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 
 :root {
   /* Shared Spacing Scale */
+  --space-05: 2px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -149,16 +172,22 @@
   --space-10: 40px;
   --space-12: 48px;
 
-  /* Shared Border Radii */
+  /* Shared Border Radii (Moderate rounded corners) */
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 14px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
   --radius-full: 9999px;
 
   /* Micro-Transitions */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 200ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Layout Dimensions */
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 68px;
+  --header-height: 60px;
+  --content-max-width: 1440px;
 }

@@ -1,4 +1,5 @@
 import axiosInstance from './axiosInstance';
+import { assignmentFilterOptions } from '../data/assignmentMockData';
 /**
  * Normalize UI filter values for backend API requests.
  * Strips out human-readable placeholder labels like "All departments", "All assignment statuses", etc.

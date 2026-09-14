@@ -67,8 +67,8 @@ export default function SubmitVerificationModal({ isOpen, task, onClose, onSubmi
             </div>
             <div style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
               {isCandidate
-                ? `Candidate: ${task.candidateId || task.id} &bull; Pred Ref: {pred.predictionId || 'N/A'}`
-                : `Task: {task.assignmentId || task.id} &bull; Pred Ref: {pred.predictionId || 'N/A'}`
+                ? `Candidate: ${task.candidateId || task.id} • Pred Ref: ${pred.predictionId || 'N/A'}`
+                : `Task: ${task.assignmentId || task.id || task._id} • Pred Ref: ${pred.predictionId || 'N/A'}`
               }
             </div>
           </div>

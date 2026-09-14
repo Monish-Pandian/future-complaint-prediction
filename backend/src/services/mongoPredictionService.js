@@ -10,6 +10,22 @@ const ApiError = require('../utils/apiError');
 
 const MODEL_DIR = path.join(__dirname, '..', '..', 'ai_service', 'data', 'models');
 
+const _getDepartmentForSrType = (srType) => {
+  const srToDept = {
+    'Rodent Baiting/Rat Complaint': 'Vector Control',
+    'Abandoned Vehicle Complaint': 'Vehicle & Traffic Operations',
+    'Garbage Cart Maintenance': 'Sanitation & Recycling',
+    'Graffiti Removal Request': 'Community Maintenance',
+    'Traffic Signal Out Complaint': 'Electrical & Lighting',
+    'Blue Recycling Cart': 'Sanitation & Recycling',
+    'Building Violation': 'Building & Safety Inspections',
+    'Street Light Out Complaint': 'Electrical & Lighting',
+    'Pothole in Street Complaint': 'Infrastructure Repair',
+    'Tree Debris Clean-Up Request': 'Community Maintenance',
+  };
+  return srToDept[srType] || 'Municipal';
+};
+
 class MongoPredictionService {
   constructor() {
     this.featureEngineering = new FeatureEngineeringService();
@@ -543,19 +559,7 @@ if __name__ == '__main__':
   }
 
   _getDepartmentForSrType(srType) {
-    const srToDept = {
-      'Rodent Baiting/Rat Complaint': 'Vector Control',
-      'Abandoned Vehicle Complaint': 'Vehicle & Traffic Operations',
-      'Garbage Cart Maintenance': 'Sanitation & Recycling',
-      'Graffiti Removal Request': 'Community Maintenance',
-      'Traffic Signal Out Complaint': 'Electrical & Lighting',
-      'Blue Recycling Cart': 'Sanitation & Recycling',
-      'Building Violation': 'Building & Safety Inspections',
-      'Street Light Out Complaint': 'Electrical & Lighting',
-      'Pothole in Street Complaint': 'Infrastructure Repair',
-      'Tree Debris Clean-Up Request': 'Community Maintenance',
-    };
-    return srToDept[srType] || 'Municipal';
+    return _getDepartmentForSrType(srType);
   }
 
   _getCommunityAreaCoordinates(communityArea) {
@@ -676,4 +680,5 @@ module.exports = {
   FORBIDDEN_COLUMNS,
   WARD_MAPPING,
   SEASON_MAP,
+  _getDepartmentForSrType,
 };

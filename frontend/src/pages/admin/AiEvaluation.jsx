@@ -3,10 +3,13 @@ import PageTransition from '../../components/layout/PageTransition';
 import EvaluationMetricsGrid from '../../components/evaluation/EvaluationMetricsGrid';
 import ConfusionMatrixCard from '../../components/evaluation/ConfusionMatrixCard';
 import ModelVersionInfo from '../../components/evaluation/ModelVersionInfo';
+import ClosedLoopFlow from '../../components/evaluation/ClosedLoopFlow';
+import FieldEvaluationSummary from '../../components/evaluation/FieldEvaluationSummary';
 import FeedbackPipelineCard from '../../components/evaluation/FeedbackPipelineCard';
 import EvaluationFilters from '../../components/evaluation/EvaluationFilters';
 import EvaluationRecordsTable from '../../components/evaluation/EvaluationRecordsTable';
-import EvaluationDetailsModal from '../../components/evaluation/EvaluationDetailsModal';
+import EvaluationDetailDrawer from '../../components/evaluation/EvaluationDetailDrawer';
+import ErrorState from '../../components/common/ErrorState';
 import {
   getEvaluationMetrics,
   getEvaluationRecords,
@@ -14,8 +17,8 @@ import {
 } from '../../api/evaluationApi';
 
 /**
- * Admin AI Feedback & Prediction Evaluation Page
- * Urban Intelligence Command Center — Module 11
+ * Admin AI Model Evaluation & Ground Truth Governance Console
+ * Urban Intelligence Command Center — Module 8H
  */
 export default function AiEvaluation() {
   const [metricsData, setMetricsData] = useState({});
@@ -25,6 +28,7 @@ export default function AiEvaluation() {
   const [filters, setFilters] = useState({
     search: '',
     classification: 'All classifications',
+    outcome: 'All outcomes',
     department: 'All departments',
     riskLevel: 'All risk levels',
     ward: 'All wards',
@@ -72,12 +76,23 @@ export default function AiEvaluation() {
         }
 
         if (recordsRes?.data) {
-          setRecords(recordsRes.data.records || []);
-          setPagination(recordsRes.data.pagination || { page: 1, limit: 10, total: 0, totalPages: 1 });
+          let list = recordsRes.data.records || [];
+
+          // Outcome filter client-side if applied and not supported by backend
+          if (customFilters.outcome && customFilters.outcome !== 'All outcomes') {
+            const targetOutcome = customFilters.outcome.toUpperCase().trim();
+            list = list.filter((r) => {
+              const o = (r.actualOutcome || r.verification?.outcome || '').toUpperCase();
+              return o === targetOutcome;
+            });
+          }
+
+          setRecords(list);
+          setPagination(recordsRes.data.pagination || { page: 1, limit: 10, total: list.length, totalPages: 1 });
         }
       } catch (err) {
         console.error('Failed to load AI evaluation data:', err);
-        setError('AI EVALUATION DATA UNAVAILABLE');
+        setError('Evaluation data unavailable. Please verify connection to the model governance service.');
       } finally {
         setIsLoading(false);
       }
@@ -97,9 +112,17 @@ export default function AiEvaluation() {
   };
 
   const handleReset = (emptyFilters) => {
-    setFilters(emptyFilters);
+    const defaultFilters = emptyFilters || {
+      search: '',
+      classification: 'All classifications',
+      outcome: 'All outcomes',
+      department: 'All departments',
+      riskLevel: 'All risk levels',
+      ward: 'All wards',
+    };
+    setFilters(defaultFilters);
     setPagination((prev) => ({ ...prev, page: 1 }));
-    loadEvaluationData(emptyFilters, 1, sortBy, sortOrder);
+    loadEvaluationData(defaultFilters, 1, sortBy, sortOrder);
   };
 
   // Sorting
@@ -120,7 +143,7 @@ export default function AiEvaluation() {
     setSelectedEvaluation(item);
   };
 
-  const handleCloseModal = () => {
+  const handleCloseDrawer = () => {
     setSelectedEvaluation(null);
   };
 
@@ -131,20 +154,31 @@ export default function AiEvaluation() {
         <header className="evaluation-header-wrapper">
           <div className="evaluation-title-group">
             <div className="auth-label" style={{ marginBottom: '4px' }}>
-              RESEARCH EVALUATION & FEEDBACK MATRIX
+              OPERATIONS / EVALUATIONS
             </div>
             <h1>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" strokeWidth="2">
-                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" strokeWidth="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <line x1="3" y1="9" x2="21" y2="9" />
+                <line x1="9" y1="21" x2="9" y2="9" />
               </svg>
-              AI Feedback & Prediction Evaluation
+              AI MODEL EVALUATION
             </h1>
             <p className="evaluation-subtitle">
-              Authoritative model evaluation benchmarks comparing AI forecasted civic risk against ground truth field verifications. Monitored research metrics include Precision, Recall, F1 Score, Confusion Matrix, and Feedback Buffer readiness.
+              Measure prediction performance and track how field verification validates real-world AI forecasts.
             </p>
           </div>
 
           <div className="evaluation-meta-actions">
+            <div className="eval-context-pill font-mono">
+              <span className="text-muted">MODEL:</span> <strong>xgb-test-v1</strong>
+            </div>
+            <div className="eval-context-pill font-mono">
+              <span className="text-muted">PERIOD:</span> <strong>2025 Test</strong>
+            </div>
+            <div className="eval-context-pill font-mono">
+              <span className="text-muted">THRESHOLD:</span> <strong>0.38</strong>
+            </div>
             <span className={`evaluation-mode-pill ${isLive ? 'live' : 'demo'}`}>
               <span
                 style={{
@@ -154,72 +188,55 @@ export default function AiEvaluation() {
                   backgroundColor: isLive ? '#4dd6a8' : '#ecd06f',
                 }}
               />
-              {isLive ? 'Real API Data' : 'Demo Data'}
+              {isLive ? 'OPERATIONAL' : 'SYNCING'}
             </span>
           </div>
         </header>
 
         {/* Error State Banner */}
         {error && (
-          <div
-            style={{
-              padding: '16px 20px',
-              borderRadius: 'var(--radius-md)',
-              background: 'rgba(255, 107, 107, 0.1)',
-              border: '1px solid rgba(255, 107, 107, 0.3)',
-              color: '#ff6b6b',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-              </svg>
-              <span style={{ fontWeight: '600', fontSize: '13px' }}>{error}</span>
-            </div>
-            <button
-              type="button"
-              className="evaluation-btn evaluation-btn-secondary"
-              onClick={() => loadEvaluationData()}
-            >
-              Retry Connection
-            </button>
-          </div>
+          <ErrorState
+            title="AI evaluation data unavailable"
+            description={error}
+            onRetry={() => loadEvaluationData()}
+            retryLabel="Retry Connection"
+          />
         )}
 
-        {/* Top Research Metric KPI Cards */}
-        <EvaluationMetricsGrid metrics={metricsData.metrics} />
+        {/* ====================================================
+            SECTION A: MODEL TEST PERFORMANCE (Authoritative TEST-2025)
+            ==================================================== */}
+        <EvaluationMetricsGrid />
 
-        {/* Middle Layout: Confusion Matrix + Model/Feedback Info */}
+        {/* Middle Layout: Confusion Matrix + Model Governance / Policy Info */}
         <div className="evaluation-middle-grid">
-          <ConfusionMatrixCard
-            matrix={metricsData.confusionMatrix}
-            metrics={metricsData.metrics}
-          />
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <ModelVersionInfo
-              modelVersion={metricsData.modelVersion}
-              activeCycleId={metricsData.activeCycleId}
-              leadTime={metricsData.leadTime}
-              predictions={metricsData.predictions}
-            />
-
-            <FeedbackPipelineCard
-              feedback={metricsData.feedback}
-              predictions={metricsData.predictions}
-            />
-          </div>
+          <ConfusionMatrixCard />
+          <ModelVersionInfo />
         </div>
+
+        {/* Closed-Loop Operational Governance Architecture */}
+        <ClosedLoopFlow />
+
+        {/* ====================================================
+            SECTION B: FIELD VERIFICATION EVALUATION (Live Operations)
+            ==================================================== */}
+        <FieldEvaluationSummary
+          records={records}
+          metricsData={metricsData}
+          pagination={pagination}
+        />
+
+        {/* Model Feedback Signal Store */}
+        <FeedbackPipelineCard
+          feedback={metricsData.feedback}
+          predictions={metricsData.predictions}
+        />
 
         {/* Multi-Criteria Filters */}
         <EvaluationFilters
           filters={filters}
           filterOptions={filterOptions}
+          totalFiltered={records.length}
           onFilterChange={handleFilterChange}
           onReset={handleReset}
         />
@@ -234,13 +251,14 @@ export default function AiEvaluation() {
           onSort={handleSort}
           onPageChange={handlePageChange}
           onInspect={handleInspect}
+          onResetFilters={() => handleReset()}
         />
 
-        {/* 5-Tier Detail Modal / Drawer */}
+        {/* Evaluation Assessment Detail Drawer */}
         {selectedEvaluation && (
-          <EvaluationDetailsModal
+          <EvaluationDetailDrawer
             evaluation={selectedEvaluation}
-            onClose={handleCloseModal}
+            onClose={handleCloseDrawer}
           />
         )}
       </div>

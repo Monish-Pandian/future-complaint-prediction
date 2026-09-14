@@ -16,7 +16,7 @@ export default function OfficerWorkload({ workload = {} }) {
     <div className="info-card" aria-label="Current Workload Panel">
       <div className="info-card-header">
         <h3 className="info-card-title">CURRENT WORKLOAD</h3>
-        <span className="dashboard-panel-tag">DEMO CAPACITY</span>
+        <span className="dashboard-panel-tag">CAPACITY METRICS</span>
       </div>
 
       <div className="workload-card-inner">

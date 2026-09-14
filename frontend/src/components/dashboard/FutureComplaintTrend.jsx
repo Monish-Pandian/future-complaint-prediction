@@ -17,7 +17,7 @@ function CustomTrendTooltip({ active, payload, label }) {
 
   return (
     <div className="custom-chart-tooltip" role="tooltip">
-      <div className="tooltip-date">{label}</div>
+      <div className="tooltip-date font-mono">{label}</div>
       {payload.map((item) => {
         if (item.value === null || item.value === undefined) return null;
         return (
@@ -29,7 +29,7 @@ function CustomTrendTooltip({ active, payload, label }) {
               />
               <span>{item.name}:</span>
             </div>
-            <span className="tooltip-val">{item.value}</span>
+            <span className="tooltip-val font-mono">{item.value}</span>
           </div>
         );
       })}
@@ -51,10 +51,10 @@ export default function FutureComplaintTrend({ data = [] }) {
         <div className="dashboard-panel-title-group">
           <h2 className="dashboard-panel-title">FUTURE COMPLAINT TREND</h2>
           <span className="dashboard-panel-subtitle">
-            Historical vs predicted vs observed
+            Historical baseline vs 7-day predictive forecast trajectory
           </span>
         </div>
-        <span className="dashboard-panel-tag">DEMO DATA</span>
+        <span className="dashboard-panel-tag">FORECAST ENGINE</span>
       </div>
 
       {/* Custom Legend */}
@@ -69,7 +69,7 @@ export default function FutureComplaintTrend({ data = [] }) {
         </div>
         <div className="legend-item">
           <span className="legend-line actual" />
-          <span>Observed / Actual</span>
+          <span>Observed Field Ground Truth</span>
         </div>
       </div>
 
@@ -107,10 +107,10 @@ export default function FutureComplaintTrend({ data = [] }) {
               type="monotone"
               dataKey="historical"
               name="Historical"
-              stroke="#68737e"
+              stroke="#64748b"
               strokeWidth={2}
-              dot={{ r: 2.5, fill: '#68737e', strokeWidth: 0 }}
-              activeDot={{ r: 5, fill: '#68737e', stroke: '#080b0f', strokeWidth: 2 }}
+              dot={{ r: 2.5, fill: '#64748b', strokeWidth: 0 }}
+              activeDot={{ r: 5, fill: '#64748b', stroke: '#0f172a', strokeWidth: 2 }}
               connectNulls={false}
               isAnimationActive={false}
             />
@@ -120,24 +120,24 @@ export default function FutureComplaintTrend({ data = [] }) {
               type="monotone"
               dataKey="predicted"
               name="Predicted"
-              stroke="#4dd6c7"
+              stroke="#06b6d4"
               strokeWidth={2.5}
               strokeDasharray="4 2"
-              dot={{ r: 3, fill: '#4dd6c7', strokeWidth: 0 }}
-              activeDot={{ r: 6, fill: '#4dd6c7', stroke: '#080b0f', strokeWidth: 2 }}
+              dot={{ r: 3, fill: '#06b6d4', strokeWidth: 0 }}
+              activeDot={{ r: 6, fill: '#06b6d4', stroke: '#0f172a', strokeWidth: 2 }}
               connectNulls={false}
               isAnimationActive={false}
             />
 
-            {/* Observed / Actual Series (Warm neutral high-contrast line) */}
+            {/* Observed / Actual Series (Warm amber line) */}
             <Line
               type="monotone"
               dataKey="actual"
-              name="Actual"
-              stroke="#e7b65a"
+              name="Actual Observed"
+              stroke="#f59e0b"
               strokeWidth={2}
-              dot={{ r: 3, fill: '#e7b65a', strokeWidth: 0 }}
-              activeDot={{ r: 5, fill: '#e7b65a', stroke: '#080b0f', strokeWidth: 2 }}
+              dot={{ r: 3, fill: '#f59e0b', strokeWidth: 0 }}
+              activeDot={{ r: 5, fill: '#f59e0b', stroke: '#0f172a', strokeWidth: 2 }}
               connectNulls={false}
               isAnimationActive={false}
             />

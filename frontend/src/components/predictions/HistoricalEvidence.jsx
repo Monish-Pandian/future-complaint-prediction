@@ -42,7 +42,7 @@ export default function HistoricalEvidence({ evidence = {} }) {
     <div className="info-card" aria-label="Historical Evidence Panel">
       <div className="info-card-header">
         <h3 className="info-card-title">HISTORICAL EVIDENCE</h3>
-        <span className="dashboard-panel-tag">DEMO DATA</span>
+        <span className="dashboard-panel-tag">BASELINE EVIDENCE</span>
       </div>
 
       {/* Historical Metrics Grid */}

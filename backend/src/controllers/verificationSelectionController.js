@@ -1,5 +1,6 @@
 const verificationSelectionService = require('../services/verificationSelectionService');
 const autoAssignmentService = require('../services/autoAssignmentService');
+const { validatePagination, validateSort } = require('../utils/sanitizer');
 const { sendSuccess } = require('../utils/responseHandler');
 const ApiError = require('../utils/apiError');
 
@@ -145,21 +146,85 @@ const assignCandidates = async (req, res, next) => {
     }
 
     const { VerificationCandidate } = require('../models/VerificationCandidate');
+    const { Prediction } = require('../models/Prediction');
+    const { Assignment, ASSIGNMENT_STATUS } = require('../models/Assignment');
+    const { CommunityAreaCentroid } = require('../models/CommunityAreaCentroid');
+    const { haversine } = require('../utils/assignmentUtils');
 
-    const updated = await VerificationCandidate.updateMany(
-      { _id: { $in: candidateIds }, status: 'PENDING_ASSIGNMENT' },
-      {
+    const centroids = await CommunityAreaCentroid.find({}).lean();
+    const centroidMap = new Map(centroids.map((c) => [c.communityArea, { lat: c.latitude, lon: c.longitude }]));
+
+    const candidates = await VerificationCandidate.find({
+      _id: { $in: candidateIds },
+      status: 'PENDING_ASSIGNMENT',
+    });
+
+    let assignedCount = 0;
+    const offCoords =
+      officer.homeCommunityArea && centroidMap.has(officer.homeCommunityArea)
+        ? centroidMap.get(officer.homeCommunityArea)
+        : officer.location?.coordinates
+        ? { lat: officer.location.coordinates[1], lon: officer.location.coordinates[0] }
+        : null;
+
+    for (const candidate of candidates) {
+      const candCoords = centroidMap.get(candidate.communityArea);
+      let distanceKm = 1.5;
+      if (offCoords && candCoords) {
+        distanceKm = haversine(offCoords.lat, offCoords.lon, candCoords.lat, candCoords.lon);
+      }
+
+      const predDocId = candidate.predictionId?._id || candidate.predictionId;
+
+      // Idempotent assignment creation
+      let assignment = await Assignment.findOne({ predictionId: predDocId });
+      if (!assignment) {
+        const assignmentId = `ASGN-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
+        assignment = await Assignment.create({
+          assignmentId,
+          predictionId: predDocId,
+          officerId: officer._id,
+          department: candidate.department || officer.department,
+          distanceKm: Math.round(distanceKm * 100) / 100,
+          estimatedTravelMinutes: Math.round((distanceKm / 30) * 60),
+          currentWorkload: officer.currentWorkload || 0,
+          availability: officer.availability,
+          departmentMatch: (candidate.department || '').toLowerCase() === (officer.department || '').toLowerCase(),
+          assignmentScore: 85,
+          status: ASSIGNMENT_STATUS.AI_ASSIGNED,
+          assignedAt: new Date(),
+          isAdminOverride: true,
+          reasoning: `Admin manual assignment to officer ${officer.name} (${officer.officerId})`,
+        });
+
+        await Officer.findByIdAndUpdate(officer._id, {
+          $inc: { currentWorkload: 1 },
+        });
+      }
+
+      await VerificationCandidate.findByIdAndUpdate(candidate._id, {
         $set: {
           assignedOfficer: officer._id,
+          assignedAssignment: assignment._id,
           assignedAt: new Date(),
           status: 'ASSIGNED',
         },
-      }
-    );
+      });
+
+      await Prediction.findByIdAndUpdate(predDocId, {
+        $set: {
+          assignedOfficer: officer._id,
+          assignedOfficerId: officer._id,
+          verificationStatus: 'ASSIGNED',
+        },
+      });
+
+      assignedCount++;
+    }
 
     return sendSuccess(res, 200, {
-      modifiedCount: updated.modifiedCount,
-      message: `Assigned ${updated.modifiedCount} candidates to officer ${officer.officerId}`,
+      modifiedCount: assignedCount,
+      message: `Assigned ${assignedCount} candidates to officer ${officer.officerId}`,
     });
   } catch (error) {
     next(error);
@@ -179,21 +244,60 @@ const unassignCandidates = async (req, res, next) => {
     }
 
     const { VerificationCandidate } = require('../models/VerificationCandidate');
+    const { Assignment } = require('../models/Assignment');
+    const { Officer } = require('../models/Officer');
+    const { Prediction } = require('../models/Prediction');
 
-    const updated = await VerificationCandidate.updateMany(
-      { _id: { $in: candidateIds }, status: 'ASSIGNED' },
-      {
+    const candidates = await VerificationCandidate.find({
+      _id: { $in: candidateIds },
+      status: 'ASSIGNED',
+    });
+
+    let unassignedCount = 0;
+    for (const candidate of candidates) {
+      if (candidate.assignedOfficer) {
+        await Officer.findByIdAndUpdate(candidate.assignedOfficer, [
+          {
+            $set: {
+              currentWorkload: {
+                $max: [0, { $subtract: ['$currentWorkload', 1] }],
+              },
+            },
+          },
+        ]);
+      }
+
+      if (candidate.assignedAssignment) {
+        await Assignment.findByIdAndDelete(candidate.assignedAssignment);
+      } else if (candidate.predictionId) {
+        await Assignment.deleteOne({ predictionId: candidate.predictionId });
+      }
+
+      if (candidate.predictionId) {
+        await Prediction.findByIdAndUpdate(candidate.predictionId, {
+          $set: {
+            assignedOfficer: null,
+            assignedOfficerId: null,
+            verificationStatus: 'UNASSIGNED',
+          },
+        });
+      }
+
+      await VerificationCandidate.findByIdAndUpdate(candidate._id, {
         $set: {
           assignedOfficer: null,
+          assignedAssignment: null,
           assignedAt: null,
           status: 'PENDING_ASSIGNMENT',
         },
-      }
-    );
+      });
+
+      unassignedCount++;
+    }
 
     return sendSuccess(res, 200, {
-      modifiedCount: updated.modifiedCount,
-      message: `Unassigned ${updated.modifiedCount} candidates`,
+      modifiedCount: unassignedCount,
+      message: `Unassigned ${unassignedCount} candidates`,
     });
   } catch (error) {
     next(error);

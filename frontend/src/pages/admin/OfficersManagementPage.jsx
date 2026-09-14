@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PageTransition from '../../components/layout/PageTransition';
-import KpiCard from '../../components/dashboard/KpiCard';
-import { renderOfficerStatusBadge } from '../../components/officerPerformance/OfficerBadges';
+import OfficerSummary from '../../components/officers/OfficerSummary';
+import WorkforceCapacityPanel from '../../components/officers/WorkforceCapacityPanel';
+import OfficerFilters from '../../components/officers/OfficerFilters';
+import OfficerTable from '../../components/officers/OfficerTable';
+import OfficerDetailDrawer from '../../components/officers/OfficerDetailDrawer';
 import { CreateOfficerModal, EditOfficerModal } from '../../components/officers/OfficerModals';
+import ErrorState from '../../components/common/ErrorState';
 import {
   getAdminOfficers,
   createAdminOfficer,
@@ -12,8 +16,9 @@ import {
 } from '../../api/officerApi';
 
 /**
- * Admin Officer Management Registry Page
- * Urban Intelligence Command Center — Module 12
+ * Admin Field Officer Operations & Workforce Capacity Management
+ * Route: /officers
+ * Module 8I — Redesigned Operational Workforce Interface
  */
 export default function OfficersManagementPage() {
   const [officers, setOfficers] = useState([]);
@@ -24,16 +29,19 @@ export default function OfficersManagementPage() {
     search: '',
     department: 'All departments',
     availability: 'All statuses',
+    capacityFilter: 'All',
   });
+  const [sortBy, setSortBy] = useState('name');
+  const [sortOrder, setSortOrder] = useState('asc');
   const [isLoading, setIsLoading] = useState(true);
-  const [isLive, setIsLive] = useState(false);
   const [error, setError] = useState(null);
 
-  // Modals
+  // Inspection Drawer & Modals
+  const [selectedOfficer, setSelectedOfficer] = useState(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingOfficer, setEditingOfficer] = useState(null);
 
-  // Load filter options
+  // Load filter options once on mount
   useEffect(() => {
     async function loadFilters() {
       try {
@@ -46,9 +54,9 @@ export default function OfficersManagementPage() {
     loadFilters();
   }, []);
 
-  // Fetch officers
+  // Fetch officers from authoritative backend
   const loadOfficers = useCallback(
-    async (customFilters = filters, page = pagination.page) => {
+    async (customFilters = filters, page = pagination.page, sortField = sortBy, sortDir = sortOrder) => {
       setIsLoading(true);
       setError(null);
       try {
@@ -56,45 +64,62 @@ export default function OfficersManagementPage() {
           ...customFilters,
           page,
           limit: pagination.limit || 10,
+          sortBy: sortField,
+          sortOrder: sortDir,
         });
 
         if (res?.data) {
-          setOfficers(res.data.officers || []);
-          setPagination(res.data.pagination || { page: 1, limit: 10, total: 0, totalPages: 1 });
+          const list = res.data.officers || [];
+          setOfficers(list);
+          setPagination(res.data.pagination || { page: 1, limit: 10, total: list.length, totalPages: 1 });
           setSummary(res.data.summary || {});
-          setIsLive(Boolean(res.isLive));
         }
       } catch (err) {
-        console.error('Failed to load officers list:', err);
-        setError('OFFICER REGISTRY DATA UNAVAILABLE');
+        console.error('Failed to load field officers list:', err);
+        setError(err.response?.data?.message || err.message || 'Field officer operations data unavailable.');
       } finally {
         setIsLoading(false);
       }
     },
-    [filters, pagination.page, pagination.limit]
+    [filters, pagination.page, pagination.limit, sortBy, sortOrder]
   );
 
   useEffect(() => {
     loadOfficers();
   }, [loadOfficers]);
 
-  // Filter change
+  // Filter change handler
   const handleFilterChange = (field, value) => {
     const next = { ...filters, [field]: value };
     setFilters(next);
     setPagination((prev) => ({ ...prev, page: 1 }));
-    loadOfficers(next, 1);
+    loadOfficers(next, 1, sortBy, sortOrder);
   };
 
+  // Reset filters
   const handleReset = () => {
     const emptyFilters = {
       search: '',
       department: 'All departments',
       availability: 'All statuses',
+      capacityFilter: 'All',
     };
     setFilters(emptyFilters);
     setPagination((prev) => ({ ...prev, page: 1 }));
-    loadOfficers(emptyFilters, 1);
+    loadOfficers(emptyFilters, 1, sortBy, sortOrder);
+  };
+
+  // Sort handler
+  const handleSort = (field, order) => {
+    setSortBy(field);
+    setSortOrder(order);
+    loadOfficers(filters, pagination.page, field, order);
+  };
+
+  // Pagination page change
+  const handlePageChange = (newPage) => {
+    setPagination((prev) => ({ ...prev, page: newPage }));
+    loadOfficers(filters, newPage, sortBy, sortOrder);
   };
 
   // CRUD Handlers
@@ -109,7 +134,7 @@ export default function OfficersManagementPage() {
   };
 
   const handleDelete = async (officer) => {
-    if (window.confirm(`Are you sure you want to remove ${officer.name} (${officer.officerId})?`)) {
+    if (window.confirm(`Are you sure you want to deactivate or remove ${officer.name} (${officer.officerId})?`)) {
       try {
         await deleteAdminOfficer(officer.id || officer._id || officer.officerId);
         await loadOfficers();
@@ -119,322 +144,136 @@ export default function OfficersManagementPage() {
     }
   };
 
+  const isFiltered =
+    Boolean(filters.search?.trim()) ||
+    (filters.department && !filters.department.startsWith('All')) ||
+    (filters.availability && !filters.availability.startsWith('All')) ||
+    (filters.capacityFilter && filters.capacityFilter !== 'All');
+
   return (
     <PageTransition>
       <div className="officers-mgmt-container">
-        {/* Compact Page Header */}
-        <header className="officers-mgmt-header">
-          <div className="officers-mgmt-title">
-            <h1>OFFICER REGISTRY</h1>
-            <p className="officers-mgmt-subtitle">
-              Municipal field operations and dispatch management
+        {/* Command Action Bar */}
+        <div className="stitch-command-bar">
+          <div className="stitch-command-title-wrap">
+            <div className="stitch-telemetry-badge">
+              <span className="stitch-live-dot" />
+              <span>OPERATIONS / OFFICERS • FIELD FLEET DISPATCH</span>
+            </div>
+            <h1 className="stitch-page-title">Field Officer Operations</h1>
+            <p className="stitch-page-desc">
+              Monitor officer availability, workload, capacity, departments, and assignment readiness.
             </p>
           </div>
 
-          <div className="officers-header-actions">
-            <span className={`verification-mode-pill ${isLive ? 'live' : 'demo'}`}>
-              <span
-                style={{
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  backgroundColor: isLive ? '#10b981' : '#f59e0b',
-                }}
-              />
-              {isLive ? 'Real API Data' : 'Demo Data'}
-            </span>
+          <div className="stitch-command-actions">
+            <div className="command-telemetry-pill">
+              <span className="pill-lbl">AVAILABLE FLEET:</span>
+              <span className="pill-val-green">
+                {summary.availableOfficers ?? summary.available ?? 0} Ready
+              </span>
+            </div>
+
+            <div className="command-telemetry-pill">
+              <span className="pill-lbl">ACTIVE WORKLOAD:</span>
+              <span className="pill-val-cyan">
+                {summary.assignedTasks ?? summary.totalWorkload ?? 0} Tasks
+              </span>
+            </div>
 
             <button
               type="button"
-              className="btn-provision-officer"
+              className="stitch-btn-primary"
               id="provision-officer-btn"
               onClick={() => setIsCreateOpen(true)}
             >
-              + Provision Officer
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              <span>Provision Officer</span>
             </button>
           </div>
-        </header>
+        </div>
 
-        {/* Error State Banner */}
+        {/* Error Banner with Retry */}
         {error && (
-          <div
-            style={{
-              padding: '12px 16px',
-              borderRadius: 'var(--radius-sm)',
-              background: 'rgba(239, 68, 68, 0.08)',
-              border: '1px solid var(--danger-border)',
-              color: 'var(--danger)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <span>{error}</span>
-            <button
-              type="button"
-              className="officers-btn-reset"
-              onClick={() => loadOfficers()}
-            >
-              Retry
-            </button>
+          <div className="officers-error-wrap">
+            <ErrorState
+              message={error}
+              onRetry={() => loadOfficers()}
+            />
           </div>
         )}
 
-        {/* 4 Compact KPIs */}
-        <section className="officers-kpis-grid" aria-label="Officer Registry KPIs">
-          <KpiCard
-            label="TOTAL OFFICERS"
-            value={summary.totalOfficers ?? officers.length}
-            supportingText="Registered field inspectors"
-            status="info"
+        {/* 6 Compact KPI Cards */}
+        <OfficerSummary
+          summary={summary}
+          officers={officers}
+        />
+
+        {/* Workforce Capacity Overview & Department Summary Panel */}
+        <WorkforceCapacityPanel
+          officers={officers}
+          summary={summary}
+        />
+
+        {/* Search & Filter Toolbar */}
+        <OfficerFilters
+          filters={filters}
+          filterOptions={filterOptions}
+          onChange={handleFilterChange}
+          onReset={handleReset}
+          totalCount={pagination.total}
+          filteredCount={officers.length}
+        />
+
+        {/* Main High-Density Officers Workspace Table */}
+        <OfficerTable
+          officers={officers}
+          isLoading={isLoading}
+          pagination={pagination}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onSort={handleSort}
+          onPageChange={handlePageChange}
+          onInspect={setSelectedOfficer}
+          onEdit={setEditingOfficer}
+          onDelete={handleDelete}
+          isFiltered={isFiltered}
+          onResetFilters={handleReset}
+        />
+
+        {/* Slide-over Officer Detail Drawer */}
+        {selectedOfficer && (
+          <OfficerDetailDrawer
+            officer={selectedOfficer}
+            onClose={() => setSelectedOfficer(null)}
+            onEdit={(officer) => {
+              setSelectedOfficer(null);
+              setEditingOfficer(officer);
+            }}
           />
-          <KpiCard
-            label="AVAILABLE FOR DISPATCH"
-            value={summary.availableOfficers ?? 5}
-            supportingText="Ready for AI task allocation"
-            status="success"
-          />
-          <KpiCard
-            label="BUSY / EN ROUTE"
-            value={summary.busyOfficers ?? 1}
-            supportingText="Active on-site inspection"
-            status="warning"
-          />
-          <KpiCard
-            label="OFFLINE / INACTIVE"
-            value={summary.inactiveOfficers ?? 0}
-            supportingText="Off duty or on leave"
-            status="info"
-          />
-        </section>
+        )}
 
-        {/* Clean Filter Toolbar */}
-        <div className="officers-filter-toolbar">
-          <div className="officers-search-wrapper">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input
-              id="officer-mgmt-search"
-              type="text"
-              className="officers-search-input"
-              placeholder="Search officers by name, ID, or skills..."
-              value={filters.search}
-              onChange={(e) => handleFilterChange('search', e.target.value)}
-            />
-          </div>
-
-          <select
-            id="officer-mgmt-dept"
-            className="officers-select"
-            value={filters.department}
-            onChange={(e) => handleFilterChange('department', e.target.value)}
-          >
-            {filterOptions.departments?.map((d) => (
-              <option key={d} value={d}>{d}</option>
-            ))}
-          </select>
-
-          <select
-            id="officer-mgmt-avail"
-            className="officers-select"
-            value={filters.availability}
-            onChange={(e) => handleFilterChange('availability', e.target.value)}
-          >
-            {filterOptions.availabilities?.map((a) => (
-              <option key={a} value={a}>{a.replace(/_/g, ' ')}</option>
-            ))}
-          </select>
-
-          <button
-            type="button"
-            className="officers-btn-reset"
-            onClick={handleReset}
-          >
-            Reset
-          </button>
-        </div>
-
-        {/* Officers Table Card */}
-        <div className="officers-table-card">
-          <div className="officers-table-header">
-            <div className="officers-table-title">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-              </svg>
-              Registered Municipal Officers
-            </div>
-            <div className="officers-table-count">
-              Showing {officers.length} officers
-            </div>
-          </div>
-
-          <div className="officers-table-responsive">
-            <table className="officers-table" aria-label="Officer Registry Table">
-              <thead>
-                <tr>
-                  <th>OFFICER ID</th>
-                  <th>OFFICER</th>
-                  <th>DEPARTMENT</th>
-                  <th>EMPLOYEE ID</th>
-                  <th>AVAILABILITY</th>
-                  <th>ACTIVE WORKLOAD</th>
-                  <th>PATROL SKILLS</th>
-                  <th style={{ textAlign: 'right' }}>ACTIONS</th>
-                </tr>
-              </thead>
-              <tbody>
-                {isLoading ? (
-                  Array.from({ length: 6 }).map((_, i) => (
-                    <tr key={`skeleton-${i}`}>
-                      <td colSpan={8}>
-                        <div style={{ height: '20px', background: 'var(--surface-secondary)', borderRadius: '4px', opacity: 0.6 }} />
-                      </td>
-                    </tr>
-                  ))
-                ) : officers.length === 0 ? (
-                  <tr>
-                    <td colSpan={8} style={{ textAlign: 'center', padding: '40px' }}>
-                      <div style={{ fontSize: '24px', marginBottom: '8px' }}>👤</div>
-                      <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>No officers match your search</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                        Try clearing filters or provisioning a new officer.
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  officers.map((officer) => {
-                    const id = officer.id || officer._id || officer.officerId;
-                    return (
-                      <tr key={id}>
-                        <td>
-                          <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '11px', color: 'var(--accent)' }}>
-                            {officer.officerId || id}
-                          </span>
-                        </td>
-                        <td>
-                          <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
-                            {officer.name}
-                          </div>
-                          {officer.phone && (
-                            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                              {officer.phone}
-                            </div>
-                          )}
-                        </td>
-                        <td>
-                          <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                            {officer.department}
-                          </span>
-                        </td>
-                        <td>
-                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11.5px', color: 'var(--text-muted)' }}>
-                            {officer.employeeCode || '—'}
-                          </span>
-                        </td>
-                        <td>
-                          {renderOfficerStatusBadge(officer.availability)}
-                        </td>
-                        <td>
-                          <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
-                            {officer.currentWorkload ?? 0} tasks
-                          </span>
-                        </td>
-                        <td>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                            {Array.isArray(officer.skills) && officer.skills.length > 0 ? (
-                              officer.skills.map((skill, idx) => (
-                                <span key={idx} className="officer-skill-tag">
-                                  {skill}
-                                </span>
-                              ))
-                            ) : (
-                              <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>General</span>
-                            )}
-                          </div>
-                        </td>
-                        <td>
-                          <div className="officers-actions-cell">
-                            <button
-                              type="button"
-                              className="btn-officer-edit"
-                              onClick={() => setEditingOfficer(officer)}
-                              title="Edit Officer"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              type="button"
-                              className="btn-officer-delete"
-                              onClick={() => handleDelete(officer)}
-                              title="Delete Officer"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination Controls */}
-          <div className="officers-pagination">
-            <span>
-              Page {pagination.page} of {pagination.totalPages} ({pagination.total} total officers)
-            </span>
-            <div className="officers-pagination-actions">
-              <button
-                type="button"
-                className="btn-pagination"
-                disabled={pagination.page <= 1}
-                onClick={() => {
-                  const prev = pagination.page - 1;
-                  setPagination((p) => ({ ...p, page: prev }));
-                  loadOfficers(filters, prev);
-                }}
-              >
-                Previous
-              </button>
-              <button
-                type="button"
-                className="btn-pagination"
-                disabled={pagination.page >= pagination.totalPages}
-                onClick={() => {
-                  const next = pagination.page + 1;
-                  setPagination((p) => ({ ...p, page: next }));
-                  loadOfficers(filters, next);
-                }}
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Provision Officer Modal (Conditionally Mounted) */}
+        {/* Provision Officer Modal */}
         {isCreateOpen && (
           <CreateOfficerModal
             isOpen={isCreateOpen}
             onClose={() => setIsCreateOpen(false)}
             onSubmit={handleCreateSubmit}
+            departments={filterOptions.departments || []}
           />
         )}
 
-        {/* Edit Officer Modal (Conditionally Mounted) */}
+        {/* Edit Officer Modal */}
         {editingOfficer && (
           <EditOfficerModal
             isOpen={Boolean(editingOfficer)}
             officer={editingOfficer}
             onClose={() => setEditingOfficer(null)}
             onSubmit={(payload) => handleEditSubmit(editingOfficer.id || editingOfficer._id || editingOfficer.officerId, payload)}
+            departments={filterOptions.departments || []}
           />
         )}
       </div>

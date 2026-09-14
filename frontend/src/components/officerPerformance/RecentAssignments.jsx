@@ -47,7 +47,7 @@ export default function RecentAssignments({ assignments = [] }) {
     <div className="info-card" aria-label="Recent Assignments Table">
       <div className="info-card-header">
         <h3 className="info-card-title">RECENT AI PREDICTION ASSIGNMENTS</h3>
-        <span className="dashboard-panel-tag">DEMO DATA</span>
+        <span className="dashboard-panel-tag">AI DISPATCH QUEUE</span>
       </div>
 
       <div className="prediction-table-wrapper">

@@ -1,29 +1,51 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { MenuIcon } from '../common/Icons';
+import { MenuIcon, SearchIcon } from '../common/Icons';
 import ThemeToggle from '../common/ThemeToggle';
 
 const ROUTE_TITLES = {
-  '/dashboard': { title: 'COMMAND OVERVIEW', breadcrumb: 'COMMAND CENTER / OVERVIEW' },
-  '/predictions': { title: 'PREDICTED COMPLAINTS', breadcrumb: 'INTELLIGENCE / PREDICTIONS' },
-  '/officer-performance': { title: 'OFFICER PERFORMANCE', breadcrumb: 'ANALYTICS / PERFORMANCE' },
+  '/dashboard': { title: 'COMMAND OVERVIEW', breadcrumb: 'MUNICIPAL TRIAGE / COMMAND CENTER' },
+  '/predictions': { title: 'PREDICTED COMPLAINTS', breadcrumb: 'INTELLIGENCE / FORECASTS' },
+  '/risk-map': { title: 'SPATIAL RISK HEATMAP', breadcrumb: 'INTELLIGENCE / RISK MAP' },
   '/heatmap': { title: 'SPATIAL RISK HEATMAP', breadcrumb: 'INTELLIGENCE / SPATIAL HEATMAP' },
-  '/officers': { title: 'OFFICER REGISTRY', breadcrumb: 'OPERATIONS / OFFICERS' },
   '/assignments': { title: 'AI DISPATCH ASSIGNMENTS', breadcrumb: 'OPERATIONS / ASSIGNMENTS' },
   '/verification': { title: 'FIELD VERIFICATION LOGS', breadcrumb: 'OPERATIONS / VERIFICATION' },
+  '/verification/candidates': { title: 'VERIFICATION CANDIDATES', breadcrumb: 'OPERATIONS / 90:10 CANDIDATES' },
+  '/evaluations': { title: 'AI MODEL EVALUATION', breadcrumb: 'OPERATIONS / EVALUATIONS' },
   '/evaluation': { title: 'AI MODEL EVALUATION', breadcrumb: 'ANALYTICS / MODEL EVALUATION' },
+  '/officers': { title: 'FIELD OFFICER OPERATIONS', breadcrumb: 'OPERATIONS / OFFICERS' },
+  '/analytics': { title: 'CIVIC OPERATIONS ANALYTICS', breadcrumb: 'INTELLIGENCE / ANALYTICS' },
+  '/officer-performance': { title: 'OFFICER PERFORMANCE', breadcrumb: 'ANALYTICS / PERFORMANCE' },
+  '/system': { title: 'SYSTEM INTELLIGENCE & GOVERNANCE', breadcrumb: 'MANAGEMENT / SYSTEM' },
+  '/profile': { title: 'OPERATOR PROFILE', breadcrumb: 'ACCOUNT / PROFILE' },
   '/officer': { title: 'FIELD DISPATCH DASHBOARD', breadcrumb: 'FIELD OPERATIONS / OVERVIEW' },
+  '/officer/dashboard': { title: 'FIELD DISPATCH DASHBOARD', breadcrumb: 'FIELD OPERATIONS / OVERVIEW' },
+  '/officer/assignments': { title: 'MY ASSIGNMENTS', breadcrumb: 'FIELD OPERATIONS / MY ASSIGNMENTS' },
   '/officer/complaints': { title: 'ASSIGNED COMPLAINTS', breadcrumb: 'FIELD OPERATIONS / TASK QUEUE' },
+  '/officer/verification': { title: 'FIELD VERIFICATION TASKS', breadcrumb: 'FIELD OPERATIONS / VERIFICATION' },
+  '/officer/history': { title: 'OPERATIONAL VERIFICATION HISTORY', breadcrumb: 'FIELD OPERATIONS / HISTORY' },
+  '/officer/profile': { title: 'OFFICER PROFILE', breadcrumb: 'ACCOUNT / PROFILE' },
   '/officer/heatmap': { title: 'DEPARTMENT HEATMAP', breadcrumb: 'FIELD OPERATIONS / SPATIAL ACTIVITY' },
 };
 
 export default function AppHeader({ onToggleMobile }) {
   const { user } = useAuth();
   const location = useLocation();
+  const [timeStr, setTimeStr] = useState('');
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setTimeStr(now.toTimeString().split(' ')[0] + ' UTC');
+    };
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const currentRouteInfo = ROUTE_TITLES[location.pathname] || {
-    title: 'COMMAND CENTER',
+    title: 'CIVIC COMMAND CENTER',
     breadcrumb: 'CIVIC INTELLIGENCE / OPERATIONS',
   };
 
@@ -46,44 +68,43 @@ export default function AppHeader({ onToggleMobile }) {
           <MenuIcon />
         </button>
 
-        <div>
+        <div className="header-title-group">
           <div className="header-breadcrumb">{currentRouteInfo.breadcrumb}</div>
           <h1 className="header-page-title">{currentRouteInfo.title}</h1>
         </div>
       </div>
 
       <div className="header-actions">
-        {/* Quick Search Shortcut Bar */}
+        {/* Quick Search Box */}
         <div className="header-quick-search" role="search">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
+          <SearchIcon size={13} />
           <input
             type="text"
-            placeholder="Search command center..."
+            placeholder="Quick search..."
             className="header-search-input"
             aria-label="Quick search"
           />
           <kbd className="header-search-kbd">⌘K</kbd>
         </div>
 
-        {/* Global Light / Dark Mode Toggle */}
-        <ThemeToggle />
-
-        {/* Operational Status Pill */}
-        <div className="system-status">
-          <div className="system-status-dot" aria-hidden="true" />
-          <span>LIVE CONNECTED</span>
+        {/* System Clock */}
+        <div className="header-utc-clock" title="System Live Time (UTC)">
+          <span>{timeStr || 'LIVE UTC'}</span>
         </div>
 
-        {/* User Identity Chip */}
+        {/* Real Status Pill */}
+        <div className="system-status">
+          <span className="system-status-dot" aria-hidden="true" />
+          <span>ONLINE</span>
+        </div>
+
+        {/* User Identity Badge */}
         <div className="header-user-badge">
           <div className="header-user-avatar" aria-hidden="true">
             {getInitials(user?.name)}
           </div>
           <div className="header-user-text">
-            <span className="header-user-name">{user?.name || 'Operator'}</span>
+            <span className="header-user-name">{user?.name || 'Authorized User'}</span>
             <span className="header-user-role">{user?.role || 'OFFICER'}</span>
           </div>
         </div>

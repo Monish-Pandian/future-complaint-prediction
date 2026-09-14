@@ -41,7 +41,7 @@ export default function OfficerTaskChart({ taskStatusCounts = {} }) {
     <div className="info-card" aria-label="Task Status Breakdown Chart">
       <div className="info-card-header">
         <h3 className="info-card-title">TASK STATUS</h3>
-        <span className="dashboard-panel-tag">DEMO DATA</span>
+        <span className="dashboard-panel-tag">TASK BREAKDOWN</span>
       </div>
 
       <div style={{ width: '100%', height: '240px' }}>

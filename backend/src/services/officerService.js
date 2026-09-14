@@ -95,6 +95,8 @@ const createOfficer = async (data) => {
     skills: Array.isArray(data.skills) ? data.skills : [],
     availability: data.availability || AVAILABILITY_STATUS.AVAILABLE,
     currentWorkload: Math.max(0, data.currentWorkload || 0),
+    maxAssignments: data.maxAssignments !== undefined ? Number(data.maxAssignments) : 5,
+    homeCommunityArea: data.homeCommunityArea ? data.homeCommunityArea.trim() : null,
     active: data.active !== undefined ? data.active : true,
     location: data.location || {
       type: 'Point',
@@ -120,8 +122,9 @@ const getOfficers = async (queryParams = {}) => {
   // Availability filter
   if (queryParams.availability && typeof queryParams.availability === 'string') {
     const avail = queryParams.availability.toUpperCase().trim();
-    if (Object.values(AVAILABILITY_STATUS).includes(avail)) {
-      filter.availability = avail;
+    const normalizedAvail = avail === 'OFFLINE' ? AVAILABILITY_STATUS.OFF_DUTY : avail;
+    if (Object.values(AVAILABILITY_STATUS).includes(normalizedAvail)) {
+      filter.availability = normalizedAvail;
     } else {
       throw new ApiError(400, `Invalid availability filter '${avail}'. Allowed: [${Object.values(AVAILABILITY_STATUS).join(', ')}]`);
     }
@@ -390,7 +393,22 @@ const updateOfficer = async (id, updateData) => {
   if (updateData.phone !== undefined) officer.phone = updateData.phone ? updateData.phone.trim() : null;
   if (Array.isArray(updateData.skills)) officer.skills = updateData.skills;
   if (updateData.location) officer.location = updateData.location;
-  if (updateData.availability) officer.availability = updateData.availability;
+  if (updateData.availability) {
+    const avail = updateData.availability.toUpperCase().trim();
+    const normalizedAvail = avail === 'OFFLINE' ? AVAILABILITY_STATUS.OFF_DUTY : avail;
+    if (Object.values(AVAILABILITY_STATUS).includes(normalizedAvail)) {
+      officer.availability = normalizedAvail;
+    }
+  }
+  if (updateData.maxAssignments !== undefined) {
+    const maxAsgn = Number(updateData.maxAssignments);
+    if (!isNaN(maxAsgn) && maxAsgn >= 0) {
+      officer.maxAssignments = maxAsgn;
+    }
+  }
+  if (updateData.homeCommunityArea !== undefined) {
+    officer.homeCommunityArea = updateData.homeCommunityArea ? updateData.homeCommunityArea.trim() : null;
+  }
 
   if (updateData.currentWorkload !== undefined) {
     const wl = Number(updateData.currentWorkload);
@@ -404,6 +422,13 @@ const updateOfficer = async (id, updateData) => {
     if (officer.userId) {
       await User.findByIdAndUpdate(officer.userId, { isActive: updateData.active });
     }
+  }
+
+  if (officer.userId && (updateData.name || updateData.department)) {
+    const userUpdates = {};
+    if (updateData.name) userUpdates.name = updateData.name.trim();
+    if (updateData.department) userUpdates.department = updateData.department.trim();
+    await User.findByIdAndUpdate(officer.userId, userUpdates);
   }
 
   await officer.save();
@@ -422,11 +447,12 @@ const updateOfficerStatus = async (id, statusData) => {
   }
 
   if (statusData.availability) {
-    const avail = statusData.availability.toUpperCase();
-    if (!Object.values(AVAILABILITY_STATUS).includes(avail)) {
+    const avail = statusData.availability.toUpperCase().trim();
+    const normalizedAvail = avail === 'OFFLINE' ? AVAILABILITY_STATUS.OFF_DUTY : avail;
+    if (!Object.values(AVAILABILITY_STATUS).includes(normalizedAvail)) {
       throw new ApiError(400, `Invalid availability status '${statusData.availability}'`);
     }
-    officer.availability = avail;
+    officer.availability = normalizedAvail;
   }
 
   if (statusData.active !== undefined) {
@@ -441,29 +467,67 @@ const updateOfficerStatus = async (id, statusData) => {
 };
 
 /**
- * Soft delete (deactivate) an officer (Section 34: Preserve Research History)
+ * Safe Soft-Deactivate / Delete an officer with referential integrity checks
  * @param {string} id
+ * @param {Object} options
  */
-const deleteOfficer = async (id) => {
+const deleteOfficer = async (id, options = {}) => {
   const officer = await findOfficerByIdentifier(id);
   if (!officer) {
     throw new ApiError(404, `Officer not found with identifier '${id}'`);
   }
 
-  // Soft deactivation to preserve historical assignments & verifications
-  officer.active = false;
-  officer.availability = AVAILABILITY_STATUS.OFF_DUTY;
-  await officer.save();
+  // Check active and historical assignments
+  const [activeAssignments, totalAssignments] = await Promise.all([
+    Assignment.countDocuments({
+      officerId: officer._id,
+      status: { $in: [ASSIGNMENT_STATUS.AI_ASSIGNED, ASSIGNMENT_STATUS.ACCEPTED, ASSIGNMENT_STATUS.IN_PROGRESS] },
+    }),
+    Assignment.countDocuments({ officerId: officer._id }),
+  ]);
 
-  if (officer.userId) {
-    await User.findByIdAndUpdate(officer.userId, { isActive: false });
+  // Check verifications
+  let totalVerifications = 0;
+  try {
+    const { Verification } = require('../models/Verification');
+    totalVerifications = await Verification.countDocuments({ officerId: officer._id });
+  } catch {
+    // Verification model may not have records
   }
+
+  // If officer has assignments or verifications, or if hard delete not explicitly requested, perform safe deactivation
+  if (totalAssignments > 0 || totalVerifications > 0 || !options.hard) {
+    officer.active = false;
+    officer.availability = AVAILABILITY_STATUS.OFF_DUTY;
+    await officer.save();
+
+    if (officer.userId) {
+      await User.findByIdAndUpdate(officer.userId, { isActive: false });
+    }
+
+    return {
+      success: true,
+      message: `Officer '${officer.name}' (${officer.officerId}) has been safely deactivated. Active assignments: ${activeAssignments}, Historical records preserved: ${totalAssignments + totalVerifications}.`,
+      officer,
+      deleted: false,
+      deactivated: true,
+      activeAssignments,
+      totalAssignments,
+      totalVerifications,
+    };
+  }
+
+  // Safe hard delete only when 0 assignments and 0 verifications exist AND hard=true requested
+  if (officer.userId) {
+    await User.findByIdAndDelete(officer.userId);
+  }
+  await Officer.findByIdAndDelete(officer._id);
 
   return {
     success: true,
-    message: `Officer '${officer.name}' (${officer.officerId}) has been deactivated successfully. Historical assignments preserved.`,
-    officer,
-    deleted: false,
+    message: `Officer '${officer.name}' (${officer.officerId}) deleted successfully.`,
+    deleted: true,
+    deactivated: false,
   };
 };
 

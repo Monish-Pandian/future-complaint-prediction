@@ -52,46 +52,52 @@ function useCountUp(targetValue, duration = 800) {
 }
 
 /**
- * Reusable KpiCard component for Admin Dashboard Intelligence Panels
+ * Reusable KpiCard component for Admin Dashboard Intelligence Panels (Stitch Pattern)
  */
 export default function KpiCard({
   label,
   value,
   supportingText,
   change,
-  status = 'info', // 'warning' | 'critical' | 'info' | 'success'
+  status = 'info', // 'warning' | 'critical' | 'info' | 'success' | 'accent'
   prefix = '',
   suffix = '',
+  icon = null,
 }) {
   const animatedValue = useCountUp(value, 800);
 
+  const getStatusClass = () => {
+    if (status === 'critical' || status === 'danger') return 'danger';
+    if (status === 'warning') return 'warning';
+    if (status === 'success') return 'success';
+    return 'accent';
+  };
+
   return (
-    <div className="kpi-card" role="region" aria-label={label}>
-      <div className="kpi-header">
-        <span className="kpi-label">{label}</span>
-        <span
-          className={`kpi-indicator-dot kpi-indicator-${status}`}
-          aria-hidden="true"
-        />
+    <div className="stitch-telemetry-card" role="region" aria-label={label}>
+      <div className="stitch-card-top">
+        <span className="stitch-card-label">{label}</span>
+        <div className={`stitch-card-icon ${getStatusClass()}`}>
+          {icon || <span className="stitch-live-dot" />}
+        </div>
       </div>
 
-      <div className="kpi-value" aria-live="polite">
-        {prefix}
-        {animatedValue.toLocaleString()}
-        {suffix}
+      <div className="stitch-card-value-wrap">
+        <span className="stitch-card-value" aria-live="polite">
+          {prefix}
+          {animatedValue.toLocaleString()}
+          {suffix}
+        </span>
       </div>
 
-      <div className="kpi-meta-row">
-        <span className="kpi-meta">{supportingText}</span>
-        {change && (
-          <span
-            className={`kpi-trend-pill ${
-              status === 'critical' ? 'critical' : status === 'warning' || status === 'success' ? 'up' : ''
-            }`}
-          >
-            {change}
-          </span>
-        )}
+      <p className="stitch-card-subtext">{supportingText}</p>
+
+      <div className="stitch-card-footer">
+        <span>{change || 'Live Stream Active'}</span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+          <span className={`stitch-live-dot ${getStatusClass()}`} style={{ width: '5px', height: '5px' }} />
+          SLA 48h
+        </span>
       </div>
     </div>
   );

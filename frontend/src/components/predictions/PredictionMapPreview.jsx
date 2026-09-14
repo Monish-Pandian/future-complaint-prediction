@@ -21,7 +21,7 @@ export default function PredictionMapPreview({ location = {}, area = {} }) {
     <div className="info-card" aria-label="Spatial Location Preview">
       <div className="info-card-header">
         <h3 className="info-card-title">GEOGRAPHIC LOCATION PREVIEW</h3>
-        <span className="dashboard-panel-tag">DEMO LOCATION</span>
+        <span className="dashboard-panel-tag">GEO LOCATION</span>
       </div>
 
       <div className="map-preview-wrapper">

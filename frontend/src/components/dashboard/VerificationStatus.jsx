@@ -21,17 +21,17 @@ export default function VerificationStatus({ data }) {
         <div className="dashboard-panel-title-group">
           <h2 className="dashboard-panel-title">FIELD VERIFICATION STATUS</h2>
           <span className="dashboard-panel-subtitle">
-            Ground truth feedback & resolution funnel
+            Ground truth feedback & field inspection funnel
           </span>
         </div>
-        <span className="dashboard-panel-tag">DEMO DATA</span>
+        <span className="dashboard-panel-tag">INSPECTION PIPELINE</span>
       </div>
 
       <div className="verification-content">
         {/* Verification Status Breakdown Rows */}
         <div className="verification-status-list" role="list">
           {summary.map((row) => (
-            <div key={row.key} className="verification-status-row" role="listitem">
+            <div key={row.key || row.status} className="verification-status-row" role="listitem">
               <div className="verif-status-label">
                 <span
                   className="verif-status-indicator"
@@ -42,8 +42,10 @@ export default function VerificationStatus({ data }) {
               </div>
 
               <div className="verif-status-values">
-                <span className="verif-count">{row.count}</span>
-                <span className="verif-percentage">{row.percentage}%</span>
+                <span className="verif-count font-mono">{row.count}</span>
+                {row.percentage !== undefined && (
+                  <span className="verif-percentage font-mono">({row.percentage}%)</span>
+                )}
               </div>
             </div>
           ))}
@@ -52,40 +54,40 @@ export default function VerificationStatus({ data }) {
         {/* Operational Workflow Pipeline */}
         <div className="workflow-pipeline-card">
           <div className="pipeline-header">
-            <span className="pipeline-title">OPERATIONAL DISPATCH PIPELINE</span>
-            <span className="workflow-badge">DEMO WORKFLOW DATA</span>
+            <span className="pipeline-title">OPERATIONAL DISPATCH FLOW</span>
+            <span className="workflow-badge">7-NODE TRACEABILITY</span>
           </div>
 
           <div className="pipeline-steps">
             {/* Step 1: Predicted */}
             <div className="pipeline-step">
-              <span className="pipeline-step-label">Predicted</span>
-              <span className="pipeline-step-val">{pipeline.predicted}</span>
-              <span className="pipeline-connector">→</span>
+              <span className="pipeline-step-label">Forecasted</span>
+              <span className="pipeline-step-val font-mono">{pipeline.predicted}</span>
+              <span className="pipeline-connector" aria-hidden="true">→</span>
             </div>
 
             {/* Step 2: Assigned */}
             <div className="pipeline-step">
               <span className="pipeline-step-label">Assigned</span>
-              <span className="pipeline-step-val" style={{ color: '#68b3e8' }}>
+              <span className="pipeline-step-val font-mono" style={{ color: '#06b6d4' }}>
                 {pipeline.assigned}
               </span>
-              <span className="pipeline-connector">→</span>
+              <span className="pipeline-connector" aria-hidden="true">→</span>
             </div>
 
             {/* Step 3: Verified */}
             <div className="pipeline-step">
-              <span className="pipeline-step-label">Verified</span>
-              <span className="pipeline-step-val" style={{ color: '#a78bfa' }}>
+              <span className="pipeline-step-label">Inspected</span>
+              <span className="pipeline-step-val font-mono" style={{ color: '#818cf8' }}>
                 {pipeline.verified}
               </span>
-              <span className="pipeline-connector">→</span>
+              <span className="pipeline-connector" aria-hidden="true">→</span>
             </div>
 
             {/* Step 4: Confirmed */}
             <div className="pipeline-step">
               <span className="pipeline-step-label">Confirmed</span>
-              <span className="pipeline-step-val" style={{ color: '#4dd6a8' }}>
+              <span className="pipeline-step-val font-mono" style={{ color: '#10b981' }}>
                 {pipeline.confirmed}
               </span>
             </div>

@@ -51,15 +51,16 @@ export default function DepartmentHeatmapPage() {
     <PageTransition>
       <div className="officer-portal-container">
         {/* Header Bar */}
-        <header className="officer-header-card">
+        <header className="stitch-card mb-6" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div>
-            <div className="auth-label" style={{ marginBottom: '4px' }}>
-              DEPARTMENTAL SPATIAL ACTIVITY
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+              <span className="stitch-badge stitch-badge-cyan font-mono">DEPARTMENTAL SPATIAL TELEMETRY</span>
+              <span className="stitch-badge stitch-badge-slate font-mono">{department?.toUpperCase()}</span>
             </div>
-            <h1 style={{ fontSize: '24px', fontWeight: '800', margin: '4px 0', color: 'var(--text-primary)' }}>
-              {department} Heatmap
+            <h1 style={{ fontSize: '24px', fontWeight: '800', margin: '4px 0', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+              {department} Tactical Heatmap
             </h1>
-            <p className="verification-subtitle">
+            <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)' }}>
               Geospatial complaint distribution and proactive verification task density filtered strictly for your department.
             </p>
           </div>
@@ -76,13 +77,59 @@ export default function DepartmentHeatmapPage() {
               />
               {isLive ? 'Real API Data' : 'Demo Data'}
             </span>
+            <button
+              type="button"
+              className="stitch-btn stitch-btn-secondary"
+              style={{ fontSize: '12px', padding: '6px 14px' }}
+              onClick={loadHeatmap}
+            >
+              ↻ Refresh Mesh
+            </button>
           </div>
         </header>
 
-        {/* Leaflet Map Card */}
-        <div className="verification-table-card" style={{ padding: '0', overflow: 'hidden', height: '580px', position: 'relative' }}>
+        {/* Leaflet Map Card with Floating Legend */}
+        <div className="stitch-card" style={{ padding: '0', overflow: 'hidden', height: '620px', position: 'relative' }}>
+          {/* Floating Department Telemetry HUD */}
+          <div style={{
+            position: 'absolute',
+            top: '16px',
+            right: '16px',
+            zIndex: 1000,
+            background: 'var(--bg-card)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid var(--border)',
+            borderRadius: '10px',
+            padding: '12px 16px',
+            boxShadow: 'var(--shadow-md)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            minWidth: '200px'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>SECTOR DENSITY</span>
+              <span className="stitch-badge stitch-badge-emerald font-mono">{hotspots.length} HOTSPOTS</span>
+            </div>
+            <div style={{ height: '1px', background: 'var(--border)' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '11px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ff4d4f' }} />
+                <span style={{ color: 'var(--text-secondary)' }}>Critical Severity (≥0.90)</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#faad14' }} />
+                <span style={{ color: 'var(--text-secondary)' }}>High Probability (0.75-0.89)</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#1890ff' }} />
+                <span style={{ color: 'var(--text-secondary)' }}>Medium Probability (0.50-0.74)</span>
+              </div>
+            </div>
+          </div>
+
           {isLoading ? (
-            <div style={{ padding: '40px', textAlign: 'center' }}>Loading spatial map...</div>
+            <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading departmental spatial map...</div>
           ) : (
             <MapContainer
               center={[41.8781, -87.6298]}
@@ -105,10 +152,13 @@ export default function DepartmentHeatmapPage() {
                   fillOpacity={0.7}
                 >
                   <Popup>
-                    <div style={{ fontSize: '12px' }}>
-                      <strong>{h.label || h.complaintType}</strong>
-                      <div style={{ marginTop: '4px' }}>{renderRiskBadge(h.riskLevel)}</div>
-                      <div style={{ marginTop: '2px', color: '#666' }}>Dept: {department}</div>
+                    <div style={{ fontSize: '12px', padding: '4px' }}>
+                      <strong style={{ fontSize: '13px', display: 'block', marginBottom: '4px' }}>{h.label || h.complaintType}</strong>
+                      <div style={{ marginBottom: '4px' }}>{renderRiskBadge(h.riskLevel)}</div>
+                      <div style={{ fontSize: '11px', color: '#666' }}>Dept: {department}</div>
+                      {h.weight && (
+                        <div style={{ fontSize: '11px', color: '#666', fontFamily: 'var(--font-mono)' }}>Weight: {(h.weight * 100).toFixed(0)}%</div>
+                      )}
                     </div>
                   </Popup>
                 </CircleMarker>

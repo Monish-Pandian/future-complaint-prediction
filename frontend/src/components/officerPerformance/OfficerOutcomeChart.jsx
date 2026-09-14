@@ -43,7 +43,7 @@ export default function OfficerOutcomeChart({ performance = {} }) {
     <div className="info-card" aria-label="Field Verification Outcomes Chart">
       <div className="info-card-header">
         <h3 className="info-card-title">FIELD VERIFICATION OUTCOMES</h3>
-        <span className="dashboard-panel-tag">DEMO DATA</span>
+        <span className="dashboard-panel-tag">OUTCOME TELEMETRY</span>
       </div>
 
       <div style={{ width: '100%', height: '240px', position: 'relative' }}>

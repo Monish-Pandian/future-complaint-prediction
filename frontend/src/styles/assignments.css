@@ -1,249 +1,326 @@
 /* ====================================================
-   URBAN INTELLIGENCE COMMAND CENTER — ASSIGNMENTS STYLES
-   Module 09: AI Assignment Monitoring & Dispatch
+   MODULE 8F — ASSIGNMENTS UI/UX REDESIGN
+   AI Dispatch Operations & Resource Allocation Command
    ==================================================== */
 
 .assignments-container {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   width: 100%;
   max-width: 1600px;
   margin: 0 auto;
 }
 
-/* Header Bar */
-.assignments-header-wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 16px;
-  padding: 24px 28px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--glass-shadow);
-  position: relative;
-  overflow: hidden;
-}
+/* =========================================
+   1. KPI SUMMARY GRID
+   ========================================= */
 
-.assignments-header-wrapper::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #4dd6c7 0%, #3b82f6 50%, #8b5cf6 100%);
-}
-
-.assignments-title-group h1 {
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
-  margin: 4px 0 6px 0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.assignments-subtitle {
-  font-size: 13px;
-  color: var(--text-secondary);
-  line-height: 1.5;
-  max-width: 780px;
-}
-
-.assignments-meta-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.assignments-mode-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 9999px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.assignments-mode-pill.live {
-  background: rgba(77, 214, 168, 0.12);
-  border: 1px solid rgba(77, 214, 168, 0.4);
-  color: #4dd6a8;
-}
-
-.assignments-mode-pill.demo {
-  background: rgba(236, 208, 111, 0.12);
-  border: 1px solid rgba(236, 208, 111, 0.4);
-  color: #ecd06f;
-}
-
-/* KPI Summary Grid */
 .assignments-kpis-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
-}
-
-/* Filter Card */
-.assignments-filter-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  padding: 20px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  box-shadow: var(--glass-shadow);
-}
-
-.assignments-filter-row {
-  display: grid;
-  grid-template-columns: 2fr repeat(4, 1fr) auto;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
-  align-items: center;
-}
-
-@media (max-width: 1200px) {
-  .assignments-filter-row {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  }
-}
-
-.assignments-search-input {
-  width: 100%;
-  padding: 10px 14px 10px 38px;
-  background: var(--bg-primary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: 13px;
-  font-family: inherit;
-  outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.assignments-search-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.assignments-select {
-  padding: 10px 12px;
-  background: var(--bg-primary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: 13px;
-  font-family: inherit;
-  outline: none;
-  cursor: pointer;
-  transition: border-color 0.2s ease;
-}
-
-.assignments-select:focus {
-  border-color: var(--accent);
-}
-
-.assignments-select option {
-  background: var(--surface);
-  color: var(--text-primary);
-}
-
-.assignments-filter-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.assignments-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 10px 16px;
-  border-radius: var(--radius-md);
-  font-size: 12px;
-  font-weight: 700;
-  font-family: var(--font-mono);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-  outline: none;
-}
-
-.assignments-btn-primary {
-  background: var(--accent);
-  color: #ffffff;
-  box-shadow: 0 2px 8px var(--accent-soft);
-}
-
-.assignments-btn-primary:hover {
-  filter: brightness(1.05);
-  transform: translateY(-1px);
-}
-
-.assignments-btn-secondary {
-  background: var(--surface-secondary);
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-}
-
-.assignments-btn-secondary:hover {
-  background: var(--surface-hover);
-  color: var(--text-primary);
-}
-
-/* Assignments Main Grid (Table + Side Breakdown) */
-.assignments-content-grid {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 20px;
-  align-items: start;
 }
 
 @media (max-width: 1280px) {
-  .assignments-content-grid {
+  .assignments-kpis-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .assignments-kpis-grid {
     grid-template-columns: 1fr;
   }
 }
 
-/* Assignments Table Card */
-.assignments-table-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
+/* =========================================
+   2. DISPATCH STRATEGY CARD & PIPELINE
+   ========================================= */
+
+.dispatch-strategy-card {
+  background: var(--bg-surface);
+}
+
+.dispatch-strategy-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: center;
+}
+
+.dispatch-formula-section {
   display: flex;
   flex-direction: column;
+  gap: 8px;
+}
+
+.dispatch-section-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dispatch-formula-desc {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.dispatch-weights-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.dispatch-weight-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 10px 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--transition-fast);
+}
+
+.dispatch-weight-badge:hover {
+  border-color: var(--accent);
+}
+
+.weight-percent {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--accent-text);
+}
+
+.weight-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 2px;
+}
+
+.weight-sub {
+  font-size: 9.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Operational Pipeline */
+.dispatch-pipeline-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 20px;
+  border-left: 1px solid var(--border);
+}
+
+.dispatch-pipeline-steps {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.pipeline-step-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+}
+
+.pipeline-step-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.pipeline-step-label {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.pipeline-step-count {
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.pipeline-arrow {
+  color: var(--text-muted);
+  font-size: 12px;
+  user-select: none;
+}
+
+/* =========================================
+   3. FILTER TOOLBAR
+   ========================================= */
+
+.assignments-filter-card {
+  padding: 12px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.assignments-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.asgn-search-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 240px;
+  padding: 6px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  transition: border-color var(--transition-fast);
+}
+
+.asgn-search-wrapper:focus-within {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.asgn-search-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 12.5px;
+}
+
+.asgn-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.asgn-search-clear {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.asgn-search-clear:hover {
+  color: var(--text-primary);
+}
+
+.asgn-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.asgn-filter-label {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.asgn-select {
+  padding: 6px 10px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+  max-width: 180px;
+}
+
+.asgn-select:focus {
+  border-color: var(--accent);
+}
+
+.asgn-count-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.asgn-count-badge .count-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
+}
+
+/* =========================================
+   4. MAIN 70% / 30% CONTENT GRID
+   ========================================= */
+
+.assignments-content-grid {
+  display: grid;
+  grid-template-columns: 7fr 3fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.assignments-table-column {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.assignments-side-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Table Card */
+.assignments-table-card {
+  background: var(--bg-surface);
+  overflow: hidden;
 }
 
 .assignments-table-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface-secondary);
 }
 
 .assignments-table-title {
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text-primary);
   display: flex;
@@ -252,7 +329,6 @@
 }
 
 .assignments-table-count {
-  font-family: var(--font-mono);
   font-size: 11.5px;
   color: var(--text-muted);
 }
@@ -265,20 +341,18 @@
 .assignments-table {
   width: 100%;
   border-collapse: collapse;
-  text-align: left;
-  font-size: 12.5px;
 }
 
 .assignments-table th {
-  padding: 11px 16px;
+  padding: 12px 14px;
+  font-size: 11px;
   font-family: var(--font-mono);
-  font-size: 10.5px;
   font-weight: 700;
+  color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-secondary);
-  background: var(--surface-secondary);
+  letter-spacing: 0.05em;
   border-bottom: 1px solid var(--border);
+  text-align: left;
   white-space: nowrap;
 }
 
@@ -288,59 +362,33 @@
 }
 
 .assignments-table th.sortable:hover {
-  color: var(--accent);
+  color: var(--text-primary);
 }
 
 .assignments-table td {
-  padding: 13px 16px;
-  border-bottom: 1px solid var(--border);
+  padding: 12px 14px;
+  font-size: 12.5px;
   color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
   vertical-align: middle;
 }
 
-.assignments-table tbody tr {
-  transition: background-color 0.15s ease;
-}
-
 .assignments-table tbody tr:hover {
-  background-color: var(--surface-hover);
-}
-
-/* Cell Elements */
-.asgn-id-cell {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  color: #68b3e8;
-  font-size: 12px;
-  letter-spacing: 0.02em;
+  background: var(--bg-surface-hover);
 }
 
 .asgn-complaint-title {
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 2px;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .asgn-pred-ref {
-  font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-muted);
-}
-
-.asgn-area-name {
-  color: var(--text-primary);
-  font-weight: 500;
-}
-
-.asgn-ward-pill {
-  display: inline-block;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.05);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-top: 2px;
 }
 
 .asgn-officer-name {
@@ -349,213 +397,213 @@
 }
 
 .asgn-officer-code {
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10.5px;
   color: var(--text-muted);
 }
 
-/* Badges */
+.assignments-pagination {
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  background: var(--bg-surface);
+}
+
+.assignments-pagination-btns {
+  display: flex;
+  gap: 8px;
+}
+
+/* =========================================
+   5. BADGES & WORKLOAD STYLES
+   ========================================= */
+
 .asgn-status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 9px;
-  border-radius: 9999px;
-  font-family: var(--font-mono);
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
   font-size: 11px;
+  font-family: var(--font-mono);
   font-weight: 700;
-  letter-spacing: 0.03em;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
 .asgn-status-badge.ai-assigned {
-  background: rgba(77, 214, 199, 0.12);
-  border: 1px solid rgba(77, 214, 199, 0.4);
-  color: #4dd6c7;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
 }
 
 .asgn-status-badge.accepted {
-  background: rgba(104, 179, 232, 0.12);
-  border: 1px solid rgba(104, 179, 232, 0.4);
-  color: #68b3e8;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #f59e0b;
 }
 
 .asgn-status-badge.in-progress {
-  background: rgba(236, 208, 111, 0.12);
-  border: 1px solid rgba(236, 208, 111, 0.4);
-  color: #ecd06f;
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  color: #fbbf24;
 }
 
 .asgn-status-badge.submitted {
   background: rgba(167, 139, 250, 0.12);
-  border: 1px solid rgba(167, 139, 250, 0.4);
+  border: 1px solid rgba(167, 139, 250, 0.35);
   color: #a78bfa;
 }
 
 .asgn-status-badge.completed {
-  background: rgba(77, 214, 168, 0.12);
-  border: 1px solid rgba(77, 214, 168, 0.4);
-  color: #4dd6a8;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #10b981;
 }
 
 .asgn-status-badge.rejected {
-  background: rgba(255, 107, 107, 0.12);
-  border: 1px solid rgba(255, 107, 107, 0.4);
-  color: #ff6b6b;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #ef4444;
 }
 
-/* Match Score Pill */
 .asgn-score-pill {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 3px 8px;
+  padding: 2px 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
   border-radius: 9999px;
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
-  background: rgba(139, 92, 246, 0.12);
-  border: 1px solid rgba(139, 92, 246, 0.4);
-  color: #c4b5fd;
+  color: var(--accent-text);
 }
 
-/* Mini Workload Indicator */
 .asgn-workload-mini {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.asgn-workload-bar-wrap {
-  width: 48px;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.asgn-workload-fill {
-  height: 100%;
-  border-radius: 3px;
-}
-
-/* Table Actions */
-.asgn-action-btn {
-  padding: 6px 12px;
-  border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--glass-border);
-  color: #68b3e8;
-  font-size: 11px;
-  font-family: var(--font-mono);
-  font-weight: 700;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.asgn-action-btn:hover {
-  background: rgba(104, 179, 232, 0.15);
-  border-color: #68b3e8;
-  color: #ffffff;
-  transform: translateY(-1px);
-}
-
-/* Pagination Bar */
-.assignments-pagination {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 20px;
-  border-top: 1px solid var(--glass-border);
-  background: rgba(255, 255, 255, 0.01);
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.assignments-pagination-btns {
-  display: flex;
-  gap: 6px;
-}
-
-.asgn-page-btn {
-  padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.asgn-page-btn:hover:not(:disabled) {
-  background: rgba(77, 214, 199, 0.15);
-  border-color: #4dd6c7;
-}
-
-.asgn-page-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* Side Distribution Card */
-.assignments-side-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  padding: 20px;
-  box-shadow: var(--glass-shadow);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.assignments-side-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-/* Details Modal / Drawer */
+.asgn-workload-bar-wrap {
+  width: 50px;
+  height: 6px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.asgn-workload-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+/* =========================================
+   6. OFFICER CAPACITY PANEL & CHART
+   ========================================= */
+
+.officer-capacity-card {
+  background: var(--bg-surface);
+}
+
+.capacity-stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.capacity-stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.capacity-stat-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.capacity-stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.capacity-stat-sub {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+.capacity-stat-val {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.capacity-footer-note {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  color: var(--text-muted);
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+
+.assignments-side-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.assignments-side-title {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* =========================================
+   7. DETAIL SLIDE-OVER DRAWER
+   ========================================= */
+
 .asgn-modal-backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: rgba(3, 7, 18, 0.75);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index: 1000;
+  backdrop-filter: blur(6px);
+  z-index: 2000;
   display: flex;
   justify-content: flex-end;
   animation: fadeIn 0.2s ease forwards;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 .asgn-drawer-panel {
   width: 100%;
-  max-width: 620px;
+  max-width: 580px;
   height: 100%;
-  background: #0d1527;
-  border-left: 1px solid var(--glass-border);
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border);
   box-shadow: -10px 0 30px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
@@ -564,21 +612,17 @@
 }
 
 @keyframes slideLeft {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
 }
 
 .asgn-drawer-header {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--glass-border);
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  background: rgba(15, 23, 42, 0.8);
+  background: var(--bg-surface);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -586,7 +630,7 @@
 
 .asgn-drawer-close {
   background: transparent;
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--border);
   color: var(--text-secondary);
   width: 32px;
   height: 32px;
@@ -595,28 +639,27 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all var(--transition-fast);
 }
 
 .asgn-drawer-close:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ff6b6b;
-  border-color: #ff6b6b;
+  background: var(--bg-surface-hover);
+  color: var(--critical);
+  border-color: var(--critical);
 }
 
 .asgn-drawer-content {
-  padding: 24px;
+  padding: 20px 24px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
-/* Detail Section */
 .asgn-section-card {
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 16px 20px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -628,7 +671,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #4dd6c7;
+  color: var(--accent-text);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -647,44 +690,69 @@
 }
 
 .asgn-detail-label {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-muted);
   font-family: var(--font-mono);
   text-transform: uppercase;
+  font-weight: 700;
 }
 
 .asgn-detail-val {
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--text-primary);
   font-weight: 600;
 }
 
 .asgn-reason-box {
   padding: 12px 14px;
-  background: rgba(77, 214, 199, 0.06);
-  border-left: 3px solid #4dd6c7;
+  background: rgba(56, 189, 248, 0.06);
+  border-left: 3px solid var(--accent);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  font-size: 12px;
-  line-height: 1.6;
-  color: var(--text-secondary);
 }
 
-/* State Screens */
-.asgn-state-box {
-  padding: 48px 24px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  color: var(--text-secondary);
+.asgn-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 6px;
 }
 
-.asgn-state-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-primary);
-  font-family: var(--font-mono);
-  letter-spacing: 0.04em;
+/* =========================================
+   8. RESPONSIVE BREAKPOINTS
+   ========================================= */
+
+@media (max-width: 1180px) {
+  .assignments-content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dispatch-strategy-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dispatch-pipeline-section {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .assignments-filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .asgn-select {
+    max-width: 100%;
+  }
+
+  .asgn-actions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dispatch-weights-row {
+    grid-template-columns: 1fr;
+  }
 }

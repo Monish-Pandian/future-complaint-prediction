@@ -1,40 +1,53 @@
 import React from 'react';
-import KpiCard from '../dashboard/KpiCard';
+import MetricCard from '../common/MetricCard';
 
 /**
- * VerificationSummary: 5 top summary cards for ground truth verification & feedback metrics
+ * VerificationSummary: Top KPI row displaying key verification candidate counts and field outcomes
  */
-export default function VerificationSummary({ summary = {} }) {
+export default function VerificationSummary({ summary = {}, totalCount = 0 }) {
+  const total = summary.total ?? totalCount ?? 0;
+  const pending = summary.pendingAssignment ?? 0;
+  const assigned = summary.assigned ?? 0;
+  const submitted = summary.submitted ?? 0;
+  const completed = summary.completed ?? (total - pending - assigned - submitted);
+  const confirmed = summary.confirmed ?? summary.distribution?.PROBLEM_CONFIRMED ?? 0;
+
   return (
     <section className="verification-kpis-grid" aria-label="Ground Truth Verification Metrics">
-      <KpiCard
-        label="TOTAL VERIFICATIONS"
-        value={summary.totalVerifications ?? 56}
-        supportingText="Ground truth field reports"
+      <MetricCard
+        label="TOTAL CANDIDATES"
+        value={total}
+        subtext="AI-selected verification candidates"
         status="info"
       />
-      <KpiCard
-        label="CONFIRMED PROBLEMS"
-        value={summary.confirmedProblems ?? 38}
-        supportingText="True Positive validations"
-        status="success"
-      />
-      <KpiCard
-        label="UNCONFIRMED FINDINGS"
-        value={summary.unconfirmedFindings ?? 12}
-        supportingText="False Positives / Noise"
+      <MetricCard
+        label="PENDING ASSIGNMENT"
+        value={pending}
+        subtext="Awaiting officer dispatch"
         status="warning"
       />
-      <KpiCard
-        label="FEEDBACK INGESTED"
-        value={summary.feedbackSignalsIngested ?? 44}
-        supportingText="Feature store buffer signals"
+      <MetricCard
+        label="ASSIGNED / IN FIELD"
+        value={assigned}
+        subtext="Active field investigations"
+        status="neutral"
+      />
+      <MetricCard
+        label="VERIFICATION SUBMITTED"
+        value={submitted}
+        subtext="Awaiting evaluation ingestion"
         status="info"
       />
-      <KpiCard
-        label="VERIFICATION ACCURACY"
-        value={`${summary.verificationAccuracy ?? 76.0}%`}
-        supportingText="Empirical precision on forecast"
+      <MetricCard
+        label="COMPLETED"
+        value={completed}
+        subtext="Verified & evaluated cases"
+        status="success"
+      />
+      <MetricCard
+        label="CONFIRMED (TP)"
+        value={confirmed}
+        subtext="True Positive ground truth"
         status="success"
       />
     </section>

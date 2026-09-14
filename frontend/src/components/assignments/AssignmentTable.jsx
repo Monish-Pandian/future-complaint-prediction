@@ -4,10 +4,12 @@ import {
   renderMatchScorePill,
   renderMiniWorkload,
 } from './AssignmentBadges';
-import { renderRiskBadge } from '../predictions/PredictionBadges';
+import { RiskBadge } from '../common/Badge';
+import { renderVerificationBadge } from '../predictions/PredictionBadges';
+import Button from '../common/Button';
 
 /**
- * AssignmentTable: Sortable, interactive assignments monitoring data table
+ * AssignmentTable: Operational data table for AI dispatches & field monitoring
  */
 export default function AssignmentTable({
   assignments = [],
@@ -32,43 +34,43 @@ export default function AssignmentTable({
   };
 
   return (
-    <div className="assignments-table-card">
+    <div className="card assignments-table-card">
       {/* Table Header / Subtitle */}
       <div className="assignments-table-header">
         <div className="assignments-table-title">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4dd6c7" strokeWidth="2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" aria-hidden="true">
             <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
             <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
           </svg>
-          Automated Dispatches & Monitoring Queue
+          Automated Dispatches & Verification Queue
         </div>
-        <div className="assignments-table-count">
+        <div className="assignments-table-count font-mono">
           Showing {assignments.length} of {pagination.total || assignments.length} active records
         </div>
       </div>
 
       {/* Responsive Table */}
       <div className="assignments-table-responsive">
-        <table className="assignments-table" aria-label="AI Verification Assignments">
+        <table className="table assignments-table" aria-label="AI Verification Assignments">
           <thead>
             <tr>
-              <th className="sortable" onClick={() => handleSortClick('assignmentId')}>
-                Assignment ID{getSortIndicator('assignmentId')}
+              <th className="sortable" onClick={() => handleSortClick('riskScore')}>
+                Priority{getSortIndicator('riskScore')}
               </th>
-              <th>Complaint / Prediction</th>
-              <th>Area / Ward</th>
+              <th>Prediction / Community</th>
               <th>AI Risk</th>
               <th>Assigned Officer</th>
-              <th>Department</th>
+              <th>Dept Match</th>
+              <th className="sortable" onClick={() => handleSortClick('distanceKm')}>
+                Distance{getSortIndicator('distanceKm')}
+              </th>
               <th className="sortable" onClick={() => handleSortClick('currentWorkload')}>
                 Workload{getSortIndicator('currentWorkload')}
-              </th>
-              <th className="sortable" onClick={() => handleSortClick('assignmentScore')}>
-                Match Score{getSortIndicator('assignmentScore')}
               </th>
               <th className="sortable" onClick={() => handleSortClick('status')}>
                 Status{getSortIndicator('status')}
               </th>
+              <th>Verification</th>
               <th style={{ textAlign: 'right' }}>Actions</th>
             </tr>
           </thead>
@@ -93,94 +95,118 @@ export default function AssignmentTable({
               <tr>
                 <td colSpan={10} style={{ padding: '48px 24px', textAlign: 'center' }}>
                   <div className="asgn-state-box">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5" aria-hidden="true">
                       <circle cx="12" cy="12" r="10"></circle>
                       <line x1="12" y1="8" x2="12" y2="12"></line>
                       <line x1="12" y1="16" x2="12.01" y2="16"></line>
                     </svg>
                     <div className="asgn-state-title">No Assignments Found</div>
-                    <p style={{ fontSize: '13px', maxWidth: '400px', margin: 0 }}>
+                    <p style={{ fontSize: '13px', maxWidth: '400px', margin: 0, color: 'var(--text-muted)' }}>
                       No assignment records match the selected filter criteria or search query.
                     </p>
                   </div>
                 </td>
               </tr>
             ) : (
-              assignments.map((item) => (
-                <tr key={item.id || item.assignmentId}>
-                  {/* Assignment ID */}
-                  <td>
-                    <span className="asgn-id-cell">{item.assignmentId}</span>
-                  </td>
+              assignments.map((item) => {
+                const pred = item.prediction || {};
+                const officer = item.officer || {};
+                const score = typeof pred.riskScore === 'number' ? pred.riskScore.toFixed(1) : pred.riskScore || '—';
+                const dist = typeof item.distanceKm === 'number'
+                  ? `${item.distanceKm.toFixed(1)} km`
+                  : item.distanceKm ? `${item.distanceKm} km` : 'Distance unavailable';
 
-                  {/* Complaint & Prediction Reference */}
-                  <td>
-                    <div className="asgn-complaint-title">
-                      {item.prediction?.complaintType || 'Civic Complaint'}
-                    </div>
-                    <div className="asgn-pred-ref">
-                      Ref: {item.prediction?.predictionId || 'N/A'}
-                    </div>
-                  </td>
+                return (
+                  <tr key={item.id || item.assignmentId}>
+                    {/* 1. Priority */}
+                    <td>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                        <RiskBadge level={pred.riskLevel || 'LOW'} />
+                        <span className="font-mono text-muted" style={{ fontSize: '10.5px' }}>
+                          Score: {score}
+                        </span>
+                      </div>
+                    </td>
 
-                  {/* Area & Ward */}
-                  <td>
-                    <div className="asgn-area-name">
-                      {item.prediction?.communityArea || 'Chicago'}
-                    </div>
-                    <span className="asgn-ward-pill">{item.prediction?.ward || 'Ward 1'}</span>
-                  </td>
+                    {/* 2. Prediction / Area */}
+                    <td>
+                      <div className="asgn-complaint-title">
+                        {pred.complaintType || 'Civic Infrastructure Complaint'}
+                      </div>
+                      <div className="asgn-pred-ref font-mono">
+                        {pred.communityArea || 'Chicago'} • {pred.ward ? (pred.ward.startsWith('Ward') ? pred.ward : `Ward ${pred.ward}`) : 'Ward 1'}
+                      </div>
+                    </td>
 
-                  {/* AI Risk */}
-                  <td>
-                    {renderRiskBadge(item.prediction?.riskLevel || 'LOW')}
-                  </td>
+                    {/* 3. AI Risk (Probability & Ref) */}
+                    <td>
+                      <div className="font-mono text-bold" style={{ color: 'var(--accent-text)', fontSize: '12.5px' }}>
+                        {Math.round((pred.probability ?? ((pred.riskScore ?? 50) / 100)) * 100)}%
+                      </div>
+                      <span className="font-mono text-muted" style={{ fontSize: '10px' }}>
+                        {pred.predictionId || 'PRED-REF'}
+                      </span>
+                    </td>
 
-                  {/* Assigned Officer */}
-                  <td>
-                    <div className="asgn-officer-name">
-                      {item.officer?.name || 'Unassigned'}
-                    </div>
-                    <div className="asgn-officer-code">
-                      {item.officer?.officerId || 'OFF-N/A'}
-                    </div>
-                  </td>
+                    {/* 4. Assigned Officer */}
+                    <td>
+                      <div className="asgn-officer-name">
+                        {officer.name || 'Unassigned'}
+                      </div>
+                      <div className="asgn-officer-code font-mono">
+                        {officer.officerId || officer.employeeCode || 'OFF-N/A'} • {officer.department || item.department || 'Operations'}
+                      </div>
+                    </td>
 
-                  {/* Department */}
-                  <td>
-                    <span style={{ fontSize: '12px', color: 'var(--text-primary)' }}>
-                      {item.department}
-                    </span>
-                  </td>
+                    {/* 5. Department Compatibility */}
+                    <td>
+                      <span
+                        className="font-mono text-bold"
+                        style={{
+                          fontSize: '11px',
+                          color: item.departmentMatch !== false ? 'var(--success)' : 'var(--warning)',
+                        }}
+                      >
+                        {item.departmentMatch !== false ? '✓ Compatible' : '⚠ Cross-Dept'}
+                      </span>
+                    </td>
 
-                  {/* Officer Workload */}
-                  <td>
-                    {renderMiniWorkload(item.currentWorkload ?? item.officer?.currentWorkload ?? 0)}
-                  </td>
+                    {/* 6. Distance */}
+                    <td>
+                      <span className="font-mono" style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                        {dist}
+                      </span>
+                    </td>
 
-                  {/* Composite Match Score */}
-                  <td>
-                    {renderMatchScorePill(item.assignmentScore)}
-                  </td>
+                    {/* 7. Workload */}
+                    <td>
+                      {renderMiniWorkload(item.currentWorkload ?? officer.currentWorkload ?? 0, 5)}
+                    </td>
 
-                  {/* Status Badge */}
-                  <td>
-                    {renderAssignmentStatusBadge(item.status)}
-                  </td>
+                    {/* 8. Status Badge */}
+                    <td>
+                      {renderAssignmentStatusBadge(item.status)}
+                    </td>
 
-                  {/* Action Button */}
-                  <td style={{ textAlign: 'right' }}>
-                    <button
-                      type="button"
-                      className="asgn-action-btn"
-                      onClick={() => onInspect && onInspect(item)}
-                      title="Inspect AI Dispatch Details"
-                    >
-                      Inspect Dispatch
-                    </button>
-                  </td>
-                </tr>
-              ))
+                    {/* 9. Verification State */}
+                    <td>
+                      {renderVerificationBadge(item.verification?.status || (item.status === 'COMPLETED' ? 'VERIFIED' : 'PENDING'))}
+                    </td>
+
+                    {/* 10. Action */}
+                    <td style={{ textAlign: 'right' }}>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => onInspect && onInspect(item)}
+                        title="Inspect AI Dispatch Details"
+                      >
+                        Inspect
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -188,28 +214,29 @@ export default function AssignmentTable({
 
       {/* Pagination Footer */}
       <div className="assignments-pagination">
-        <div>
+        <div className="font-mono" style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
           Page {pagination.page || 1} of {pagination.totalPages || 1}
         </div>
         <div className="assignments-pagination-btns">
-          <button
-            type="button"
-            className="asgn-page-btn"
+          <Button
+            variant="secondary"
+            size="sm"
             disabled={pagination.page <= 1 || isLoading}
             onClick={() => onPageChange && onPageChange(pagination.page - 1)}
           >
             ← Previous
-          </button>
-          <button
-            type="button"
-            className="asgn-page-btn"
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
             disabled={pagination.page >= pagination.totalPages || isLoading}
             onClick={() => onPageChange && onPageChange(pagination.page + 1)}
           >
             Next →
-          </button>
+          </Button>
         </div>
       </div>
     </div>
   );
 }
+

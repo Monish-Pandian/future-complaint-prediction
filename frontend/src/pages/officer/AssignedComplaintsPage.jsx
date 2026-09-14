@@ -153,15 +153,16 @@ export default function AssignedComplaintsPage() {
     <PageTransition>
       <div className="officer-portal-container">
         {/* Header Bar */}
-        <header className="officer-header-card">
+        <header className="stitch-card mb-6" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div>
-            <div className="auth-label" style={{ marginBottom: '4px' }}>
-              GROUND INSPECTION QUEUE
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+              <span className="stitch-badge stitch-badge-emerald font-mono">FIELD OPERATIONAL DEPLOYMENT</span>
+              <span className="stitch-badge stitch-badge-slate font-mono">MUNICIPAL DISPATCH</span>
             </div>
-            <h1 style={{ fontSize: '24px', fontWeight: '800', margin: '4px 0', color: 'var(--text-primary)' }}>
-              Assigned Complaints & Verification Tasks
+            <h1 style={{ fontSize: '24px', fontWeight: '800', margin: '4px 0', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+              Field Inspection & Verification Queue
             </h1>
-            <p className="verification-subtitle">
+            <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)' }}>
               Execute field inspections dispatched by AI routing. Track assignment lifecycle from acceptance through ground truth verification.
             </p>
           </div>
@@ -182,27 +183,37 @@ export default function AssignedComplaintsPage() {
         </header>
 
         {/* Filter / Search Card */}
-        <div className="verification-filter-card">
+        <div className="stitch-card mb-6" style={{ padding: '16px 20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-{/*
-            Status Tabs */}
+            {/* Status Tabs */}
             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
               {[
-                { id: 'ALL', label: 'All Tasks' },
-                { id: 'AI_ASSIGNED', label: 'Pending Acceptance' },
-                { id: 'ACCEPTED', label: 'Accepted' },
-                { id: 'IN_PROGRESS', label: 'In Progress' },
-                { id: 'COMPLETED', label: 'Completed' },
-                { id: 'VERIFICATION_CANDIDATES', label: 'Verification Candidates' },
+                { id: 'ALL', label: 'All Tasks', count: assignments.length },
+                { id: 'AI_ASSIGNED', label: 'Pending Acceptance', count: assignments.filter(a => a.status === 'AI_ASSIGNED').length },
+                { id: 'ACCEPTED', label: 'Accepted', count: assignments.filter(a => a.status === 'ACCEPTED').length },
+                { id: 'IN_PROGRESS', label: 'In Progress', count: assignments.filter(a => a.status === 'IN_PROGRESS').length },
+                { id: 'COMPLETED', label: 'Completed', count: assignments.filter(a => a.status === 'COMPLETED').length },
+                { id: 'VERIFICATION_CANDIDATES', label: 'Verification Candidates', count: candidates.length },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   type="button"
-                  className={`verification-btn ${activeTab === tab.id ? 'verification-btn-primary' : 'verification-btn-secondary'}`}
-                  style={{ fontSize: '11px', padding: '8px 14px' }}
+                  className={`stitch-btn ${activeTab === tab.id ? 'stitch-btn-primary' : 'stitch-btn-secondary'}`}
+                  style={{ fontSize: '11px', padding: '6px 14px' }}
                   onClick={() => setActiveTab(tab.id)}
                 >
-                  {tab.label}
+                  <span>{tab.label}</span>
+                  {tab.count !== undefined && (
+                    <span style={{ 
+                      marginLeft: '6px', 
+                      background: activeTab === tab.id ? 'rgba(255,255,255,0.2)' : 'var(--bg-surface-hover)', 
+                      padding: '1px 6px', 
+                      borderRadius: '10px',
+                      fontSize: '10px'
+                    }}>
+                      {tab.count}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
@@ -256,10 +267,10 @@ export default function AssignedComplaintsPage() {
                 filteredCandidates.map((cand) => {
                   const pred = cand.prediction || {};
                   return (
-                    <div key={cand.id || cand.candidateId} className="officer-task-card">
-                      <div className="officer-task-header">
+                    <div key={cand.id || cand.candidateId} className="stitch-card p-5" style={{ transition: 'all 0.2s ease' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '14px', borderBottom: '1px solid var(--border)', paddingBottom: '12px' }}>
                         <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
                             <span style={{ fontFamily: 'var(--font-mono)', fontWeight: '700', color: '#10b981', fontSize: '13px' }}>
                               {cand.candidateId || cand.id}
                             </span>
@@ -267,61 +278,63 @@ export default function AssignedComplaintsPage() {
                             {renderSelectionTypeBadge(cand.selectionType)}
                             {renderRiskBadge(pred.riskLevel || 'LOW')}
                           </div>
-                          <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)' }}>
+                          <div style={{ fontSize: '17px', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
                             {pred.complaintType}
                           </div>
                         </div>
-                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: '#ffd166' }}>
-                          Rank: {cand.selectionRank || '—'}
+                        <span className="stitch-badge stitch-badge-amber font-mono" style={{ fontSize: '12px' }}>
+                          Selection Rank #{cand.selectionRank || '1'}
                         </span>
                       </div>
 
-                      <div className="officer-task-body">
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginBottom: '16px', background: 'var(--bg-surface-hover)', padding: '12px 14px', borderRadius: '8px' }}>
                         <div>
-                          <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>LOCATION</div>
-                          <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)' }}>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>TARGET GEOMETRY</div>
+                          <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-primary)' }}>
                             {pred.address || pred.communityArea || 'Chicago Sector'}
                           </div>
                         </div>
                         <div>
-                          <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>WARD / AREA</div>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>WARD / SECTOR</div>
                           <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>
                             {pred.ward || 'Ward 1'} &bull; {pred.communityArea || 'Central'}
                           </div>
                         </div>
                         <div>
-                          <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>FORECAST RISK SCORE</div>
-                          <div style={{ fontSize: '13px', fontWeight: '700', color: '#06b6d4', fontFamily: 'var(--font-mono)' }}>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>PREDICTED RISK</div>
+                          <div style={{ fontSize: '13px', fontWeight: '800', color: '#06b6d4', fontFamily: 'var(--font-mono)' }}>
                             {pred.riskScore ?? 75}/100
                           </div>
                         </div>
                         <div>
-                          <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>PROBABILITY</div>
-                          <div style={{ fontSize: '13px', fontWeight: '700', color: '#06b6d4', fontFamily: 'var(--font-mono)' }}>
-                            {(pred.probability * 100).toFixed(1)}%
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>ML PROBABILITY</div>
+                          <div style={{ fontSize: '13px', fontWeight: '800', color: '#10b981', fontFamily: 'var(--font-mono)' }}>
+                            {((pred.probability ?? 0.75) * 100).toFixed(1)}%
                           </div>
                         </div>
                         <div>
-                          <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>DEPARTMENT</div>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>DEPARTMENT</div>
                           <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>
-                            {pred.department || 'Municipal'}
+                            {pred.department || 'Municipal Operations'}
                           </div>
                         </div>
                       </div>
 
-                      <div className="officer-task-actions">
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '10px' }}>
                         {cand.status === 'ASSIGNED' && (
                           <>
                             <button
                               type="button"
-                              className="verification-btn verification-btn-primary"
+                              className="stitch-btn stitch-btn-primary"
+                              style={{ fontSize: '12px', padding: '8px 16px' }}
                               onClick={() => handleAcceptCandidate(cand.id || cand._id || cand.candidateId)}
                             >
                               Accept Candidate
                             </button>
                             <button
                               type="button"
-                              className="verification-btn verification-btn-secondary"
+                              className="stitch-btn stitch-btn-secondary"
+                              style={{ fontSize: '12px', padding: '8px 16px' }}
                               onClick={() => handleRejectCandidate(cand.id || cand._id || cand.candidateId)}
                             >
                               Reject Candidate
@@ -332,8 +345,8 @@ export default function AssignedComplaintsPage() {
                         {cand.status === 'VERIFICATION_SUBMITTED' && (
                           <button
                             type="button"
-                            className="verification-btn verification-btn-primary"
-                            style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}
+                            className="stitch-btn stitch-btn-primary"
+                            style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', fontSize: '12px', padding: '8px 16px' }}
                             onClick={() => setVerifyingCandidate(cand)}
                           >
                             ✓ Submit Field Verification
@@ -341,13 +354,13 @@ export default function AssignedComplaintsPage() {
                         )}
 
                         {cand.status === 'COMPLETED' && (
-                          <span style={{ fontSize: '12px', fontFamily: 'var(--font-mono)', color: '#4dd6a8', fontWeight: '700' }}>
+                          <span className="stitch-badge stitch-badge-emerald font-mono">
                             ✓ Verification Submitted
                           </span>
                         )}
 
                         {cand.status === 'CANCELLED' && (
-                          <span style={{ fontSize: '12px', fontFamily: 'var(--font-mono)', color: '#e96c6c', fontWeight: '700' }}>
+                          <span className="stitch-badge stitch-badge-rose font-mono">
                             ✗ Cancelled
                           </span>
                         )}
@@ -359,60 +372,61 @@ export default function AssignedComplaintsPage() {
             ) : (
               // Assignment Rendering
               isLoading ? (
-                <div>Loading task queue...</div>
+                <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading task queue...</div>
               ) : filteredAssignments.length === 0 ? (
-                <div className="verification-table-card" style={{ padding: '48px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                <div className="stitch-card" style={{ padding: '48px', textAlign: 'center', color: 'var(--text-secondary)' }}>
                   No assigned tasks match the selected status or search filter.
                 </div>
               ) : (
                 filteredAssignments.map((asgn) => {
                   const pred = asgn.prediction || {};
                   return (
-                    <div key={asgn.id || asgn.assignmentId} className="officer-task-card">
-                      <div className="officer-task-header">
+                    <div key={asgn.id || asgn.assignmentId} className="stitch-card p-5" style={{ transition: 'all 0.2s ease' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '14px', borderBottom: '1px solid var(--border)', paddingBottom: '12px' }}>
                         <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
                             <span style={{ fontFamily: 'var(--font-mono)', fontWeight: '700', color: '#10b981', fontSize: '13px' }}>
                               {asgn.assignmentId || asgn.id}
                             </span>
                             {renderAssignmentStatusBadge(asgn.status)}
                             {renderRiskBadge(pred.riskLevel || 'LOW')}
                           </div>
-                          <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)' }}>
+                          <div style={{ fontSize: '17px', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
                             {pred.complaintType}
                           </div>
                         </div>
-                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: '#ffd166' }}>
+                        <span className="stitch-badge stitch-badge-cyan font-mono" style={{ fontSize: '12px' }}>
                           Distance: {asgn.distanceKm ?? 1.5} km
                         </span>
                       </div>
 
-                      <div className="officer-task-body">
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginBottom: '16px', background: 'var(--bg-surface-hover)', padding: '12px 14px', borderRadius: '8px' }}>
                         <div>
-                          <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>LOCATION</div>
-                          <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)' }}>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>LOCATION</div>
+                          <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-primary)' }}>
                             {pred.address || pred.communityArea || 'Chicago Sector'}
                           </div>
                         </div>
                         <div>
-                          <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>WARD / AREA</div>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>WARD / SECTOR</div>
                           <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>
                             {pred.ward || 'Ward 1'} &bull; {pred.communityArea || 'Central'}
                           </div>
                         </div>
                         <div>
-                          <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>FORECAST RISK SCORE</div>
-                          <div style={{ fontSize: '13px', fontWeight: '700', color: '#06b6d4', fontFamily: 'var(--font-mono)' }}>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>FORECAST RISK SCORE</div>
+                          <div style={{ fontSize: '13px', fontWeight: '800', color: '#06b6d4', fontFamily: 'var(--font-mono)' }}>
                             {pred.riskScore ?? 75}/100
                           </div>
                         </div>
                       </div>
 
-                      <div className="officer-task-actions">
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '10px' }}>
                         {asgn.status === 'AI_ASSIGNED' && (
                           <button
                             type="button"
-                            className="verification-btn verification-btn-primary"
+                            className="stitch-btn stitch-btn-primary"
+                            style={{ fontSize: '12px', padding: '8px 16px' }}
                             onClick={() => handleAccept(asgn.id || asgn._id || asgn.assignmentId)}
                           >
                             Accept Dispatch
@@ -422,7 +436,8 @@ export default function AssignedComplaintsPage() {
                         {asgn.status === 'ACCEPTED' && (
                           <button
                             type="button"
-                            className="verification-btn verification-btn-primary"
+                            className="stitch-btn stitch-btn-primary"
+                            style={{ fontSize: '12px', padding: '8px 16px' }}
                             onClick={() => handleStart(asgn.id || asgn._id || asgn.assignmentId)}
                           >
                             Start Field Task
@@ -432,8 +447,8 @@ export default function AssignedComplaintsPage() {
                         {asgn.status === 'IN_PROGRESS' && (
                           <button
                             type="button"
-                            className="verification-btn verification-btn-primary"
-                            style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}
+                            className="stitch-btn stitch-btn-primary"
+                            style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', fontSize: '12px', padding: '8px 16px' }}
                             onClick={() => setVerifyingAssignment(asgn)}
                           >
                             ✓ Submit Field Verification
@@ -441,7 +456,7 @@ export default function AssignedComplaintsPage() {
                         )}
 
                         {asgn.status === 'COMPLETED' && (
-                          <span style={{ fontSize: '12px', fontFamily: 'var(--font-mono)', color: '#4dd6a8', fontWeight: '700' }}>
+                          <span className="stitch-badge stitch-badge-emerald font-mono">
                             ✓ Verification Submitted
                           </span>
                         )}

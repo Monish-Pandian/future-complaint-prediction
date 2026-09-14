@@ -187,32 +187,53 @@ export default function PredictionDetails() {
   return (
     <PageTransition>
       <div className="predictions-detail-page">
-        {/* Back Navigation Bar */}
-        <div className="detail-back-bar">
-          <Link to="/predictions" className="btn-back-link">
-            ← BACK TO PREDICTIONS
-          </Link>
-          <span className="demo-badge">LIVE DATA</span>
-        </div>
-
-        {/* Detail Identity Header */}
-        <header className="detail-identity-header">
-          <div className="identity-main">
-            <div className="identity-tag-row">
-              <span className="identity-id">{displayPrediction.id}</span>
-              <span className="workflow-badge">AI CIVIC FORECAST</span>
+        {/* Stitch Dossier Command Action Bar */}
+        <div className="stitch-command-bar">
+          <div className="stitch-command-title-wrap">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+              <Link to="/predictions" className="stitch-btn-secondary" style={{ padding: '4px 10px', fontSize: '11px' }}>
+                ← PREDICTIONS LIST
+              </Link>
+              <div className="stitch-telemetry-badge">
+                <span className="stitch-live-dot" />
+                <span>ANALYTICAL DOSSIER • {displayPrediction.id}</span>
+              </div>
             </div>
-            <h1 className="identity-title">{displayPrediction.complaintType}</h1>
-            <div className="identity-area-sub">
-              {displayPrediction.area?.communityAreaName || `Area ${displayPrediction.area?.communityArea}`} &bull; Ward {displayPrediction.area?.ward} &bull; {displayPrediction.location?.address}
-            </div>
+            <h1 className="stitch-page-title">{displayPrediction.complaintType}</h1>
+            <p className="stitch-page-desc">
+              {displayPrediction.area?.communityAreaName || `Area ${displayPrediction.area?.communityArea}`} • Ward {displayPrediction.area?.ward} • {displayPrediction.location?.address || 'Metro Chicago Sector'}
+            </p>
           </div>
 
-          <div className="identity-badges-group">
+          <div className="stitch-command-actions">
             {renderRiskBadge(displayPrediction.riskLevel)}
             {renderVerificationBadge(displayVerification.status)}
+            <button
+              type="button"
+              className="stitch-btn-secondary"
+              onClick={() => alert(`Exporting incident dossier for ${displayPrediction.id}...`)}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Export Dossier</span>
+            </button>
+            <Link
+              to="/assignments"
+              className="stitch-btn-primary"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <line x1="20" y1="8" x2="20" y2="14"></line>
+                <line x1="23" y1="11" x2="17" y2="11"></line>
+              </svg>
+              <span>Dispatch Officer</span>
+            </Link>
           </div>
-        </header>
+        </div>
 
         {/* 2-Column Responsive Layout */}
         <div className="detail-grid-layout">

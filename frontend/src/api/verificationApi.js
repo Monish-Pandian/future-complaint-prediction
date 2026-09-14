@@ -164,6 +164,12 @@ export async function getVerifications(params = {}) {
     const page = rawData.pagination?.page ?? 1;
     const totalPages = rawData.pagination?.totalPages ?? (Math.ceil(total / limit) || 1);
 
+    const pendingCount = normalizedList.filter(v => (v.assignment?.status || '').toUpperCase() === 'PENDING_ASSIGNMENT' || (v.status || '').toUpperCase() === 'PENDING_ASSIGNMENT').length;
+    const assignedCount = normalizedList.filter(v => (v.assignment?.status || '').toUpperCase() === 'ASSIGNED' || (v.status || '').toUpperCase() === 'ASSIGNED').length;
+    const submittedCount = normalizedList.filter(v => (v.assignment?.status || '').toUpperCase() === 'VERIFICATION_SUBMITTED' || (v.status || '').toUpperCase() === 'VERIFICATION_SUBMITTED').length;
+    const completedCount = normalizedList.filter(v => (v.assignment?.status || '').toUpperCase() === 'COMPLETED' || (v.status || '').toUpperCase() === 'COMPLETED').length;
+    const cancelledCount = normalizedList.filter(v => (v.assignment?.status || '').toUpperCase() === 'CANCELLED' || (v.status || '').toUpperCase() === 'CANCELLED').length;
+
     return {
       data: {
         verifications: normalizedList,
@@ -174,10 +180,16 @@ export async function getVerifications(params = {}) {
           totalPages,
         },
         summary: {
-          total: total,
+          total,
+          pendingAssignment: pendingCount,
+          assigned: assignedCount,
+          submitted: submittedCount,
+          completed: completedCount,
+          cancelled: cancelledCount,
           confirmed: normalizedList.filter(v => v.outcome === 'PROBLEM_CONFIRMED').length,
           notFound: normalizedList.filter(v => v.outcome === 'PROBLEM_NOT_FOUND').length,
           different: normalizedList.filter(v => v.outcome === 'DIFFERENT_PROBLEM').length,
+          duplicate: normalizedList.filter(v => v.outcome === 'DUPLICATE').length,
           unable: normalizedList.filter(v => v.outcome === 'UNABLE_TO_VERIFY').length,
         },
         distribution: {

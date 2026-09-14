@@ -128,13 +128,34 @@ const createPrediction = async (req, res, next) => {
 };
 
 /**
- * Admin Trigger Prediction Cycle (AI Service Integration)
+ * Admin Trigger Prediction Cycle (AI Service Integration with full candidate selection & auto-assignment pipeline)
  * @route POST /api/v1/admin/predictions/run-cycle
  */
 const runPredictionCycle = async (req, res, next) => {
   try {
-    const result = await aiService.ingestPredictionCycle(req.body);
-    return sendSuccess(res, 201, result);
+    const cycleResult = await aiService.ingestPredictionCycle(req.body);
+
+    let candidateResult = null;
+    let assignmentResult = null;
+
+    if (cycleResult.cycle && cycleResult.cycle.cycleId && cycleResult.predictions && cycleResult.predictions.length > 0) {
+      const { selectVerificationCandidates } = require('../services/verificationSelectionService');
+      const { autoAssignCandidates } = require('../services/autoAssignmentService');
+
+      const budgetPct = req.body.budgetPct || 0.05;
+      candidateResult = await selectVerificationCandidates(cycleResult.cycle.cycleId, budgetPct);
+      assignmentResult = await autoAssignCandidates(cycleResult.cycle.cycleId);
+    }
+
+    return sendSuccess(res, 201, {
+      cycle: cycleResult.cycle,
+      predictions: cycleResult.predictions,
+      candidates: candidateResult,
+      assignments: assignmentResult,
+      modelVersion: cycleResult.modelVersion,
+      metadata: cycleResult.metadata,
+      message: 'Prediction cycle completed with verification candidate selection and automated officer assignment.',
+    });
   } catch (error) {
     next(error);
   }

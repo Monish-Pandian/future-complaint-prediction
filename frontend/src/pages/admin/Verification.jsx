@@ -1,15 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PageTransition from '../../components/layout/PageTransition';
 import VerificationSummary from '../../components/verification/VerificationSummary';
+import VerificationPipeline from '../../components/verification/VerificationPipeline';
 import VerificationFilters from '../../components/verification/VerificationFilters';
 import VerificationTable from '../../components/verification/VerificationTable';
-import VerificationDetailsModal from '../../components/verification/VerificationDetailsModal';
+import VerificationDetailDrawer from '../../components/verification/VerificationDetailDrawer';
 import VerificationOutcomeChart from '../../components/verification/VerificationOutcomeChart';
+import ErrorState from '../../components/common/ErrorState';
 import { getVerifications, getVerificationFilters } from '../../api/verificationApi';
 
 /**
- * Admin Verification & Ground Truth Feedback Monitoring Page
- * Urban Intelligence Command Center — Module 10
+ * Admin Verification Operations & Ground Truth Feedback Console
+ * Urban Intelligence Command Center — Module 8G
  */
 export default function Verification() {
   const [verifications, setVerifications] = useState([]);
@@ -17,10 +19,12 @@ export default function Verification() {
   const [distribution, setDistribution] = useState([]);
   const [filterOptions, setFilterOptions] = useState({});
   const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, totalPages: 1 });
+  const [activeStage, setActiveStage] = useState(null);
   const [filters, setFilters] = useState({
     search: '',
     outcome: 'All outcomes',
     severity: 'All severities',
+    evaluation: 'All evaluations',
     department: 'All departments',
     ward: 'All wards',
     communityArea: 'All community areas',
@@ -47,7 +51,7 @@ export default function Verification() {
 
   // Fetch verification data
   const loadVerificationData = useCallback(
-    async (customFilters = filters, page = pagination.page, sortField = sortBy, sortDir = sortOrder) => {
+    async (customFilters = filters, page = pagination.page, sortField = sortBy, sortDir = sortOrder, stage = activeStage) => {
       setIsLoading(true);
       setError(null);
       try {
@@ -60,20 +64,39 @@ export default function Verification() {
         });
 
         if (res?.data) {
-          setVerifications(res.data.verifications || []);
-          setPagination(res.data.pagination || { page: 1, limit: 10, total: 0, totalPages: 1 });
+          let list = res.data.verifications || [];
+
+          // Stage filtering if pipeline stage is selected
+          if (stage) {
+            list = list.filter((item) => {
+              const itemStatus = (item.assignment?.status || item.status || '').toUpperCase();
+              return itemStatus === stage.toUpperCase();
+            });
+          }
+
+          // Evaluation filter client-side if applied
+          if (customFilters.evaluation && customFilters.evaluation !== 'All evaluations') {
+            const targetEval = customFilters.evaluation.toUpperCase().trim();
+            list = list.filter((item) => {
+              const evalClass = item.evaluation?.classification || (item.outcome === 'PROBLEM_CONFIRMED' ? 'TRUE_POSITIVE' : 'FALSE_POSITIVE');
+              return evalClass === targetEval;
+            });
+          }
+
+          setVerifications(list);
+          setPagination(res.data.pagination || { page: 1, limit: 10, total: list.length, totalPages: 1 });
           setSummary(res.data.summary || {});
           setDistribution(res.data.distribution || []);
           setIsLive(Boolean(res.isLive));
         }
       } catch (err) {
         console.error('Failed to load verification logs:', err);
-        setError('VERIFICATION DATA UNAVAILABLE');
+        setError('Verification data unavailable. Please verify connection to the operational forecasting service.');
       } finally {
         setIsLoading(false);
       }
     },
-    [filters, pagination.page, pagination.limit, sortBy, sortOrder]
+    [filters, pagination.page, pagination.limit, sortBy, sortOrder, activeStage]
   );
 
   // Initial load
@@ -81,39 +104,56 @@ export default function Verification() {
     loadVerificationData();
   }, [loadVerificationData]);
 
+  // Stage click in pipeline
+  const handleStageClick = (stageId) => {
+    setActiveStage(stageId);
+    setPagination((prev) => ({ ...prev, page: 1 }));
+    loadVerificationData(filters, 1, sortBy, sortOrder, stageId);
+  };
+
   // Filter change
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
     setPagination((prev) => ({ ...prev, page: 1 }));
-    loadVerificationData(newFilters, 1, sortBy, sortOrder);
+    loadVerificationData(newFilters, 1, sortBy, sortOrder, activeStage);
   };
 
-  // Reset
+  // Reset filters
   const handleReset = (emptyFilters) => {
-    setFilters(emptyFilters);
+    const defaultFilters = emptyFilters || {
+      search: '',
+      outcome: 'All outcomes',
+      severity: 'All severities',
+      evaluation: 'All evaluations',
+      department: 'All departments',
+      ward: 'All wards',
+      communityArea: 'All community areas',
+    };
+    setActiveStage(null);
+    setFilters(defaultFilters);
     setPagination((prev) => ({ ...prev, page: 1 }));
-    loadVerificationData(emptyFilters, 1, sortBy, sortOrder);
+    loadVerificationData(defaultFilters, 1, sortBy, sortOrder, null);
   };
 
-  // Sort
+  // Sort change
   const handleSort = (field, order) => {
     setSortBy(field);
     setSortOrder(order);
-    loadVerificationData(filters, pagination.page, field, order);
+    loadVerificationData(filters, pagination.page, field, order, activeStage);
   };
 
   // Page change
   const handlePageChange = (newPage) => {
     setPagination((prev) => ({ ...prev, page: newPage }));
-    loadVerificationData(filters, newPage, sortBy, sortOrder);
+    loadVerificationData(filters, newPage, sortBy, sortOrder, activeStage);
   };
 
-  // Inspect detail
+  // Inspect detail drawer
   const handleInspect = (item) => {
     setSelectedVerification(item);
   };
 
-  const handleCloseModal = () => {
+  const handleCloseDrawer = () => {
     setSelectedVerification(null);
   };
 
@@ -124,21 +164,27 @@ export default function Verification() {
         <header className="verification-header-wrapper">
           <div className="verification-title-group">
             <div className="auth-label" style={{ marginBottom: '4px' }}>
-              GROUND TRUTH & MODEL EVALUATION
+              OPERATIONS / VERIFICATION
             </div>
             <h1>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2">
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                 <polyline points="22 4 12 14.01 9 11.01"></polyline>
               </svg>
-              Ground Truth Verification & Feedback Integration
+              VERIFICATION OPERATIONS
             </h1>
             <p className="verification-subtitle">
-              Monitor on-site field verification logs, prediction evaluation matrix (True/False Positives), discrepancy auditing, and feedback signal ingestion into the retraining pipeline.
+              Track AI-selected verification candidates from field assignment through outcome and model evaluation.
             </p>
           </div>
 
           <div className="verification-meta-actions">
+            <div className="verif-context-pill font-mono">
+              <span className="text-muted">MODEL:</span> <strong>xgb-test-v1</strong>
+            </div>
+            <div className="verif-context-pill font-mono">
+              <span className="text-muted">CANDIDATES:</span> <strong>{summary.total ?? verifications.length}</strong>
+            </div>
             <span className={`verification-mode-pill ${isLive ? 'live' : 'demo'}`}>
               <span
                 style={{
@@ -148,50 +194,36 @@ export default function Verification() {
                   backgroundColor: isLive ? '#4dd6a8' : '#ecd06f',
                 }}
               />
-              {isLive ? 'Real API Data' : 'Demo Data'}
+              {isLive ? 'OPERATIONAL' : 'SYNCING'}
             </span>
           </div>
         </header>
 
         {/* Error State Banner */}
         {error && (
-          <div
-            style={{
-              padding: '16px 20px',
-              borderRadius: 'var(--radius-md)',
-              background: 'rgba(255, 107, 107, 0.1)',
-              border: '1px solid rgba(255, 107, 107, 0.3)',
-              color: '#ff6b6b',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-              </svg>
-              <span style={{ fontWeight: '600', fontSize: '13px' }}>{error}</span>
-            </div>
-            <button
-              type="button"
-              className="verification-btn verification-btn-secondary"
-              onClick={() => loadVerificationData()}
-            >
-              Retry Connection
-            </button>
-          </div>
+          <ErrorState
+            title="Verification data unavailable"
+            description={error}
+            onRetry={() => loadVerificationData()}
+            retryLabel="Retry Connection"
+          />
         )}
 
         {/* Top KPI Metrics */}
-        <VerificationSummary summary={summary} />
+        <VerificationSummary summary={summary} totalCount={pagination.total} />
+
+        {/* Interactive Verification Pipeline */}
+        <VerificationPipeline
+          summary={summary}
+          activeStage={activeStage}
+          onStageClick={handleStageClick}
+        />
 
         {/* Filters Bar */}
         <VerificationFilters
           filters={filters}
           filterOptions={filterOptions}
+          totalFiltered={verifications.length}
           onFilterChange={handleFilterChange}
           onReset={handleReset}
         />
@@ -207,16 +239,17 @@ export default function Verification() {
             onSort={handleSort}
             onPageChange={handlePageChange}
             onInspect={handleInspect}
+            onResetFilters={() => handleReset()}
           />
 
           <VerificationOutcomeChart distribution={distribution} />
         </div>
 
-        {/* 5-Tier Detail Modal / Drawer */}
+        {/* Verification Assessment Detail Drawer */}
         {selectedVerification && (
-          <VerificationDetailsModal
+          <VerificationDetailDrawer
             verification={selectedVerification}
-            onClose={handleCloseModal}
+            onClose={handleCloseDrawer}
           />
         )}
       </div>

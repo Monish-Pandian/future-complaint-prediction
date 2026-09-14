@@ -19,17 +19,17 @@ function CustomBarTooltip({ active, payload }) {
 
   return (
     <div className="custom-chart-tooltip" role="tooltip">
-      <div className="tooltip-date">{data.category || data.shortName}</div>
+      <div className="tooltip-date font-mono">{data.category || data.department || data.shortName}</div>
       <div className="tooltip-row">
-        <span className="tooltip-label">Predicted Volume:</span>
-        <span className="tooltip-val">{data.count}</span>
+        <span className="tooltip-label">Forecasted Incident Volume:</span>
+        <span className="tooltip-val font-mono">{data.count}</span>
       </div>
       {data.highRisk !== undefined && (
         <div className="tooltip-row">
-          <span className="tooltip-label" style={{ color: '#ff6b6b' }}>
-            High-Risk Priority:
+          <span className="tooltip-label" style={{ color: '#ef4444' }}>
+            High-Risk Escalations:
           </span>
-          <span className="tooltip-val" style={{ color: '#ff6b6b' }}>
+          <span className="tooltip-val font-mono" style={{ color: '#ef4444' }}>
             {data.highRisk}
           </span>
         </div>
@@ -39,9 +39,11 @@ function CustomBarTooltip({ active, payload }) {
 }
 
 /**
- * ComplaintDistribution: Visualizes actionable complaint categories
+ * ComplaintDistribution: Visualizes actionable complaint categories & departments
  */
 export default function ComplaintDistribution({ data = [] }) {
+  const chartData = Array.isArray(data) ? data : [];
+
   return (
     <section
       className="dashboard-panel dashboard-distribution"
@@ -49,18 +51,18 @@ export default function ComplaintDistribution({ data = [] }) {
     >
       <div className="dashboard-panel-header">
         <div className="dashboard-panel-title-group">
-          <h2 className="dashboard-panel-title">ACTIONABLE COMPLAINT TYPES</h2>
+          <h2 className="dashboard-panel-title">ACTIONABLE COMPLAINT CLUSTERS</h2>
           <span className="dashboard-panel-subtitle">
-            Intervention-ready problem classifications
+            Municipal category & departmental operational workload
           </span>
         </div>
-        <span className="dashboard-panel-tag">DEMO DATA</span>
+        <span className="dashboard-panel-tag">WORKLOAD SPECTRUM</span>
       </div>
 
       <div className="chart-content-wrapper">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
-            data={data}
+            data={chartData}
             margin={{ top: 10, right: 12, left: -20, bottom: 20 }}
           >
             <CartesianGrid
@@ -86,18 +88,18 @@ export default function ComplaintDistribution({ data = [] }) {
               axisLine={{ stroke: 'var(--border)' }}
               tickMargin={6}
             />
-            <Tooltip content={<CustomBarTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.03)' }} />
+            <Tooltip content={<CustomBarTooltip />} cursor={{ fill: 'var(--bg-surface-hover)' }} />
             <Bar
               dataKey="count"
               radius={[4, 4, 0, 0]}
-              maxBarSize={38}
+              maxBarSize={36}
               isAnimationActive={false}
             >
-              {data.map((entry, index) => (
+              {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={entry.color || '#4dd6c7'}
-                  fillOpacity={0.85}
+                  fill={entry.color || '#06b6d4'}
+                  fillOpacity={0.88}
                 />
               ))}
             </Bar>

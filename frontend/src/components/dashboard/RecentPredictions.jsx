@@ -1,52 +1,33 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
-/**
- * Risk badge renderer helper
- */
-function renderRiskBadge(riskLevel, score) {
-  const level = (riskLevel || 'LOW').toUpperCase();
-  let badgeClass = 'risk-badge-low';
-
-  if (level === 'CRITICAL') {
-    badgeClass = 'risk-badge-critical';
-  } else if (level === 'HIGH') {
-    badgeClass = 'risk-badge-high';
-  } else if (level === 'MEDIUM') {
-    badgeClass = 'risk-badge-medium';
-  }
-
-  return (
-    <span className={`status-badge ${badgeClass}`}>
-      <span className="status-badge-dot" aria-hidden="true" />
-      {level} {score ? `(${score}%)` : ''}
-    </span>
-  );
-}
+import { renderRiskBadge } from '../predictions/PredictionBadges';
 
 /**
  * Verification badge renderer helper
  */
 function renderVerificationBadge(status) {
-  const s = (status || 'PENDING').toUpperCase().replace('_', ' ');
-  let badgeClass = 'verif-badge-pending';
+  const rawStatus = (status || 'PENDING_VERIFICATION').toUpperCase();
+  let badgeClass = 'status-pending';
+  let label = 'PENDING';
 
-  if (s.includes('CRITICAL') || s === 'CRITICAL') {
-    badgeClass = 'risk-badge-critical';
-  } else if (s === 'ASSIGNED') {
-    badgeClass = 'verif-badge-assigned';
-  } else if (s.includes('PROGRESS')) {
-    badgeClass = 'verif-badge-in-progress';
-  } else if (s.includes('VERIFIED')) {
-    badgeClass = 'verif-badge-verified';
-  } else if (s.includes('NOT FOUND')) {
-    badgeClass = 'verif-badge-not-found';
+  if (rawStatus.includes('VERIFIED_TRUE') || rawStatus === 'VERIFIED') {
+    badgeClass = 'status-verified';
+    label = 'VERIFIED';
+  } else if (rawStatus.includes('VERIFIED_FALSE') || rawStatus.includes('NOT_FOUND')) {
+    badgeClass = 'status-not-found';
+    label = 'NOT FOUND';
+  } else if (rawStatus.includes('ASSIGNED')) {
+    badgeClass = 'status-assigned';
+    label = 'ASSIGNED';
+  } else if (rawStatus.includes('PROGRESS')) {
+    badgeClass = 'status-progress';
+    label = 'IN PROGRESS';
   }
 
   return (
     <span className={`status-badge ${badgeClass}`}>
       <span className="status-badge-dot" aria-hidden="true" />
-      {s}
+      {label}
     </span>
   );
 }
@@ -61,6 +42,8 @@ export default function RecentPredictions({ data = [] }) {
     navigate(`/predictions/${id}`);
   };
 
+  const predictionsList = Array.isArray(data) ? data : [];
+
   return (
     <section
       className="dashboard-panel dashboard-recent"
@@ -73,65 +56,80 @@ export default function RecentPredictions({ data = [] }) {
             Forecasting queue, AI officer dispatch, and ground-truth verification
           </span>
         </div>
-        <span className="dashboard-panel-tag">DEMO DATA</span>
+        <span className="dashboard-panel-tag">AI INFERENCES</span>
       </div>
 
       <div className="prediction-table-wrapper">
-        <table className="prediction-table">
-          <thead>
-            <tr>
-              <th scope="col">Area</th>
-              <th scope="col">Complaint Type</th>
-              <th scope="col">Risk</th>
-              <th scope="col">Prediction Window</th>
-              <th scope="col">Assignment</th>
-              <th scope="col">Verification</th>
-              <th scope="col" style={{ textAlign: 'right' }}>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item) => (
-              <tr key={item.id}>
-                <td>
-                  <div className="cell-primary">{item.area}</div>
-                  {item.ward && <div className="cell-subtext">{item.ward}</div>}
-                </td>
-                <td>
-                  <div className="cell-primary">{item.complaintType}</div>
-                  <div className="cell-subtext">{item.id}</div>
-                </td>
-                <td>
-                  {renderRiskBadge(item.riskLevel, item.riskScore)}
-                </td>
-                <td>
-                  <span className="cell-window">{item.predictionWindow}</span>
-                </td>
-                <td>
-                  <div className="cell-officer">
-                    <span className="cell-primary">{item.assignment}</span>
-                    {item.officerName && (
-                      <span className="cell-subtext">{item.officerName}</span>
-                    )}
-                  </div>
-                </td>
-                <td>
-                  {renderVerificationBadge(item.verification)}
-                </td>
-                <td style={{ textAlign: 'right' }}>
-                  <button
-                    type="button"
-                    onClick={() => handleViewPrediction(item.id)}
-                    className="prediction-action"
-                    aria-label={`View details for prediction ${item.id}`}
-                  >
-                    <span>VIEW</span>
-                    <span aria-hidden="true">→</span>
-                  </button>
-                </td>
+        {predictionsList.length === 0 ? (
+          <div style={{ padding: '32px 20px', textAlign: 'center', color: 'var(--text-muted)' }}>
+            No recent predictions found. Run a prediction cycle to generate forecasts.
+          </div>
+        ) : (
+          <table className="prediction-table">
+            <thead>
+              <tr>
+                <th scope="col">Community Area</th>
+                <th scope="col">Complaint Type</th>
+                <th scope="col">Risk Level</th>
+                <th scope="col">Prediction Window</th>
+                <th scope="col">Officer Assignment</th>
+                <th scope="col">Field Status</th>
+                <th scope="col" style={{ textAlign: 'right' }}>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {predictionsList.map((item, idx) => {
+                const id = item.predictionId || item.id || item._id || `PRED-${idx}`;
+                const area = item.communityAreaName || (typeof item.communityArea === 'number' ? `Community Area ${item.communityArea}` : item.communityArea || item.area || 'Chicago Sector');
+                const ward = item.ward || (item.area?.ward ?? null);
+                const complaint = item.complaintType || 'Civic Complaint';
+                const riskLevel = (item.riskLevel || 'LOW').toUpperCase();
+                const riskScore = item.riskScore ?? Math.round((item.probability ?? 0.5) * 100);
+                const windowText = item.predictionWindow?.display || item.predictionWindow || 'Next 7 days';
+                const officerName = item.assignedOfficer?.name || item.officerName || (item.assignedOfficer ? 'Officer Assigned' : (item.assignment || 'Unassigned'));
+                const verification = item.verificationStatus || item.verification || 'PENDING';
+
+                return (
+                  <tr key={id}>
+                    <td>
+                      <div className="cell-primary">{area}</div>
+                      {ward && <div className="cell-subtext">{ward}</div>}
+                    </td>
+                    <td>
+                      <div className="cell-primary">{complaint}</div>
+                      <div className="cell-subtext font-mono">{id}</div>
+                    </td>
+                    <td>
+                      {renderRiskBadge(riskLevel, riskScore)}
+                    </td>
+                    <td>
+                      <span className="cell-window">{windowText}</span>
+                    </td>
+                    <td>
+                      <div className="cell-officer">
+                        <span className="cell-primary">{officerName}</span>
+                      </div>
+                    </td>
+                    <td>
+                      {renderVerificationBadge(verification)}
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleViewPrediction(id)}
+                        className="prediction-action"
+                        aria-label={`View details for prediction ${id}`}
+                      >
+                        <span>VIEW</span>
+                        <span aria-hidden="true">→</span>
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
       </div>
     </section>
   );
