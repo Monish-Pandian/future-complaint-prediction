@@ -16,7 +16,7 @@ export function RiskBadge({ level = 'LOW', className = '' }) {
   }
 
   return (
-    <span className={`badge ${badgeClass} ${className}`.trim()}>
+    <span className={`badge badge-risk ${badgeClass} ${className}`.trim()}>
       <span className="status-badge-dot" aria-hidden="true" />
       {norm}
     </span>

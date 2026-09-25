@@ -373,8 +373,14 @@ if __name__ == '__main__':
       }
     ]);
 
-    const allCommunities = filters.communityAreas || Array.from({ length: 77 }, (_, i) => String(i + 1));
-    const allTypes = filters.srTypes || TARGET_COMPLAINT_TYPES;
+    const allCommunities =
+      filters.communityAreas && filters.communityAreas.length > 0
+        ? filters.communityAreas
+        : Array.from({ length: 77 }, (_, i) => String(i + 1));
+    const allTypes =
+      filters.srTypes && filters.srTypes.length > 0
+        ? filters.srTypes
+        : TARGET_COMPLAINT_TYPES;
 
     const features = [];
     const weeklyCountMap = new Map();

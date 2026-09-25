@@ -120,6 +120,8 @@ export default function AdminDashboardPage() {
 
   // Derive dynamic metrics safely from live payloads
   const totalPreds = dashboardMetrics?.totalPredictions ?? 770;
+  const cyclePreds = dashboardMetrics?.currentCyclePredictions ?? dashboardMetrics?.activeCycle?.predictionCount ?? 770;
+  const activeCycleId = dashboardMetrics?.activeCycle?.cycleId || evaluationMetrics?.activeCycleId || 'CYCLE-2026-09-16-1789579174116';
   const highRiskCount = (dashboardMetrics?.highRiskPredictions || 0) + (dashboardMetrics?.criticalPredictions || 0);
   const pendingVerifCount = dashboardMetrics?.pendingVerification ?? 1;
   const activeAssignCount = dashboardMetrics?.assignedPredictions ?? 39;
@@ -232,7 +234,7 @@ export default function AdminDashboardPage() {
                 <MetricCard
                   label="Total Predictions"
                   value={totalPreds.toLocaleString()}
-                  subtext="Current prediction cycle"
+                  subtext={`Current cycle: ${cyclePreds} • All cycles`}
                   status="info"
                   change="7-day horizon"
                   footer="Click to view forecasts →"
@@ -323,10 +325,10 @@ export default function AdminDashboardPage() {
             {/* 2. Hero Card: Current Prediction Cycle */}
             <PredictionCycleSummary
               cycleData={{
-                cycleId: evaluationMetrics?.activeCycleId || 'CYCLE-2026-09-14-1789376320059',
-                totalPredictions: totalPreds,
-                status: 'ACTIVE',
-                createdAt: dashboardMetrics?.recentPredictions?.[0]?.createdAt,
+                cycleId: activeCycleId,
+                totalPredictions: cyclePreds,
+                status: dashboardMetrics?.activeCycle?.status || 'ACTIVE',
+                createdAt: dashboardMetrics?.activeCycle?.createdAt || dashboardMetrics?.recentPredictions?.[0]?.createdAt,
               }}
               modelInfo={activeModelInfo}
               onRunCycle={handleRunPredictionCycle}

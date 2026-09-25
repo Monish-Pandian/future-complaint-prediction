@@ -10,7 +10,9 @@ node_modules/
 package-lock.json
 !frontend/package-lock.json
 !backend/package-lock.json
-
+# Paper artifacts
+paper/
+/paper/
 # ------------------------------------------------------------------------------
 # Environment variables & secrets (NEVER COMMIT CREDENTIALS)
 # ------------------------------------------------------------------------------
@@ -192,3 +194,46 @@ backend/validate_*.js
 backend/validation_*.js
 backend/test_*.py
 backend/verify_*.js
+
+# ------------------------------------------------------------------------------
+# Presentations, Office Documents & PDFs (Binary Bloat)
+# ------------------------------------------------------------------------------
+*.pptx
+*.ppt
+*.key
+*.docx
+*.doc
+*.pdf
+
+# ------------------------------------------------------------------------------
+# Rendered Previews & Screen Dumps
+# ------------------------------------------------------------------------------
+*_preview/
+*_preview*/
+pages_preview/
+slides_preview/
+slides_preview_matched/
+paper/pages_preview/
+paper/pages_preview_6page/
+
+# ------------------------------------------------------------------------------
+# Scratch Generators & Review Reports
+# ------------------------------------------------------------------------------
+build_presentation*.py
+build_comai_review_*.py
+paper/build_*.py
+paper/generate_*.py
+paper/tune_paper.py
+paper/write_paper.py
+PPT_REVIEW_ACTION_REPORT.md
+
+# ------------------------------------------------------------------------------
+# Scratch Text Audits & Dumps
+# ------------------------------------------------------------------------------
+*_dump.txt
+*_audit.txt
+*AUDIT*.txt
+*.audit
+backend/reports/
+reports/
+

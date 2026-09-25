@@ -12,6 +12,7 @@ import {
   rejectVerificationCandidate,
   submitOfficerVerification,
 } from '../../api/officerPortalApi';
+import { getCommunityAreaName, getPredictionCoordinates, formatRiskScore } from '../../utils/geoUtils';
 
 /**
  * Officer Task Queue: Assigned Complaints & Verification Tasks
@@ -129,12 +130,14 @@ export default function AssignedComplaintsPage() {
   }
   if (search.trim() && activeTab !== 'VERIFICATION_CANDIDATES') {
     const q = search.trim().toLowerCase();
-    filteredAssignments = filteredAssignments.filter(
-      (a) =>
+    filteredAssignments = filteredAssignments.filter((a) => {
+      const pred = a.prediction || (typeof a.predictionId === 'object' ? a.predictionId : {}) || {};
+      return (
         (a.assignmentId || a.id || '').toLowerCase().includes(q) ||
-        (a.prediction?.complaintType || '').toLowerCase().includes(q) ||
-        (a.prediction?.communityArea || '').toLowerCase().includes(q)
-    );
+        (pred.complaintType || '').toLowerCase().includes(q) ||
+        (String(pred.communityArea) || '').toLowerCase().includes(q)
+      );
+    });
   }
 
   let filteredCandidates = [...candidates];
@@ -265,7 +268,10 @@ export default function AssignedComplaintsPage() {
                 </div>
               ) : (
                 filteredCandidates.map((cand) => {
-                  const pred = cand.prediction || {};
+                  const pred = cand.prediction || (typeof cand.predictionId === 'object' ? cand.predictionId : {}) || {};
+                  const coords = getPredictionCoordinates(pred);
+                  const areaName = getCommunityAreaName(pred.communityArea);
+                  const predIdStr = pred.predictionId || (typeof cand.predictionId === 'string' ? cand.predictionId : 'N/A');
                   return (
                     <div key={cand.id || cand.candidateId} className="stitch-card p-5" style={{ transition: 'all 0.2s ease' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '14px', borderBottom: '1px solid var(--border)', paddingBottom: '12px' }}>
@@ -279,7 +285,7 @@ export default function AssignedComplaintsPage() {
                             {renderRiskBadge(pred.riskLevel || 'LOW')}
                           </div>
                           <div style={{ fontSize: '17px', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
-                            {pred.complaintType}
+                            {pred.complaintType || 'Civic Infrastructure Issue'}
                           </div>
                         </div>
                         <span className="stitch-badge stitch-badge-amber font-mono" style={{ fontSize: '12px' }}>
@@ -287,35 +293,42 @@ export default function AssignedComplaintsPage() {
                         </span>
                       </div>
 
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginBottom: '16px', background: 'var(--bg-surface-hover)', padding: '12px 14px', borderRadius: '8px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '14px', marginBottom: '16px', background: 'var(--bg-surface-hover)', padding: '12px 14px', borderRadius: '8px' }}>
                         <div>
-                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>TARGET GEOMETRY</div>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>PREDICTION REF</div>
+                          <div style={{ fontSize: '12px', fontWeight: '700', fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>
+                            {predIdStr}
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>LOCATION (COMMUNITY AREA)</div>
                           <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-primary)' }}>
-                            {pred.address || pred.communityArea || 'Chicago Sector'}
+                            {areaName ? `${areaName} (CA ${pred.communityArea})` : (pred.communityArea ? `Community Area ${pred.communityArea}` : 'Chicago Sector')}
+                          </div>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Location basis: Community Area centroid</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>PREDICTION COORDINATES</div>
+                          <div style={{ fontSize: '12px', fontWeight: '600', fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}>
+                            {coords ? coords.formatted : 'Coordinates pending'}
                           </div>
                         </div>
                         <div>
                           <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>WARD / SECTOR</div>
                           <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>
-                            {pred.ward || 'Ward 1'} &bull; {pred.communityArea || 'Central'}
+                            {pred.ward ? `Ward ${pred.ward}` : '—'}
                           </div>
                         </div>
                         <div>
-                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>PREDICTED RISK</div>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>FORECAST RISK SCORE</div>
                           <div style={{ fontSize: '13px', fontWeight: '800', color: '#06b6d4', fontFamily: 'var(--font-mono)' }}>
-                            {pred.riskScore ?? 75}/100
+                            {formatRiskScore(pred.riskScore)}/100
                           </div>
                         </div>
                         <div>
                           <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>ML PROBABILITY</div>
                           <div style={{ fontSize: '13px', fontWeight: '800', color: '#10b981', fontFamily: 'var(--font-mono)' }}>
-                            {((pred.probability ?? 0.75) * 100).toFixed(1)}%
-                          </div>
-                        </div>
-                        <div>
-                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>DEPARTMENT</div>
-                          <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>
-                            {pred.department || 'Municipal Operations'}
+                            {pred.probability != null ? `${(pred.probability * 100).toFixed(1)}%` : '—'}
                           </div>
                         </div>
                       </div>
@@ -379,7 +392,10 @@ export default function AssignedComplaintsPage() {
                 </div>
               ) : (
                 filteredAssignments.map((asgn) => {
-                  const pred = asgn.prediction || {};
+                  const pred = asgn.prediction || (typeof asgn.predictionId === 'object' ? asgn.predictionId : {}) || {};
+                  const coords = getPredictionCoordinates(pred);
+                  const areaName = getCommunityAreaName(pred.communityArea);
+                  const predIdStr = pred.predictionId || (typeof asgn.predictionId === 'string' ? asgn.predictionId : 'N/A');
                   return (
                     <div key={asgn.id || asgn.assignmentId} className="stitch-card p-5" style={{ transition: 'all 0.2s ease' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '14px', borderBottom: '1px solid var(--border)', paddingBottom: '12px' }}>
@@ -392,31 +408,44 @@ export default function AssignedComplaintsPage() {
                             {renderRiskBadge(pred.riskLevel || 'LOW')}
                           </div>
                           <div style={{ fontSize: '17px', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
-                            {pred.complaintType}
+                            {pred.complaintType || 'Civic Infrastructure Complaint'}
                           </div>
                         </div>
                         <span className="stitch-badge stitch-badge-cyan font-mono" style={{ fontSize: '12px' }}>
-                          Distance: {asgn.distanceKm ?? 1.5} km
+                          Distance: {asgn.distanceKm != null ? `${asgn.distanceKm} km` : '—'}
                         </span>
                       </div>
 
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginBottom: '16px', background: 'var(--bg-surface-hover)', padding: '12px 14px', borderRadius: '8px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '14px', marginBottom: '16px', background: 'var(--bg-surface-hover)', padding: '12px 14px', borderRadius: '8px' }}>
                         <div>
-                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>LOCATION</div>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>PREDICTION ID</div>
+                          <div style={{ fontSize: '12px', fontWeight: '700', fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>
+                            {predIdStr}
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>LOCATION (COMMUNITY AREA)</div>
                           <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-primary)' }}>
-                            {pred.address || pred.communityArea || 'Chicago Sector'}
+                            {areaName ? `${areaName} (CA ${pred.communityArea})` : (pred.communityArea ? `Community Area ${pred.communityArea}` : 'Chicago Sector')}
+                          </div>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Location basis: Community Area centroid</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>PREDICTION COORDINATES</div>
+                          <div style={{ fontSize: '12px', fontWeight: '600', fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}>
+                            {coords ? coords.formatted : 'Coordinates pending'}
                           </div>
                         </div>
                         <div>
                           <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>WARD / SECTOR</div>
                           <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>
-                            {pred.ward || 'Ward 1'} &bull; {pred.communityArea || 'Central'}
+                            {pred.ward ? `Ward ${pred.ward}` : '—'}
                           </div>
                         </div>
                         <div>
                           <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>FORECAST RISK SCORE</div>
                           <div style={{ fontSize: '13px', fontWeight: '800', color: '#06b6d4', fontFamily: 'var(--font-mono)' }}>
-                            {pred.riskScore ?? 75}/100
+                            {formatRiskScore(pred.riskScore)}/100
                           </div>
                         </div>
                       </div>

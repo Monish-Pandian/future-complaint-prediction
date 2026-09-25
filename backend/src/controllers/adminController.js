@@ -133,7 +133,16 @@ const createPrediction = async (req, res, next) => {
  */
 const runPredictionCycle = async (req, res, next) => {
   try {
-    const cycleResult = await aiService.ingestPredictionCycle(req.body);
+    const payload = { ...req.body };
+
+    // Default to full 77 community areas × 10 official complaint types if omitted or empty
+    if (!payload.areas || !Array.isArray(payload.areas) || payload.areas.length === 0) {
+      const { PredictionSchedulerService } = require('../services/predictionSchedulerService');
+      const scheduler = new PredictionSchedulerService();
+      payload.areas = scheduler.getAllCommunityAreaCombinations();
+    }
+
+    const cycleResult = await aiService.ingestPredictionCycle(payload);
 
     let candidateResult = null;
     let assignmentResult = null;

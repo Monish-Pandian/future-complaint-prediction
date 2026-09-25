@@ -502,17 +502,22 @@
    5. UNIFIED BADGES (Risk, Assignment, Verification, Evaluation)
    ============================================================================== */
 .badge,
-.stitch-badge {
+.stitch-badge,
+.badge-risk,
+.badge-verif,
+.badge-assignment {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
-  padding: 3px 8px;
-  border-radius: var(--radius-xs);
+  padding: 2px 8px;
+  border-radius: 9999px;
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
   white-space: nowrap;
+  line-height: 1.4;
 }
 
 .status-badge-dot {
@@ -524,7 +529,6 @@
 }
 
 /* Risk Badges */
-.badge-risk,
 .badge-risk-critical,
 .stitch-badge.critical {
   background: var(--critical-soft);

@@ -1,17 +1,16 @@
 import { test, expect } from '../../fixtures/auth.fixture.js';
 
 test.describe('Field Officer Navigation & Browser Session Journey', () => {
-  test('Officer sidebar contains exclusively 5 operational tabs and maintains isolation from Admin navigation', async ({ officerPage }) => {
+  test('Officer sidebar contains exclusively 4 operational tabs and maintains isolation from Admin navigation', async ({ officerPage }) => {
     const { page } = officerPage;
 
     const sidebar = page.locator('.sidebar, nav[aria-label="Sidebar navigation"], aside').first();
     await expect(sidebar).toBeVisible();
 
-    // 1. Expected Officer navigation items
+    // 1. Expected Officer navigation items (Verification performed within My Assignments)
     const expectedOfficerItems = [
       { label: 'Dashboard', path: '/officer' },
       { label: 'My Assignments', path: '/officer/assignments' },
-      { label: 'Verification', path: '/officer/verification' },
       { label: 'History', path: '/officer/history' },
       { label: 'Profile', path: '/officer/profile' },
     ];
@@ -21,8 +20,9 @@ test.describe('Field Officer Navigation & Browser Session Journey', () => {
       await expect(link).toBeVisible();
     }
 
-    // 2. Prohibited Admin items must NOT be visible in sidebar
+    // 2. Prohibited Admin items and standalone Verification must NOT be visible in officer sidebar
     const prohibitedAdminItems = [
+      'Verification',
       'Predictions',
       'Risk Map',
       'Evaluations',
@@ -45,17 +45,12 @@ test.describe('Field Officer Navigation & Browser Session Journey', () => {
     await expect(page).toHaveURL(/\/officer\/assignments/);
     await expect(page.locator('h1').first()).toBeVisible();
 
-    // 2. My Assignments -> Verification
-    await page.click('a[href*="/officer/verification"], .nav-item:has-text("Verification")');
-    await expect(page).toHaveURL(/\/officer\/verification/);
-    await expect(page.locator('h1').first()).toBeVisible();
-
-    // 3. Verification -> History
+    // 2. My Assignments -> History
     await page.click('a[href*="/officer/history"], .nav-item:has-text("History")');
     await expect(page).toHaveURL(/\/officer\/history/);
     await expect(page.locator('h1').first()).toBeVisible();
 
-    // 4. History -> Profile
+    // 3. History -> Profile
     await page.click('a[href*="/officer/profile"], .nav-item:has-text("Profile")');
     await expect(page).toHaveURL(/\/officer\/profile/);
     await expect(page.locator('.stitch-page-title, h1').first()).toBeVisible();

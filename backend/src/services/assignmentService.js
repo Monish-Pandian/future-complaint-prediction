@@ -483,8 +483,27 @@ const getOfficerAssignments = async (officerUser, queryParams = {}) => {
 
   const totalPages = Math.ceil(total / limit) || 1;
 
+  const assignmentIds = assignments.map((a) => a._id);
+  const verifications = await Verification.find({ assignmentId: { $in: assignmentIds } }).lean();
+  const verifMap = new Map();
+  verifications.forEach((v) => {
+    if (v.assignmentId) {
+      verifMap.set(v.assignmentId.toString(), v);
+    }
+  });
+
+  const formattedAssignments = assignments.map((doc) => {
+    const obj = doc.toObject ? doc.toObject() : { ...doc };
+    if (obj.predictionId && typeof obj.predictionId === 'object') {
+      obj.prediction = obj.predictionId;
+    }
+    const objId = (obj._id || obj.id)?.toString();
+    obj.verification = objId ? verifMap.get(objId) || null : null;
+    return obj;
+  });
+
   return {
-    assignments,
+    assignments: formattedAssignments,
     pagination: {
       page,
       limit,

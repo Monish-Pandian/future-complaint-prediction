@@ -1,5 +1,10 @@
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = 'test';
+}
+
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
+const { assertTestDatabase } = require('../../src/config/database');
 
 const {
   User,
@@ -110,6 +115,30 @@ const createTestOfficer = async (overrides = {}) => {
 };
 
 let monotonicSeq = 1;
+let defaultTestCycle = null;
+
+const resetTestCycle = () => {
+  defaultTestCycle = null;
+};
+
+/**
+ * Get or create a shared test prediction cycle to avoid one-cycle-per-prediction multiplication
+ */
+const getOrCreateDefaultTestCycle = async () => {
+  if (defaultTestCycle) {
+    try {
+      const exists = await PredictionCycle.findById(defaultTestCycle._id);
+      if (exists) return defaultTestCycle;
+    } catch (_) {
+      defaultTestCycle = null;
+    }
+  }
+  defaultTestCycle = await createTestPredictionCycle({
+    status: CYCLE_STATUS.COMPLETED,
+    predictionCount: 0,
+  });
+  return defaultTestCycle;
+};
 
 /**
  * Create Test Prediction Cycle Factory
@@ -122,13 +151,13 @@ const createTestPredictionCycle = async (overrides = {}) => {
   return PredictionCycle.create({
     cycleId: overrides.cycleId || `CYCLE-TEST-${id}`,
     cycleNumber,
-    status: overrides.status || CYCLE_STATUS.ACTIVE,
+    status: overrides.status || CYCLE_STATUS.COMPLETED,
     startDate: overrides.startDate || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
     endDate: overrides.endDate || new Date(),
     predictionWindowStart: overrides.predictionWindowStart || new Date(),
     predictionWindowEnd:
       overrides.predictionWindowEnd || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    totalPredictions: overrides.totalPredictions || 1,
+    predictionCount: overrides.predictionCount !== undefined ? overrides.predictionCount : (overrides.totalPredictions || 0),
     metadata: {
       dataSource: 'TEST_SYNTHETIC',
       generatedBy: 'TEST_FACTORY',
@@ -146,8 +175,9 @@ const createTestPrediction = async (overrides = {}) => {
   let cycleId = overrides.predictionCycleId;
 
   if (!cycleId && !overrides.skipCycle) {
-    const cycle = await createTestPredictionCycle();
+    const cycle = await getOrCreateDefaultTestCycle();
     cycleId = cycle._id;
+    await PredictionCycle.findByIdAndUpdate(cycleId, { $inc: { predictionCount: 1 } });
   }
 
   return Prediction.create({
@@ -345,6 +375,8 @@ const createTestHistoricalComplaint = async (overrides = {}) => {
  * Clean all test database collections (safe for isolated test DB)
  */
 const cleanupTestDatabase = async () => {
+  assertTestDatabase();
+  defaultTestCycle = null;
   const collections = mongoose.connection.collections;
   for (const key in collections) {
     await collections[key].deleteMany({});
@@ -362,4 +394,5 @@ module.exports = {
   createTestFeedback,
   createTestHistoricalComplaint,
   cleanupTestDatabase,
+  resetTestCycle,
 };

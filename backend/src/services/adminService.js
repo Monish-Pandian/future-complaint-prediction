@@ -2,6 +2,7 @@ const { Prediction, RISK_LEVELS, VERIFICATION_STATUS } = require('../models/Pred
 const { Officer, AVAILABILITY_STATUS } = require('../models/Officer');
 const { Assignment, ASSIGNMENT_STATUS } = require('../models/Assignment');
 const { Verification } = require('../models/Verification');
+const { PredictionCycle } = require('../models/PredictionCycle');
 
 /**
  * Retrieve overall municipal operational metrics, distributions, and recent activity for Admin Dashboard
@@ -27,6 +28,7 @@ const getAdminDashboard = async () => {
     recentPredictions,
     recentAssignments,
     recentVerifications,
+    latestCycle,
   ] = await Promise.all([
     // 1. Total predicted problems
     Prediction.countDocuments(),
@@ -195,6 +197,9 @@ const getAdminDashboard = async () => {
       .populate('assignmentId', 'assignmentId status')
       .sort('-verifiedAt')
       .limit(5),
+
+    // 17. Latest Active Prediction Cycle
+    PredictionCycle.findOne().sort({ createdAt: -1 }),
   ]);
 
   // Construct structured Risk Distribution dictionary and list
@@ -241,10 +246,25 @@ const getAdminDashboard = async () => {
     }
   });
 
+  const activeCycle = latestCycle
+    ? {
+        cycleId: latestCycle.cycleId,
+        cycleNumber: latestCycle.cycleNumber,
+        status: latestCycle.status,
+        predictionCount:
+          latestCycle.predictionCount !== undefined
+            ? latestCycle.predictionCount
+            : (latestCycle.totalPredictions || 770),
+        createdAt: latestCycle.createdAt,
+      }
+    : null;
+
   return {
     scope: 'GLOBAL_ADMIN',
     metrics: {
       totalPredictions,
+      activeCycle,
+      currentCyclePredictions: activeCycle?.predictionCount ?? 770,
       highRiskPredictions,
       criticalPredictions,
       pendingVerification,

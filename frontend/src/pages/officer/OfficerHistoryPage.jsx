@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import PageTransition from '../../components/layout/PageTransition';
 import { renderRiskBadge } from '../../components/predictions/PredictionBadges';
 import { getMyAssignments } from '../../api/officerPortalApi';
+import { getCommunityAreaName, getPredictionCoordinates, formatRiskScore } from '../../utils/geoUtils';
 
 /**
  * Field Officer Operational History Page
@@ -37,13 +38,20 @@ export default function OfficerHistoryPage() {
   }, [loadHistory]);
 
   const filteredHistory = history.filter((item) => {
-    const complaintType = item.prediction?.complaintType || item.complaintType || '';
-    const communityArea = item.prediction?.communityArea || item.communityArea || '';
+    const pred = item.prediction || (typeof item.predictionId === 'object' ? item.predictionId : {}) || {};
+    const complaintType = pred.complaintType || item.complaintType || '';
+    const communityArea = pred.communityArea || item.communityArea || '';
+    const areaName = getCommunityAreaName(communityArea);
+    const predId = pred.predictionId || '';
+    const asgnId = item.assignmentId || '';
     const outcome = item.verification?.outcome || item.verificationOutcome || '';
 
     const matchesSearch =
       complaintType.toLowerCase().includes(search.toLowerCase()) ||
-      String(communityArea).toLowerCase().includes(search.toLowerCase());
+      String(communityArea).toLowerCase().includes(search.toLowerCase()) ||
+      areaName.toLowerCase().includes(search.toLowerCase()) ||
+      predId.toLowerCase().includes(search.toLowerCase()) ||
+      asgnId.toLowerCase().includes(search.toLowerCase());
 
     const matchesOutcome = outcomeFilter === 'ALL' || outcome === outcomeFilter;
 
@@ -116,30 +124,47 @@ export default function OfficerHistoryPage() {
               <thead>
                 <tr style={{ background: 'var(--bg-surface-raised)', borderBottom: '1px solid var(--glass-border)', textAlign: 'left' }}>
                   <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontWeight: '600' }}>DISPATCH ID</th>
+                  <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontWeight: '600' }}>PREDICTION REF</th>
                   <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontWeight: '600' }}>COMPLAINT TYPE</th>
-                  <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontWeight: '600' }}>AREA / WARD</th>
-                  <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontWeight: '600' }}>RISK LEVEL</th>
+                  <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontWeight: '600' }}>LOCATION (AREA / WARD)</th>
+                  <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontWeight: '600' }}>CENTROID COORDS</th>
+                  <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontWeight: '600' }}>FORECAST RISK</th>
                   <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontWeight: '600' }}>VERIFICATION OUTCOME</th>
                   <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontWeight: '600' }}>COMPLETED DATE</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredHistory.map((item, idx) => {
-                  const pred = item.prediction || {};
+                  const pred = item.prediction || (typeof item.predictionId === 'object' ? item.predictionId : {}) || {};
                   const verif = item.verification || {};
+                  const coords = getPredictionCoordinates(pred);
+                  const areaName = getCommunityAreaName(pred.communityArea);
+                  const predIdStr = pred.predictionId || (typeof item.predictionId === 'string' ? item.predictionId : '—');
                   return (
                     <tr key={item._id || item.assignmentId || idx} style={{ borderBottom: '1px solid var(--glass-border)' }}>
-                      <td style={{ padding: '12px 16px', fontFamily: 'var(--font-mono)', color: 'var(--accent)' }}>
+                      <td style={{ padding: '12px 16px', fontFamily: 'var(--font-mono)', color: 'var(--accent)', fontWeight: '600' }}>
                         {item.assignmentId || `ASGN-${idx + 1}`}
+                      </td>
+                      <td style={{ padding: '12px 16px', fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)', fontSize: '12px' }}>
+                        {predIdStr}
                       </td>
                       <td style={{ padding: '12px 16px', fontWeight: '600', color: 'var(--text-primary)' }}>
                         {pred.complaintType || item.complaintType || 'Civic Issue'}
                       </td>
                       <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>
-                        Area {pred.communityArea || item.communityArea || '—'} {pred.ward ? `(Ward ${pred.ward})` : ''}
+                        <div>{areaName ? `${areaName} (CA ${pred.communityArea})` : (pred.communityArea ? `Area ${pred.communityArea}` : '—')}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{pred.ward ? `Ward ${pred.ward}` : ''}</div>
+                      </td>
+                      <td style={{ padding: '12px 16px', fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-secondary)' }}>
+                        {coords ? coords.formatted : '—'}
                       </td>
                       <td style={{ padding: '12px 16px' }}>
-                        {renderRiskBadge(pred.riskLevel || item.riskLevel || 'MEDIUM')}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          {renderRiskBadge(pred.riskLevel || item.riskLevel || 'MEDIUM')}
+                          <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#06b6d4' }}>
+                            {formatRiskScore(pred.riskScore)}/100
+                          </span>
+                        </div>
                       </td>
                       <td style={{ padding: '12px 16px' }}>
                         <span style={{

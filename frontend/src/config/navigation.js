@@ -96,11 +96,6 @@ export const officerNavigationGroups = [
         icon: ComplaintsIcon,
       },
       {
-        label: 'Verification',
-        path: '/officer/verification',
-        icon: VerificationIcon,
-      },
-      {
         label: 'History',
         path: '/officer/history',
         icon: HistoryIcon,

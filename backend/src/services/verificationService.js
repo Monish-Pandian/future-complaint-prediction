@@ -69,8 +69,12 @@ const submitVerification = async (officerUser, data) => {
 
   // 3. Security & Ownership Check: Officer can verify ONLY their own assigned prediction
   const isAssignedToOfficer =
-    prediction.assignedOfficer &&
-    prediction.assignedOfficer.toString() === officerDoc._id.toString();
+    (prediction.assignedOfficer &&
+      prediction.assignedOfficer.toString() === officerDoc._id.toString()) ||
+    (prediction.assignedOfficerId &&
+      prediction.assignedOfficerId.toString() === officerDoc._id.toString()) ||
+    Boolean(await Assignment.findOne({ predictionId: prediction._id, officerId: officerDoc._id })) ||
+    Boolean(await VerificationCandidate.findOne({ predictionId: prediction._id, assignedOfficer: officerDoc._id }));
 
   if (!isAssignedToOfficer) {
     throw new ApiError(
@@ -129,10 +133,27 @@ const submitVerification = async (officerUser, data) => {
   }
 
   // 8. Locate existing linked assignment
-  const assignment = await Assignment.findOne({
-    predictionId: prediction._id,
-    officerId: officerDoc._id,
-  });
+  let assignment = null;
+  if (data.assignmentId) {
+    const asgnIdStr = data.assignmentId.toString().trim();
+    if (mongoose.Types.ObjectId.isValid(asgnIdStr)) {
+      assignment = await Assignment.findOne({
+        $or: [{ _id: asgnIdStr }, { assignmentId: asgnIdStr.toUpperCase() }],
+        officerId: officerDoc._id,
+      });
+    } else {
+      assignment = await Assignment.findOne({
+        assignmentId: asgnIdStr.toUpperCase(),
+        officerId: officerDoc._id,
+      });
+    }
+  }
+  if (!assignment) {
+    assignment = await Assignment.findOne({
+      predictionId: prediction._id,
+      officerId: officerDoc._id,
+    });
+  }
 
   // 9. Generate Unique Verification Identifier
   const verificationId = `VERIF-${Date.now().toString().slice(-6)}-${Math.floor(

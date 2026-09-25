@@ -12,6 +12,7 @@ import {
   startAssignment,
   submitOfficerVerification,
 } from '../../api/officerPortalApi';
+import { getCommunityAreaName, getPredictionCoordinates, formatRiskScore } from '../../utils/geoUtils';
 
 /**
  * Field Officer Dashboard — Module 8L
@@ -395,14 +396,18 @@ export default function OfficerDashboardPage() {
                 </div>
               ) : (
                 sortedAssignments.map((asgn) => {
-                  const pred = asgn.prediction || {};
+                  const pred = asgn.prediction || (typeof asgn.predictionId === 'object' ? asgn.predictionId : {}) || {};
+                  const coords = getPredictionCoordinates(pred);
                   const asgnId = asgn.assignmentId || asgn.id || asgn._id;
-                  const riskLevel = pred.riskLevel || asgn.riskLevel || 'LOW';
-                  const riskScore = pred.riskScore ?? asgn.riskScore ?? 75;
-                  const distanceKm = asgn.distanceKm ?? 1.5;
-                  const communityArea = pred.communityArea || asgn.communityArea || 'Chicago Sector';
-                  const ward = pred.ward || asgn.ward || 'Ward 1';
-                  const address = pred.address || asgn.address || `${communityArea}, ${ward}`;
+                  const riskLevel = pred.riskLevel || asgn.riskLevel || 'MEDIUM';
+                  const riskScore = formatRiskScore(pred.riskScore ?? asgn.riskScore);
+                  const distanceKm = asgn.distanceKm != null ? `${asgn.distanceKm} km` : '—';
+                  const areaName = getCommunityAreaName(pred.communityArea || asgn.communityArea);
+                  const communityArea = areaName
+                    ? `${areaName} (CA ${pred.communityArea || asgn.communityArea})`
+                    : (pred.communityArea || asgn.communityArea ? `Area ${pred.communityArea || asgn.communityArea}` : 'Chicago Sector');
+                  const ward = pred.ward || asgn.ward ? `Ward ${pred.ward || asgn.ward}` : '—';
+                  const address = coords ? coords.formatted : (pred.address || asgn.address || `${communityArea}, ${ward}`);
 
                   return (
                     <article key={asgnId} className="officer-task-card" aria-label={`Task ${asgnId}`}>
@@ -420,15 +425,15 @@ export default function OfficerDashboardPage() {
                         </div>
 
                         <span className="officer-task-distance" title="Distance from officer base">
-                          📍 {distanceKm} km away
+                          📍 {distanceKm} away
                         </span>
                       </div>
 
                       {/* Location & Context Body */}
                       <div className="officer-task-body">
                         <div>
-                          <span className="officer-task-spec-lbl">LOCATION / ADDRESS</span>
-                          <div className="officer-task-spec-val">{address}</div>
+                          <span className="officer-task-spec-lbl">CENTROID COORDS</span>
+                          <div className="officer-task-spec-val font-mono">{coords ? coords.formatted : address}</div>
                         </div>
                         <div>
                           <span className="officer-task-spec-lbl">COMMUNITY & WARD</span>
@@ -517,8 +522,13 @@ export default function OfficerDashboardPage() {
                   </div>
                 ) : (
                   verificationQueue.map((t) => {
-                    const pred = t.prediction || {};
+                    const pred = t.prediction || (typeof t.predictionId === 'object' ? t.predictionId : {}) || {};
                     const id = t.assignmentId || t.id || t._id;
+                    const coords = getPredictionCoordinates(pred);
+                    const areaName = getCommunityAreaName(pred.communityArea);
+                    const locStr = areaName
+                      ? `${areaName} (CA ${pred.communityArea})`
+                      : (pred.communityArea ? `Area ${pred.communityArea}` : 'Chicago Sector');
                     return (
                       <div key={id} className="quick-verif-item">
                         <div className="quick-verif-header">
@@ -526,7 +536,7 @@ export default function OfficerDashboardPage() {
                           {renderRiskBadge(pred.riskLevel || 'MEDIUM')}
                         </div>
                         <span className="quick-verif-loc">
-                          📍 {pred.address || pred.communityArea || 'Chicago Sector'}
+                          📍 {locStr} {coords ? `• ${coords.formatted}` : ''}
                         </span>
                         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
                           <button

@@ -1,5 +1,31 @@
 const mongoose = require('mongoose');
 
+// Detect if process was invoked in test mode
+if (!process.env.NODE_ENV && (
+  process.execArgv.includes('--test') ||
+  (process.argv && process.argv.some((arg) => typeof arg === 'string' && arg.includes('test')))
+)) {
+  process.env.NODE_ENV = 'test';
+}
+
+/**
+ * Asserts that the currently connected database is safe for destructive test operations.
+ * Aborts immediately if connected to production 'civic_forecasting'.
+ */
+const assertTestDatabase = () => {
+  const dbName = mongoose.connection?.name || mongoose.connection?.db?.databaseName;
+  if (!dbName || dbName === 'civic_forecasting') {
+    throw new Error(
+      `[CRITICAL SAFETY VIOLATION] Destructive operation rejected! Connected database is "${dbName}". Destructive cleanup is strictly prohibited on the operational database.`
+    );
+  }
+  if (dbName !== 'civic_forecasting_test') {
+    throw new Error(
+      `[CRITICAL SAFETY VIOLATION] Destructive operation rejected! Current database is "${dbName}", expected "civic_forecasting_test".`
+    );
+  }
+};
+
 /**
  * Connect to MongoDB database safely
  */
@@ -12,7 +38,16 @@ const connectDB = async () => {
     return mongoose.connection;
   }
 
-  const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/civic_forecasting';
+  let mongoUri;
+  if (process.env.NODE_ENV === 'test') {
+    mongoUri = process.env.TEST_MONGO_URI || 'mongodb://127.0.0.1:27017/civic_forecasting_test';
+    // Extra safety guarantee: Never allow test environment to point to operational civic_forecasting
+    if (mongoUri.endsWith('/civic_forecasting') || mongoUri.includes('/civic_forecasting?')) {
+      mongoUri = mongoUri.replace('/civic_forecasting', '/civic_forecasting_test');
+    }
+  } else {
+    mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/civic_forecasting';
+  }
 
   try {
     const conn = await mongoose.connect(mongoUri, {
@@ -60,4 +95,6 @@ const disconnectDB = async () => {
 module.exports = {
   connectDB,
   disconnectDB,
+  assertTestDatabase,
 };
+
